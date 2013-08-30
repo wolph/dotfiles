@@ -21,3 +21,11 @@ If you are brave enough to give it a try, the install is fairly simple:
 Don't worry, it won't overwrite anything and only symlink the files to this
 location if they don't exist yet. Trying is perfectly safe.
 
+Uninstallation
+==============================================================================
+
+If you don't like it anymore, there's always the uninstall script.
+
+    cd dotfiles
+    ./uninstall.sh
+
