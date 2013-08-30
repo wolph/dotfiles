@@ -9,3 +9,15 @@ any questions or simply like the scripts/settings/etc.
 
 Cheers :)
 
+Installation
+==============================================================================
+
+If you are brave enough to give it a try, the install is fairly simple:
+
+    git clone https://github.com/WoLpH/dotfiles.git
+    cd dotfiles
+    ./install.sh
+
+Don't worry, it won't overwrite anything and only symlink the files to this
+location if they don't exist yet. Trying is perfectly safe.
+
