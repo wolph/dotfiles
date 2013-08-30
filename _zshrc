@@ -1,0 +1,283 @@
+# vim: ft=zsh
+
+# Tool to check the timing of the config file, handy for debugging
+T=0
+t(){
+    T="$(gdate +%s%N)"
+}
+
+td(){
+    # Time delta
+    TD="$(($(gdate +%s%N)-T))"
+    # Milliseconds
+    M="$((TD/1000000))"
+    echo "Time in milliseconds: ${M}"
+    t
+}    
+
+# Adding my own completion functions
+fpath=(~/.zsh/site-functions $fpath)
+fpath=(~/.zsh/completion $fpath)
+fpath=(~/.zsh/zsh-completions/src $fpath)
+
+source /etc/profile
+autoload -U compinit
+compinit
+
+export LANG=en_US.UTF-8
+export PATH=~/bin:$PATH
+export PATH=$HOME/.rvm/bin:$PATH
+export PATH=/usr/local/share/python:$PATH
+export PATH=/usr/local/bin:$PATH
+export PATH=/usr/local/sbin:$PATH
+export PATH=/usr/bin:$PATH
+export PATH=/usr/sbin:$PATH
+export PATH=/bin:$PATH
+export PATH=/sbin:$PATH
+
+# Set the java home
+export JAVA_HOME=$(/usr/libexec/java_home)
+
+# if we're on ec2, set the hostname to the cluster setting if available
+EC2=0
+if [ $(hostname | grep -E '^ip-10-') ]; then
+    host=$(curl --silent http://169.254.169.254/latest/user-data/ | python -mjson.tool | grep cluster | sed 's/.*: *"\([^"]*\)".*/\1/g')
+    if [ "$host" ]; then
+        HOST=$host
+        EC2=1
+    fi
+fi
+
+if [ "$TERM" = "xterm" ]; then
+    export TERM=xterm-256color
+fi
+
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
+zstyle ':completion:*' max-errors 2
+zstyle :compinstall filename '/home/rick/.zshrc'
+
+# Allow local X access, seems to be needed for OSX to work with X properly...
+if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
+    xhost +$(hostname -s) > /dev/null
+    xhost +$(hostname -f) > /dev/null
+fi
+
+if [ -x /home/rick/bin/start_supervisord ]; then
+    sudo /home/rick/bin/start_supervisord
+fi
+
+# Enable keychain
+eval $(keychain -q --eval ~/.ssh/id_dsa )
+
+# Some convenient aliases
+alias mv='nocorrect mv'       # no spelling correction on mv
+alias cp='nocorrect cp'       # no spelling correction on cp
+alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
+alias less='/usr/bin/less -R'
+alias ls=/bin/ls
+alias l='ls -A'
+alias ll='l -l'
+alias push='git pull; git push'
+# Some people might not like this but I find it convenient. It makes find
+# search in symlinks by default
+alias find='find -L'
+alias grep='grep --color=auto'
+test -x /usr/local/bin/hub && alias git=/usr/local/bin/hub
+# Link vim to the OS X clipboard
+if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
+    alias vi='reattach-to-user-namespace vim'
+else
+    alias vi='reattach-to-user-namespace vim'
+fi
+
+# Little trick to change the name of the shell
+. ~/bin/iterm2_helpers.sh
+function mosh(){
+    if [ -n "$1" ]; then
+        title "$1"
+    fi
+    /usr/local/bin/mosh $@
+    title ""
+}
+function ssh(){
+    if [ -n "$1" ]; then
+        title "$1"
+    fi
+    /usr/bin/ssh $*
+    title ""
+}
+title ""
+
+
+# ec2 utils
+ec2ssh(){
+    host=$(echo $@ | sed 's/.*://')
+    label=$(echo $@ | sed 's/:.*//')
+    echo "Connecting to $label ($host)"
+    ssh-keygen -f '/home/rick/.ssh/known_hosts' -R $host
+    rsync -av ~/.ec2_skel/ $host:~/
+    #rsync -aq ~/.gitconfig ~/.gitignore ~/.screenrc ~/.zshrc ~/.vim ~/.vimrc $host:./
+    ssh -t $host exec zsh
+}
+
+update_ec2(){
+    /home/rick/.ec2/list_instances.py
+}
+
+_ec2ssh(){
+    reply=(`cat ~/.ec2/instances`)
+}
+compctl -K _ec2ssh ec2ssh
+
+s(){
+    sudo su -m $@ -c 'exec zsh'
+}
+
+
+
+# Auto active virtualenv for the current directory
+activate(){
+    if [ -e "activate" ]; then
+        . ./activate
+    fi
+    # if our current dir is the name of a virtualenv, activate
+    dir=$(basename "$(pwd)")
+    virtualenv="${WORKON_HOME}/${dir}/bin/activate"
+    if [ -e "$virtualenv" ]; then
+        . "$virtualenv"
+        echo "Working on $(basename $VIRTUAL_ENV)"
+    fi
+    # if our parent dir is the name of a virtualenv, activate
+    dir=$(basename $(dirname "$(pwd)"))
+    virtualenv="${WORKON_HOME}/${dir}/bin/activate"
+    if [ -e "$virtualenv" ]; then
+        . "$virtualenv"
+        echo "Working on $(basename $VIRTUAL_ENV)"
+    fi
+}
+
+# Virtualenvwrapper stuff
+export WORKON_HOME="${HOME}/envs/"
+export PROJECT_HOME="${HOME}/workspace/"
+export DISPLAY=:0
+. ~/bin/mount_workon
+
+# activate virtualenv automatically
+if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
+    activate
+fi
+
+# reset all bindkeys, this makes vi mode work _much_ faster
+bindkey -rpM viins '\e'
+
+#Rebind HOME and END to do the decent thing:
+bindkey '^[[1~' beginning-of-line
+bindkey '^[[4~' end-of-line
+bindkey '^[[H' beginning-of-line
+bindkey '^[[F' end-of-line
+bindkey '^[[1;5D' backward-word
+bindkey '^[[1;5C' forward-word
+case $TERM in (xterm*)
+	bindkey '\eOH' beginning-of-line
+	bindkey '\eOF' end-of-line
+esac
+
+autoload -U edit-command-line
+zle -N edit-command-line
+bindkey '^E' edit-command-line
+
+#And DEL too, as well as PGDN and insert:
+bindkey '^[[3~' delete-char
+bindkey '^[[6~' end-of-history
+#bindkey '\e[2~' redisplay
+
+#Now bind pgup to paste the last word of the last command,
+bindkey '\e[5~' insert-last-word
+
+# History search should use patterns
+bindkey '^R' history-incremental-pattern-search-backward
+bindkey '^S' history-incremental-pattern-search-forward
+bindkey '^Xr' history-incremental-pattern-search-backward
+bindkey '^Xs' history-incremental-pattern-search-forward
+
+bindkey '^[[A' up-line-or-history
+bindkey '^[[B' down-line-or-history
+bindkey '^[[C' forward-char
+bindkey '^[[D' backward-char
+
+# Color listing
+export LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;33;01:cd=40;33;01:or=40;31;01:su=37;41:sg=30;43:ca=30;41:tw=30;42:ow=34;42:st=37;44:ex=01;32:*.tar=01;31:*.tgz=01;31:*.arj=01;31:*.taz=01;31:*.lzh=01;31:*.lzma=01;31:*.tlz=01;31:*.txz=01;31:*.zip=01;31:*.z=01;31:*.Z=01;31:*.dz=01;31:*.gz=01;31:*.lz=01;31:*.xz=01;31:*.bz2=01;31:*.bz=01;31:*.tbz=01;31:*.tbz2=01;31:*.tz=01;31:*.deb=01;31:*.rpm=01;31:*.jar=01;31:*.war=01;31:*.ear=01;31:*.sar=01;31:*.rar=01;31:*.ace=01;31:*.zoo=01;31:*.cpio=01;31:*.7z=01;31:*.rz=01;31:*.jpg=01;35:*.jpeg=01;35:*.gif=01;35:*.bmp=01;35:*.pbm=01;35:*.pgm=01;35:*.ppm=01;35:*.tga=01;35:*.xbm=01;35:*.xpm=01;35:*.tif=01;35:*.tiff=01;35:*.png=01;35:*.svg=01;35:*.svgz=01;35:*.mng=01;35:*.pcx=01;35:*.mov=01;35:*.mpg=01;35:*.mpeg=01;35:*.m2v=01;35:*.mkv=01;35:*.webm=01;35:*.ogm=01;35:*.mp4=01;35:*.m4v=01;35:*.mp4v=01;35:*.vob=01;35:*.qt=01;35:*.nuv=01;35:*.wmv=01;35:*.asf=01;35:*.rm=01;35:*.rmvb=01;35:*.flc=01;35:*.avi=01;35:*.fli=01;35:*.flv=01;35:*.gl=01;35:*.dl=01;35:*.xcf=01;35:*.xwd=01;35:*.yuv=01;35:*.cgm=01;35:*.emf=01;35:*.axv=01;35:*.anx=01;35:*.ogv=01;35:*.ogx=01;35:*.aac=00;36:*.au=00;36:*.flac=00;36:*.mid=00;36:*.midi=00;36:*.mka=00;36:*.mp3=00;36:*.mpc=00;36:*.ogg=00;36:*.ra=00;36:*.wav=00;36:*.axa=00;36:*.oga=00;36:*.spx=00;36:*.xspf=00;36:'
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+export CLICOLOR=true
+export LSCOLORS=Exfxcxdxbxegedabagacad
+
+export EDITOR='/usr/bin/vim'
+
+# Prompts
+export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
+export RPS1='%~'
+
+# history settings
+HISTFILE=~/.zshhistory
+HISTSIZE=50000
+SAVEHIST=50000
+
+# The maximum amount of search results to show in autocompletion
+LISTMAX=250
+
+# Expansion options
+zstyle ':completion:*' completer _complete _prefix
+zstyle ':completion::prefix-1:*' completer _complete
+zstyle ':completion:incremental:*' completer _complete _correct
+zstyle ':completion:predict:*' completer _complete
+
+# Completion caching
+zstyle ':completion::complete:*' use-cache 1
+zstyle ':completion::complete:*' cache-path ~/.zsh/cache/$HOST
+
+# Expand partial paths
+zstyle ':completion:*' expand 'yes'
+zstyle ':completion:*' squeeze-slashes 'yes'
+
+# Include non-hidden directories in globbed file completions
+# for certain commands
+
+zstyle ':completion::complete:*' '\'
+
+# tag-order 'globbed-files directories' all-files
+zstyle ':completion::complete:*:tar:directories' file-patterns '*~.*(-/)'
+
+# Don't complete backup files as executables
+zstyle ':completion:*:complete:-command-::commands' ignored-patterns '*\~'
+
+# Don't complete files that vim shouldn't handle
+zstyle ':completion:*:*:vi:*:*files' ignored-patterns '*?.pyc' '*?.pyo' \
+        '*?.pdf' '*?.o'
+
+# Separate matches into groups
+zstyle ':completion:*:matches' group 'yes'
+
+# Describe each match group.
+zstyle ':completion:*:descriptions' format "%B---- %d%b"
+
+# Messages/warnings format
+zstyle ':completion:*:messages' format '%B%U---- %d%u%b'
+zstyle ':completion:*:warnings' format '%B%U---- no match for: %d%u%b'
+
+# Describe options in full
+zstyle ':completion:*:options' description 'yes'
+zstyle ':completion:*:options' auto-description '%d'
+
+zstyle ':completion:*' rehash true
+zstyle ':completion:*' menu select=2
+
+# start menu completion only if it could find no unambiguous initial string
+zstyle ':completion:*:correct:*'       insert-unambiguous true
+zstyle ':completion:*:man:*'      menu yes select
+# activate menu
+zstyle ':completion:*:history-words'   menu yes                            
+# complete 'cd -<tab>' with menu
+zstyle ':completion:*:*:cd:*:directory-stack' menu yes select              
+zstyle ':completion:*' menu select=5
+
