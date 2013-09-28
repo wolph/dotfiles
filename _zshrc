@@ -15,6 +15,12 @@ td(){
     t
 }    
 
+# Load some default modules
+setopt extendedglob
+zmodload -a colors
+zmodload -a autocomplete
+zmodload -a complist
+
 # Adding my own completion functions
 fpath=(~/.zsh/site-functions $fpath)
 fpath=(~/.zsh/completion $fpath)
@@ -27,13 +33,21 @@ compinit
 export LANG=en_US.UTF-8
 export PATH=~/bin:$PATH
 export PATH=$HOME/.rvm/bin:$PATH
+export PATH=/usr/bin:$PATH
+export PATH=/usr/sbin:$PATH
 export PATH=/usr/local/share/python:$PATH
 export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/sbin:$PATH
-export PATH=/usr/bin:$PATH
-export PATH=/usr/sbin:$PATH
 export PATH=/bin:$PATH
 export PATH=/sbin:$PATH
+
+# Prompts
+#export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
+export PS1="$(print '%{\e[38;5;208m%}%n%{\e[0m%}')$(print '%{\e[38;5;33m%}@%{\e[0m%}')$(print '%{\e[38;5;10m%}%m%{\e[0m%}')# "
+export RPS1='%~'
+
+# Enable Jedi within the normal Python interpreter
+export PYTHONSTARTUP="$HOME/.pythonrc.py"
 
 # Set the java home
 export JAVA_HOME=$(/usr/libexec/java_home)
@@ -84,6 +98,7 @@ alias push='git pull; git push'
 alias find='find -L'
 alias grep='grep --color=auto'
 test -x /usr/local/bin/hub && alias git=/usr/local/bin/hub
+alias gh=git
 # Link vim to the OS X clipboard
 if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
     alias vi='reattach-to-user-namespace vim'
@@ -214,9 +229,8 @@ export LSCOLORS=Exfxcxdxbxegedabagacad
 
 export EDITOR='/usr/bin/vim'
 
-# Prompts
-export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
-export RPS1='%~'
+zstyle ':completion:*' list-colors 'reply=( "=(#b)(*$VAR)(?)*=00=$color[green]=$color[bg-green]" )'
+zstyle ':completion:*:*:tmx:*:active-sessions' list-colors '=*=228;0'
 
 # history settings
 HISTFILE=~/.zshhistory

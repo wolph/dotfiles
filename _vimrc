@@ -26,7 +26,6 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
-
 " Tree like file browser
 Bundle 'scrooloose/nerdtree'
 " A Git wrapper so awesome, it should be illegal
@@ -35,7 +34,49 @@ Bundle 'tpope/vim-fugitive'
 Bundle 'Lokaltog/vim-easymotion'
 " Uber awesome syntax and errors highlighter
 Bundle 'Syntastic' 
+" Snipmate and requirements for TextMate snippets
+Bundle "MarcWeber/vim-addon-mw-utils"
+Bundle "tomtom/tlib_vim"
+Bundle "garbas/vim-snipmate"
+Bundle "tpope/vim-eunuch"
+Bundle "tpope/vim-repeat"
+Bundle 'Jinja'
+Bundle 'thiderman/vim-supervisor'
 
+" Lots of snippets
+Bundle "honza/vim-snippets"
+" snippets for BibTeX files
+Bundle "rbonvall/snipmate-snippets-bib"
+" snippets for Arduino files
+Bundle "sudar/vim-arduino-snippets"
+" snippets for Python, TAL and ZCML
+Bundle "zedr/zope-snipmate-bundle.git"
+" snippets for Twitter Bootstrap markup, in HTML and Haml
+Bundle "bonsaiben/bootstrap-snippets"
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Surround text/selection with tags
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Bundle "tpope/vim-surround"
+
+autocmd FileType rst let g:surround_{char2nr(':')} = ":\1command\1:`\r`"
+autocmd FileType rst vmap m S:math<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" reStructuedText in Vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Bundle 'Rykka/riv.vim'
+" Set the default path for Riv (Not supported yet, will work in 0.75 and up)
+let g:riv_default_path = "~/Desktop/TU"
+let g:riv_projects = [{'path': './',  'build_path': 'build'}]
+
+" Set the default (web|file)browser for OS X
+let g:riv_ft_browser = "open"
+let g:riv_web_browser = "open"
+
+augroup filetypedetect
+    au BufNewFile,BufRead *.rst set suffixesadd+=.rst
+augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Supertab so we can <Tab> for autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -74,7 +115,33 @@ Bundle 'klen/python-mode'
 " ]M            Jump on next class or method (normal, visual, operator modes)
 
 " No need for Rope completion with Jedi
-let g:pymode_rope = 0
+" Load rope plugin
+let g:pymode_rope = 1
+
+" Map keys for autocompletion
+let g:pymode_rope_autocomplete_map = '<C-Space>'
+
+" Auto create and open ropeproject
+let g:pymode_rope_auto_project = 1
+
+" Enable autoimport
+let g:pymode_rope_enable_autoimport = 1
+
+" Auto generate global cache
+let g:pymode_rope_autoimport_generate = 1
+let g:pymode_rope_autoimport_underlineds = 0
+let g:pymode_rope_codeassist_maxfixes = 10
+let g:pymode_rope_sorted_completions = 1
+let g:pymode_rope_extended_complete = 1
+let g:pymode_rope_autoimport_modules = ["os","shutil","datetime", "sys"]
+let g:pymode_rope_confirm_saving = 1
+let g:pymode_rope_global_prefix = "<C-x>p"
+let g:pymode_rope_local_prefix = "<C-c>r"
+let g:pymode_rope_vim_completion = 1
+let g:pymode_rope_guess_project = 1
+let g:pymode_rope_goto_def_newwin = ""
+let g:pymode_rope_always_show_complete_menu = 1
+let g:pymode_rope_short_prefix = "<C-x>t"
 
 " Documentation
 let g:pymode_doc = 1
@@ -86,7 +153,7 @@ let g:pymode_lint_checker = "pep8,pyflakes"
 " Auto check on save
 let g:pymode_lint_write = 1
 " Check while typing
-let g:pymode_lint_onfly = 1
+let g:pymode_lint_onfly = 0
 " Don't open the error window
 let g:pymode_lint_cwindow = 0
 " Show an error message at the cursor
@@ -114,10 +181,15 @@ let g:pymode_folding = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Jedi plugin for better autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'davidhalter/jedi-vim'
+" Bundle 'davidhalter/jedi-vim'
+Bundle 'file:///Users/rick/workspace/jedi-vim'
 
-" I prefer tabs over buffers, but if you need to change it
-" let g:jedi#use_tabs_not_buffers = 0
+" Load rope plugin
+let g:pymode_rope = 0
+
+" Due to a bug(?) in Jedi I'm currently using buffers
+let g:jedi#use_tabs_not_buffers = 0
+let g:jedi#use_splits_not_buffers = 1
 
 " Shortcuts
 let g:jedi#goto_assignments_command = "<leader>g"
@@ -129,9 +201,10 @@ let g:jedi#rename_command = "<leader>r"
 let g:jedi#show_call_signatures = "1"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Really nice color scheme for 256 colors shell
+" Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'desert256.vim'
+Bundle 'vim-scripts/xorium.vim'
 
 " Enable 256 color support when available
 if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
@@ -184,7 +257,17 @@ set nosol
 set modeline
 " Allow modelines to be read from the first/last 4 lines of a file
 set modelines=4
-
+" Enable secure mode with exrc (NOTE! this is potentially dangerous as it will
+" also load settings from files in your current working directory from files
+" you might not trust. Beware of this if you regularly open directories from
+" untrusted sources
+set exrc
+set secure
+" Lower the timeout for mappings, they are annoyingly slow otherwise
+set timeout timeoutlen=5000 ttimeoutlen=50
+" Write all files on `make`
+set autowrite
+set autowriteall
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
@@ -199,11 +282,16 @@ set sessionoptions+=localoptions
 set sessionoptions+=resize 
 " What should be saved during sessions being saved
 set sessionoptions+=winpos 
-" read/write a .viminfo file, don't store more than 50 lines of registers
-set viminfo='20,\"50    
 " Enable global undo even after closing Vim
 set undofile
-set undodir=~/.vim/undo
+set undodir=~/.vim/undo/
+" Tell vim to remember certain things when we exit
+" '10  :  marks will be remembered for up to 10 previously edited files
+" "100 :  will save up to 100 lines for each register
+" :20  :  up to 20 lines of command-line history will be remembered
+" %    :  saves and restores the buffer list
+" n... :  where to save the viminfo files
+set viminfo='10,\"100,:20,%,n~/.viminfo
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
@@ -217,6 +305,8 @@ set wildmode=list:full
 " ignore formats
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyo,*.pyc,*.swp,*.jpg,*.gif,*.png 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*\\tmp\\*,*.swp,*.zip,*.exe,*.dll
+set nowildignorecase
+set nofileignorecase 
 " Always show current positions along the bottom 
 set ruler 
 " the command bar is 1 high
@@ -384,20 +474,44 @@ let b:match_ignorecase = 1
 let perl_extended_vars=1 " highlight advanced perl vars inside strings
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Mappings
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Change paging overlap amount from 2 to 5 (+3)
 " if you swapped C-y and C-e, and set them to 2, it would 
 " remove any overlap between pages
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 nnoremap <C-f> <C-f>3<C-y> "  Make overlap 3 extra on control-f
 nnoremap <C-b> <C-b>3<C-e> "  Make overlap 3 extra on control-b
+" Add the current date in yyyy-mm-dd format
+nnoremap <F5> "=strftime("%F")<CR>P
+inoremap <F5> <C-R>=strftime("%F")<CR>
+" Insert the current filename
+nnoremap <F6> "=expand("%:t:r")<CR>P
+inoremap <F6> <C-R>=expand("%:t:r")<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autocommands 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Map filetypes to get proper highlighting
 augroup filetypedetect
-    au BufNewFile,BufRead /usr/local/etc/apache22/*/* setf apache
+    au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
+    au BufNewFile,BufRead /etc/supervisor/* setf supervisor
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
     au BufNewFile,BufRead */templates/*.html setf htmljinja
 augroup END
 
+autocmd Filetype python setlocal suffixesadd=.py
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Save and restore the cursor
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+function! ResCur()
+  if line("'\"") <= line("$")
+    normal! g`"
+    return 1
+  endif
+endfunction
+
+augroup resCur
+  autocmd!
+  autocmd BufWinEnter * call ResCur()
+augroup END
