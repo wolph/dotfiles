@@ -69,7 +69,7 @@ fi
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
 zstyle ':completion:*' max-errors 2
-zstyle :compinstall filename '/home/rick/.zshrc'
+zstyle :compinstall filename '~/.zshrc'
 
 # Allow local X access, seems to be needed for OSX to work with X properly...
 if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
@@ -77,8 +77,8 @@ if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
     xhost +$(hostname -f) > /dev/null
 fi
 
-if [ -x /home/rick/bin/start_supervisord ]; then
-    sudo /home/rick/bin/start_supervisord
+if [ -x ~/bin/start_supervisord ]; then
+    sudo ~/bin/start_supervisord
 fi
 
 # Enable keychain
@@ -130,14 +130,13 @@ ec2ssh(){
     host=$(echo $@ | sed 's/.*://')
     label=$(echo $@ | sed 's/:.*//')
     echo "Connecting to $label ($host)"
-    ssh-keygen -f '/home/rick/.ssh/known_hosts' -R $host
+    ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$host"
     rsync -av ~/.ec2_skel/ $host:~/
-    #rsync -aq ~/.gitconfig ~/.gitignore ~/.screenrc ~/.zshrc ~/.vim ~/.vimrc $host:./
     ssh -t $host exec zsh
 }
 
 update_ec2(){
-    /home/rick/.ec2/list_instances.py
+    "$HOME/.ec2/list_instances.py"
 }
 
 _ec2ssh(){

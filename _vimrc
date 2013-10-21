@@ -182,8 +182,7 @@ let g:pymode_folding = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Jedi plugin for better autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Bundle 'davidhalter/jedi-vim'
-Bundle 'file:///Users/rick/workspace/jedi-vim'
+Bundle 'davidhalter/jedi-vim'
 
 " Load rope plugin
 let g:pymode_rope = 0
