@@ -107,7 +107,7 @@ else
 fi
 
 # Little trick to change the name of the shell
-. ~/bin/iterm2_helpers.sh
+. ~/bin/iterm2_helpers
 function mosh(){
     if [ -n "$1" ]; then
         title "$1"
@@ -169,6 +169,8 @@ activate(){
     if [ -e "$virtualenv" ]; then
         . "$virtualenv"
         echo "Working on $(basename $VIRTUAL_ENV)"
+    elif [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ]; then
+        export PS1="($(tmux display-message -p '#S'))$PS1"
     fi
 }
 
