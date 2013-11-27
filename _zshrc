@@ -1,19 +1,37 @@
 # vim: ft=zsh
 
+#DEBUG=1
+if [ 1 -eq "$DEBUG" ]; then
+    # set the trace prompt to include seconds, nanoseconds, script name and line number
+    PS4='+$(gdate "+%s:%N") %N:%i> '
+    # save file stderr to file descriptor 3 and redirect stderr (including trace 
+    # output) to a file with the script's PID as an extension
+    exec 3>&2 2>/tmp/startlog.$$
+    # set options to turn on tracing and expansion of commands contained in the prompt
+    setopt xtrace prompt_subst
+fi
+
+
 # Tool to check the timing of the config file, handy for debugging
 T=0
 t(){
     T="$(gdate +%s%N)"
 }
-
+t
 td(){
     # Time delta
     TD="$(($(gdate +%s%N)-T))"
     # Milliseconds
     M="$((TD/1000000))"
-    echo "Time in milliseconds: ${M}"
+    echo -n "Time in milliseconds: ${M}"
+
+    if [ 0 = "$#" ]; then
+        echo
+    else
+        echo " for $@"
+    fi
     t
-}    
+}
 
 # Load some default modules
 setopt extendedglob
@@ -35,11 +53,12 @@ export PATH=~/bin:$PATH
 export PATH=$HOME/.rvm/bin:$PATH
 export PATH=/usr/bin:$PATH
 export PATH=/usr/sbin:$PATH
-export PATH=/usr/local/share/python:$PATH
+#export PATH=/usr/local/share/python:$PATH
 export PATH=/usr/local/bin:$PATH
 export PATH=/usr/local/sbin:$PATH
 export PATH=/bin:$PATH
 export PATH=/sbin:$PATH
+
 
 # Prompts
 #export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
@@ -65,11 +84,10 @@ fi
 if [ "$TERM" = "xterm" ]; then
     export TERM=xterm-256color
 fi
-
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
 zstyle ':completion:*' max-errors 2
-zstyle :compinstall filename '~/.zshrc'
+# zstyle :compinstall filename '~/.zshrc'
 
 # Allow local X access, seems to be needed for OSX to work with X properly...
 if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
@@ -82,7 +100,7 @@ if [ -x ~/bin/start_supervisord ]; then
 fi
 
 # Enable keychain
-eval $(keychain -q --eval ~/.ssh/id_dsa )
+eval $(keychain -Q -q --eval ~/.ssh/id_dsa )
 
 # Some convenient aliases
 alias mv='nocorrect mv'       # no spelling correction on mv
@@ -92,6 +110,7 @@ alias less='/usr/bin/less -R'
 alias ls=/bin/ls
 alias l='ls -A'
 alias ll='l -l'
+alias qmv='qmv -f do'
 alias push='git pull; git push'
 # Some people might not like this but I find it convenient. It makes find
 # search in symlinks by default
@@ -147,8 +166,6 @@ compctl -K _ec2ssh ec2ssh
 s(){
     sudo su -m $@ -c 'exec zsh'
 }
-
-
 
 # Auto active virtualenv for the current directory
 activate(){
@@ -295,4 +312,13 @@ zstyle ':completion:*:history-words'   menu yes
 # complete 'cd -<tab>' with menu
 zstyle ':completion:*:*:cd:*:directory-stack' menu yes select              
 zstyle ':completion:*' menu select=5
+
+test -f .zshrc_local && source .zshrc_local
+
+if [ 1 -eq "$DEBUG" ]; then
+    # turn off tracing
+    unsetopt xtrace
+    # restore stderr to the value saved in FD 3
+    exec 2>&3 3>&-
+fi
 
