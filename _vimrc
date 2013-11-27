@@ -314,6 +314,10 @@ if version >= 703
     set nowildignorecase
     set nofileignorecase 
 endif
+set nowildignorecase
+" TODO: Not supported everywhere
+" set nofileignorecase 
+>>>>>>> 32cf6ec88c6b1b13bcb6232010978a14824bf47e
 " Always show current positions along the bottom 
 set ruler 
 " the command bar is 1 high

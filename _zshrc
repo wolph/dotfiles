@@ -2,15 +2,21 @@
 
 #DEBUG=1
 if [ 1 -eq "$DEBUG" ]; then
-    # set the trace prompt to include seconds, nanoseconds, script name and line number
+    # set the trace prompt to include seconds, nanoseconds, script name and
+    # line number
     PS4='+$(gdate "+%s:%N") %N:%i> '
-    # save file stderr to file descriptor 3 and redirect stderr (including trace 
-    # output) to a file with the script's PID as an extension
+    # save file stderr to file descriptor 3 and redirect stderr (including
+    # trace output) to a file with the script's PID as an extension
     exec 3>&2 2>/tmp/startlog.$$
-    # set options to turn on tracing and expansion of commands contained in the prompt
+    # set options to turn on tracing and expansion of commands contained in
+    # the prompt
     setopt xtrace prompt_subst
 fi
 
+# On OS X we have GNU Date as gdate, on normal operating systems it's just date
+if ! type gdate > /dev/null; then
+    alias gdate=date
+fi
 
 # Tool to check the timing of the config file, handy for debugging
 T=0
