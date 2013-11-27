@@ -37,12 +37,13 @@ Bundle 'Syntastic'
 " Snipmate and requirements for TextMate snippets
 Bundle "MarcWeber/vim-addon-mw-utils"
 Bundle "tomtom/tlib_vim"
-Bundle "garbas/vim-snipmate"
+" Bundle "garbas/vim-snipmate"
 Bundle "tpope/vim-eunuch"
 Bundle "tpope/vim-repeat"
 Bundle 'Jinja'
 Bundle 'thiderman/vim-supervisor'
 Bundle 'evanmiller/nginx-vim-syntax'
+Bundle 'alfredodeza/pytest.vim'
 
 " Lots of snippets
 Bundle "honza/vim-snippets"
@@ -204,6 +205,7 @@ let g:jedi#show_call_signatures = "1"
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'desert256.vim'
+Bundle 'oceandeep.vim'
 Bundle 'vim-scripts/xorium.vim'
 
 " Enable 256 color support when available
