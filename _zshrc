@@ -44,13 +44,14 @@ export PATH=/sbin:$PATH
 # Prompts
 #export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
 export PS1="$(print '%{\e[38;5;208m%}%n%{\e[0m%}')$(print '%{\e[38;5;33m%}@%{\e[0m%}')$(print '%{\e[38;5;10m%}%m%{\e[0m%}')# "
+export ORIGINAL_PS1="$PS1"
 export RPS1='%~'
 
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
 
 # Set the java home
-export JAVA_HOME=$(/usr/libexec/java_home)
+test -x /usr/libexec/java_home && export JAVA_HOME=$(/usr/libexec/java_home)
 
 # if we're on ec2, set the hostname to the cluster setting if available
 EC2=0
@@ -103,7 +104,7 @@ alias gh=git
 if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
     alias vi='reattach-to-user-namespace vim'
 else
-    alias vi='reattach-to-user-namespace vim'
+    alias vi='vim'
 fi
 
 # Little trick to change the name of the shell
@@ -169,7 +170,10 @@ activate(){
         . "$virtualenv"
         echo "Working on $(basename $VIRTUAL_ENV)"
     elif [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ]; then
-        export PS1="($(tmux display-message -p '#S'))$PS1"
+        session_name="$(tmux display-message -p '#S') | grep -vqE '^[0-9]*$')"
+        if [ -z "$session_name" ]; then
+            export PS1="($session_name)$ORIGINAL_PS1"
+        fi
     fi
 }
 
