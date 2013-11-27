@@ -286,8 +286,10 @@ set sessionoptions+=resize
 " What should be saved during sessions being saved
 set sessionoptions+=winpos 
 " Enable global undo even after closing Vim
-set undofile
-set undodir=~/.vim/undo/
+if version >= 703
+    set undofile
+    set undodir=~/.vim/undo/
+endif
 " Tell vim to remember certain things when we exit
 " '1000 :  marks will be remembered for up to 10 previously edited files
 " "100  :  will save up to 100 lines for each register
@@ -308,8 +310,10 @@ set wildmode=list:full
 " ignore formats
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyo,*.pyc,*.swp,*.jpg,*.gif,*.png 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*\\tmp\\*,*.swp,*.zip,*.exe,*.dll
-set nowildignorecase
-set nofileignorecase 
+if version >= 703
+    set nowildignorecase
+    set nofileignorecase 
+endif
 " Always show current positions along the bottom 
 set ruler 
 " the command bar is 1 high
@@ -339,8 +343,10 @@ set nolist
 " show tabs and trailing whitespace
 set listchars=tab:>-,trail:- 
 " add the pretty line at 80 characters
-set colorcolumn=80
-hi ColorColumn ctermbg=234 guibg=234
+if version >= 703
+    set colorcolumn=80
+    hi ColorColumn ctermbg=234 guibg=234
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Visual Cues
