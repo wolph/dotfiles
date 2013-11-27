@@ -31,6 +31,10 @@ if [[ -z "$1" ]]; then
     exit
 fi
 
+# Clean up old sessions
+tmux ls | grep "^client-$(date '+%Y')" | grep -v '(attached)' \
+    | cut -d ':' -f1 | xargs --replace={} tmux kill-session -t {}
+
 # Only because I often issue `ls` to this script by accident
 if [[ "$1" == "ls" ]]; then
     available_sessions
@@ -72,7 +76,7 @@ else
 
         echo "Launching copy of base session $base_session ..."
         # Session is is date and time to prevent conflict
-        session_id=`date +%Y%m%d%H%M%S`
+        session_id=client-$(date +%Y%m%d%H%M%S)
 
         # Create a new session (without attaching it) and link to base session 
         # to share windows

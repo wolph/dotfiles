@@ -43,6 +43,7 @@ Bundle "tpope/vim-repeat"
 Bundle 'Jinja'
 Bundle 'thiderman/vim-supervisor'
 Bundle 'evanmiller/nginx-vim-syntax'
+Bundle 'alfredodeza/coveragepy.vim'
 Bundle 'alfredodeza/pytest.vim'
 
 " Lots of snippets
