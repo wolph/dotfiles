@@ -309,7 +309,8 @@ set wildmode=list:full
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyo,*.pyc,*.swp,*.jpg,*.gif,*.png 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*\\tmp\\*,*.swp,*.zip,*.exe,*.dll
 set nowildignorecase
-set nofileignorecase 
+" TODO: Not supported everywhere
+" set nofileignorecase 
 " Always show current positions along the bottom 
 set ruler 
 " the command bar is 1 high
