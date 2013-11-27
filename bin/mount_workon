@@ -7,10 +7,10 @@ function mount_file(){
     image="$dir.sparseimage"
 
     if [ -d "$dir" ]; then
-        empty=$(ls "$dir")
+        empty=$(ls -a "$dir")
         if [ -z "$empty" ]; then
             echo "Removing empty dir $dir"
-            rm -vrf "$dir"
+            rmdir -v "$dir"
         fi
     fi
 
