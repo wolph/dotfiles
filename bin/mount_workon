@@ -1,6 +1,12 @@
 #!/bin/zsh
-which workon > /dev/null || . "$(which virtualenvwrapper_lazy.sh)"
-eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
+
+if [ $(command -v workon >/dev/null 2>&1) ]; then
+    if [ $(command -v virtualenvwrapper_lazy.sh) ]; then
+        . "$(which virtualenvwrapper_lazy.sh)"
+        eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
+    fi
+fi
+
 
 function mount_file(){
     dir="$1"
