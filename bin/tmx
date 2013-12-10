@@ -17,6 +17,16 @@ trim() { echo $1; }
 # List all sessions only if there is a server running
 sessions=$(tmux ls 2> /dev/null)
 
+# Clean up old sessions
+old_sessions=$(echo "$sessions" \
+    | grep -v '(attached)' \
+    | awk -F ':' '{print $1}' \
+    | grep -E '\d{14}$')
+
+if [ -n "$old_sessions" ]; then
+    echo "$old_sessions" | xargs -L1 tmux kill-session -t
+fi
+
 function available_sessions(){
     sessions=$(tmux ls 2> /dev/null | grep -Ei "^[a-z]")
     echo "Available sessions:"
@@ -30,10 +40,6 @@ if [[ -z "$1" ]]; then
     available_sessions
     exit
 fi
-
-# Clean up old sessions
-tmux ls | grep "^client-$(date '+%Y')" | grep -v '(attached)' \
-    | cut -d ':' -f1 | xargs --replace={} tmux kill-session -t {}
 
 # Only because I often issue `ls` to this script by accident
 if [[ "$1" == "ls" ]]; then
@@ -76,7 +82,7 @@ else
 
         echo "Launching copy of base session $base_session ..."
         # Session is is date and time to prevent conflict
-        session_id=client-$(date +%Y%m%d%H%M%S)
+        session_id="${base_session}-$(date +%Y%m%d%H%M%S)"
 
         # Create a new session (without attaching it) and link to base session 
         # to share windows
