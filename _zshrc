@@ -107,7 +107,7 @@ if [ -x ~/bin/start_supervisord ]; then
 fi
 
 # Enable keychain
-eval $(keychain -Q -q --eval ~/.ssh/id_dsa )
+command -v keychain >/dev/null 2>&1 && eval $(keychain -Q -q --eval ~/.ssh/id_dsa )
 
 # Some convenient aliases
 alias mv='nocorrect mv'       # no spelling correction on mv
