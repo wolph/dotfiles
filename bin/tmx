@@ -58,10 +58,18 @@ if [[ "$tmux_nb" == "0" ]]; then
     # see if there's a project to activate :)
     project_path="$PROJECT_HOME$1"
     project_image="$project_path.sparseimage"
+
     if [ -d "$project_path" ] || [ -f "$project_image" ]; then
         . ~/bin/mount_workon
         workon "$1"
         cd "$PROJECT_HOME$1"
+    fi
+
+    if [ -d "$project_path" ]; then
+        export HISTFILE="$PROJECT_HOME$1/.zshhistory"
+        if [ ! -f "$HISTFILE" ]; then
+            cp ~/.zshhistory "$HISTFILE"
+        fi
     fi
 
     echo "Launching tmux base session $base_session ..."
