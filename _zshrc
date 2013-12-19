@@ -127,9 +127,11 @@ test -x /usr/local/bin/hub && alias git=/usr/local/bin/hub
 alias gh=git
 # Link vim to the OS X clipboard
 if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
-    alias vi='reattach-to-user-namespace vim'
-else
+    alias vim="reattach-to-user-namespace $(which vim)"
+    alias vimdiff="reattach-to-user-namespace $(which vimdiff)"
     alias vi='vim'
+else
+    alias vi="$(which vim)"
 fi
 
 # Little trick to change the name of the shell
@@ -255,15 +257,20 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 export CLICOLOR=true
 export LSCOLORS=Exfxcxdxbxegedabagacad
 
-export EDITOR='/usr/bin/vim'
+export EDITOR=vi
 
 zstyle ':completion:*' list-colors 'reply=( "=(#b)(*$VAR)(?)*=00=$color[green]=$color[bg-green]" )'
 zstyle ':completion:*:*:tmx:*:active-sessions' list-colors '=*=228;0'
 
 # history settings
-HISTFILE=~/.zshhistory
 HISTSIZE=50000
 SAVEHIST=50000
+
+if [ -f "$PWD/.zshhistory" ]; then
+    export HISTFILE="$PWD/.zshhistory"
+else
+    export HISTFILE=~/.zshhistory
+fi
 
 # The maximum amount of search results to show in autocompletion
 LISTMAX=250
