@@ -45,6 +45,7 @@ Bundle 'thiderman/vim-supervisor'
 Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'alfredodeza/coveragepy.vim'
 Bundle 'alfredodeza/pytest.vim'
+Bundle 'pig.vim'
 
 " Lots of snippets
 Bundle "honza/vim-snippets"
@@ -310,7 +311,7 @@ set wildmode=list:full
 " ignore formats
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyo,*.pyc,*.swp,*.jpg,*.gif,*.png 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*\\tmp\\*,*.swp,*.zip,*.exe,*.dll
-if version >= 703
+if version >= 704
     set nowildignorecase
     set nofileignorecase 
 endif
@@ -506,6 +507,7 @@ augroup filetypedetect
     au BufNewFile,BufRead /etc/supervisor/* setf supervisor
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
     au BufNewFile,BufRead */templates/*.html setf htmljinja
+    au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
 augroup END
 
 autocmd Filetype python setlocal suffixesadd=.py
