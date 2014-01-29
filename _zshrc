@@ -50,21 +50,11 @@ fpath=(~/.zsh/site-functions $fpath)
 fpath=(~/.zsh/completion $fpath)
 fpath=(~/.zsh/zsh-completions/src $fpath)
 
-source /etc/profile
-autoload -U compinit
-compinit
+# $PATH changes are done in .zprofile
 
 export LANG=en_US.UTF-8
-export PATH=~/bin:$PATH
-export PATH=$HOME/.rvm/bin:$PATH
-export PATH=/usr/bin:$PATH
-export PATH=/usr/sbin:$PATH
-#export PATH=/usr/local/share/python:$PATH
-export PATH=/usr/local/bin:$PATH
-export PATH=/usr/local/sbin:$PATH
-export PATH=/bin:$PATH
-export PATH=/sbin:$PATH
-
+autoload -U compinit
+compinit
 
 # Prompts
 #export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
@@ -127,12 +117,10 @@ test -x /usr/local/bin/hub && alias git=/usr/local/bin/hub
 alias gh=git
 # Link vim to the OS X clipboard
 if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
-    alias vim="reattach-to-user-namespace $(which vim)"
-    alias vimdiff="reattach-to-user-namespace $(which vimdiff)"
-    alias vi='vim'
-else
-    alias vi="$(which vim)"
+    alias vim="reattach-to-user-namespace vim"
+    alias vimdiff="reattach-to-user-namespace vimdiff"
 fi
+alias vi='vim'
 
 # Little trick to change the name of the shell
 . ~/bin/iterm2_helpers
@@ -152,6 +140,19 @@ function ssh(){
 }
 title ""
 
+# Little function to go to a random directory, handy if you have a lot of
+# stuff to sort out and don't know where to start ;)
+torandomdir(){
+    files=(*)
+    dir=("${files[RANDOM%${#files[@]}]}")
+    cd "$dir"
+}
+
+torandomparentdir(){
+    cd ..
+    echo "$PWD"
+    torandomdir
+}
 
 # ec2 utils
 ec2ssh(){
@@ -257,7 +258,7 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 export CLICOLOR=true
 export LSCOLORS=Exfxcxdxbxegedabagacad
 
-export EDITOR=vi
+export EDITOR=$(whereis vim)
 
 zstyle ':completion:*' list-colors 'reply=( "=(#b)(*$VAR)(?)*=00=$color[green]=$color[bg-green]" )'
 zstyle ':completion:*:*:tmx:*:active-sessions' list-colors '=*=228;0'

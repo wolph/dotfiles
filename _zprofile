@@ -1,0 +1,32 @@
+
+# Setting PATH for Python 2.7
+# The orginal version is saved in .zprofile.pysave
+PATH="/Library/Frameworks/Python.framework/Versions/2.7/bin:${PATH}"
+
+[[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm" # Load RVM into a shell session *as a function*
+
+_append_to_path() {
+    if [ -d "$@" ] && [[ ":$PATH:" != *":$@:"* ]]; then
+        PATH="${PATH:+"$PATH:"}$@"
+    fi
+}
+
+_insert_to_path() {
+    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+        shift
+        while [[ $# > 0 ]]; do
+            PATH="$1:$PATH"
+            shift
+        done
+    fi
+}
+
+_append_to_path /sbin
+_append_to_path /bin
+_append_to_path /usr/sbin
+_append_to_path /usr/bin
+
+_insert_to_path /usr/local/sbin ~/bin $HOME/.rvm/bin /usr/local/bin /usr/local/sbin 
+
+export PATH
+
