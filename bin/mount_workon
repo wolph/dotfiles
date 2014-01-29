@@ -1,10 +1,10 @@
 #!/bin/zsh
 
-VIRTUALENVWRAPPER_PYTHON=$(whereis python)
+VIRTUALENVWRAPPER_PYTHON=$(which python)
 
 if [ ! $(command -v original_workon >/dev/null 2>&1) ]; then
     if [ ! $(command -v virtualenvwrapper_lazy.sh >/dev/null 2>&1) ]; then
-        . "$(whereis virtualenvwrapper.sh)"
+        . $(which virtualenvwrapper.sh)
         eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
     fi
 fi
