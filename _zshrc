@@ -258,7 +258,7 @@ zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 export CLICOLOR=true
 export LSCOLORS=Exfxcxdxbxegedabagacad
 
-export EDITOR=$(whereis vim)
+export EDITOR=vim
 
 zstyle ':completion:*' list-colors 'reply=( "=(#b)(*$VAR)(?)*=00=$color[green]=$color[bg-green]" )'
 zstyle ':completion:*:*:tmx:*:active-sessions' list-colors '=*=228;0'
