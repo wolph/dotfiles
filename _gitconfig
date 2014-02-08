@@ -1,0 +1,38 @@
+[user]
+	name = WoLpH
+	email = Rick@Fawo.nl
+[github]
+	user = WoLpH
+	token = de7d225159843a5b9d4a23ddd2e73a68
+[alias]
+    st = status
+    ci = commit
+    co = checkout
+    info = remote -v
+	switch = !legit switch \"$@\"
+	branches = !legit branches
+	sprout = !legit sprout \"$@\"
+	unpublish = !legit unpublish \"$@\"
+	harvest = !legit harvest \"$@\"
+	sync = !legit sync \"$@\"
+	publish = !legit publish \"$@\"
+	graft = !legit graft \"$@\"
+	global-gc = !git-global-gc
+[color]
+	diff = auto
+	status = auto
+	branch = auto
+[core]
+	excludesfile = /home/rick/.gitignore
+	autocrlf = input
+	safecrlf = false
+[giggle]
+	main-window-maximized = true
+	main-window-geometry = 1068x890+231+57
+	file-view-vpane-position = 1060
+	history-view-vpane-position = 561
+	main-window-view = HistoryView
+	file-view-hpane-position = 350
+
+[push]
+	default = upstream
