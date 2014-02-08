@@ -46,9 +46,9 @@ zmodload -a autocomplete
 zmodload -a complist
 
 # Adding my own completion functions
-fpath=(~/.zsh/site-functions $fpath)
-fpath=(~/.zsh/completion $fpath)
-fpath=(~/.zsh/zsh-completions/src $fpath)
+fpath=(./.zsh/site-functions $fpath)
+fpath=(./.zsh/completion $fpath)
+fpath=(./.zsh/zsh-completions/src $fpath)
 
 # $PATH changes are done in .zprofile
 
@@ -92,8 +92,8 @@ if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
     xhost +$(hostname -f) > /dev/null
 fi
 
-if [ -x ~/bin/start_supervisord ]; then
-    sudo ~/bin/start_supervisord
+if [ -x ./bin/start_supervisord ]; then
+    sudo ./bin/start_supervisord
 fi
 
 # Enable keychain
@@ -123,7 +123,7 @@ fi
 alias vi='vim'
 
 # Little trick to change the name of the shell
-. ~/bin/iterm2_helpers
+. ./bin/iterm2_helpers
 function mosh(){
     if [ -n "$1" ]; then
         title "$1"
@@ -207,7 +207,7 @@ activate(){
 export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 export DISPLAY=:0
-. ~/bin/mount_workon
+. ./bin/mount_workon
 
 # activate virtualenv automatically
 if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
