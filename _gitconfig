@@ -1,6 +1,6 @@
 [user]
 	name = WoLpH
-	email = Rick@Fawo.nl
+	email = Wolph@wol.ph
 [github]
 	user = WoLpH
 	token = de7d225159843a5b9d4a23ddd2e73a68
@@ -23,7 +23,7 @@
 	status = auto
 	branch = auto
 [core]
-	excludesfile = /home/rick/.gitignore
+	excludesfile = ~/.gitignore
 	autocrlf = input
 	safecrlf = false
 [giggle]
