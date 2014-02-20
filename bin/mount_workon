@@ -14,10 +14,11 @@ function mount_file(){
     image="$dir.sparseimage"
 
     if [ -d "$dir" ]; then
-        empty=$(ls -a "$dir")
+        empty=$(ls -A "$dir" | grep -v '^.autodiskmounted$')
         if [ -z "$empty" ]; then
             echo "Removing empty dir $dir"
-            rmdir -v "$dir"
+            rm "$dir/.autodiskmounted"
+            rmdir "$dir"
         fi
     fi
 
