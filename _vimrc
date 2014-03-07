@@ -207,7 +207,7 @@ let g:jedi#show_call_signatures = "1"
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'desert256.vim'
-Bundle 'oceandeep.vim'
+Bundle 'oceandeep'
 Bundle 'vim-scripts/xorium.vim'
 
 " Enable 256 color support when available
