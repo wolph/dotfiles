@@ -418,8 +418,8 @@ set expandtab
 set nowrap 
 " but above all -- follow the conventions laid before us
 set preserveindent 
-" case insensitive by default
-set ignorecase 
+" case sensitive by default
+set noignorecase 
 " if there are caps, go case-sensitive
 set smartcase 
 " improve the way autocomplete works
