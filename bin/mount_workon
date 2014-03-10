@@ -22,6 +22,10 @@ function mount_file(){
         fi
     fi
 
+    if [ -f "${image}.bz2" ]; then
+        pbzip2 -dvv "${image}.bz2"
+    fi
+
     if [ -f "$image" ] && [ ! -d "$dir" ]; then
         echo "Attaching $image to $dir"
         hdiutil attach -mountroot $(dirname "$dir") "$image"
