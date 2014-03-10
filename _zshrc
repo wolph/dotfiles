@@ -129,6 +129,7 @@ if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
     alias vimdiff="reattach-to-user-namespace vimdiff"
 fi
 alias vi='vim'
+alias parallel='parallel --no-notice'
 
 # Little trick to change the name of the shell
 . ${ROOT_DIR}bin/iterm2_helpers
@@ -215,6 +216,7 @@ activate(){
 export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 export DISPLAY=:0
+
 . ${ROOT_DIR}bin/mount_workon
 
 # activate virtualenv automatically
