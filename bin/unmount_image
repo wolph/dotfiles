@@ -1,5 +1,8 @@
 #!/bin/sh
 
+diskutil eject "$1" &> /dev/null
 sleep 1
+diskutil eject "$1" &> /dev/null
+sleep 10
 diskutil eject "$1" &> /dev/null
 

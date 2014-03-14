@@ -28,7 +28,8 @@ function mount_file(){
 
     if [ -f "$image" ] && [ ! -d "$dir" ]; then
         echo "Attaching $image to $dir"
-        hdiutil attach -mountroot $(dirname "$dir") "$image"
+        #hdiutil attach -mountroot $(dirname "$dir") "$image"
+        hdiutil mount -mountpoint "$dir" "$image"
     fi
 }
 
@@ -56,6 +57,9 @@ function workon(){
 }
 
 function workoff(){
+    # Make sure we don't block anything by changing directory
+    cd
+
     project_dir="$HOME/workspace/$1"
     env_dir="$HOME/envs/$1"
     unmount_file "$project_dir"
