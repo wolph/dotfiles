@@ -191,8 +191,8 @@ Bundle 'davidhalter/jedi-vim'
 let g:pymode_rope = 0
 
 " Due to a bug(?) in Jedi I'm currently using buffers
-let g:jedi#use_tabs_not_buffers = 0
-let g:jedi#use_splits_not_buffers = 1
+let g:jedi#use_tabs_not_buffers = 1
+let g:jedi#use_splits_not_buffers = 0
 
 " Shortcuts
 let g:jedi#goto_assignments_command = "<leader>g"
