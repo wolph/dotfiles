@@ -57,6 +57,33 @@ zmodload -a complist
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 fpath=(${ROOT_DIR}.zsh/completion $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
+#. ${ROOT_DIR}.zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+
+td 'pre-antigen'
+# Antigen bundles
+. ${ROOT_DIR}.antigen.zsh
+zsh-users/zsh-completions src
+td 'completeions'
+antigen bundle git
+td antigen bundle git
+antigen bundle svn
+td antigen bundle svn
+antigen bundle python
+td antigen bundle python
+antigen bundle virtualenv
+td antigen bundle virtualenv
+antigen bundle virtualenvwrapper
+td antigen bundle virtualenvwrapper
+antigen bundle pip
+td antigen bundle pip
+antigen bundle extract
+td antigen bundle extract
+antigen bundle sharat87/zsh-vim-mode
+td antigen bundle sharat87/zsh-vim-mode
+antigen bundle kennethreitz/autoenv
+td antigen bundle kennethreitz/autoenv
+antigen apply
+td 'post-antigen'
 
 # $PATH changes are done in .zprofile
 
