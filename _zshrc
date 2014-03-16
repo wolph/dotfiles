@@ -75,7 +75,7 @@ antigen apply
 
 export LANG=en_US.UTF-8
 autoload -U compinit
-compinit
+compinit -u
 
 # Prompts
 #export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
