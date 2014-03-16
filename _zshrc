@@ -72,7 +72,7 @@ fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 # antigen apply
 
 autoload -U compinit
-compinit
+compinit -u
 
 # $PATH changes are done in .zprofile
 
