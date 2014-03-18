@@ -35,3 +35,5 @@
 	file-view-hpane-position = 350
 [push]
 	default = matching
+[hub]
+	protocol = https
