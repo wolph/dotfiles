@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
 VIRTUALENVWRAPPER_PYTHON=$(which python)
 
@@ -14,16 +14,22 @@ function mount_file(){
     image="$dir.sparseimage"
 
     if [ -d "$dir" ]; then
-        empty=$(ls -a "$dir")
+        empty=$(ls -A "$dir" | grep -v '^.autodiskmounted$')
         if [ -z "$empty" ]; then
             echo "Removing empty dir $dir"
-            rmdir -v "$dir"
+            rm "$dir/.autodiskmounted"
+            rmdir "$dir"
         fi
+    fi
+
+    if [ -f "${image}.bz2" ]; then
+        pbzip2 -dvv "${image}.bz2"
     fi
 
     if [ -f "$image" ] && [ ! -d "$dir" ]; then
         echo "Attaching $image to $dir"
-        hdiutil attach -mountroot $(dirname "$dir") "$image"
+        #hdiutil attach -mountroot $(dirname "$dir") "$image"
+        hdiutil mount -mountpoint "$dir" "$image"
     fi
 }
 
@@ -51,6 +57,9 @@ function workon(){
 }
 
 function workoff(){
+    # Make sure we don't block anything by changing directory
+    cd
+
     project_dir="$HOME/workspace/$1"
     env_dir="$HOME/envs/$1"
     unmount_file "$project_dir"

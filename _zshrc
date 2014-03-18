@@ -1,5 +1,13 @@
 # vim: ft=zsh
 
+if [ -x ~/bin/mount_workon ]; then
+    export ROOT_DIR=~/
+elif [ -x ./bin/mount_workon ]; then
+    export ROOT_DIR=./
+else;
+    export ROOT_DIR=~rick/
+fi
+
 #DEBUG=1
 if [ 1 -eq "$DEBUG" ]; then
     # set the trace prompt to include seconds, nanoseconds, script name and
@@ -45,16 +53,28 @@ zmodload -a colors
 zmodload -a autocomplete
 zmodload -a complist
 
+export LANG=en_US.UTF-8
+
 # Adding my own completion functions
-fpath=(./.zsh/site-functions $fpath)
-fpath=(./.zsh/completion $fpath)
-fpath=(./.zsh/zsh-completions/src $fpath)
+fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
+fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
+
+# # Antigen bundles
+# . ${ROOT_DIR}.antigen.zsh
+# antigen bundle WoLpH/zsh-completions src
+# antigen bundle git
+# antigen bundle svn
+# antigen bundle python
+# antigen bundle pip
+# antigen bundle extract
+# antigen bundle sharat87/zsh-vim-mode
+# antigen bundle kennethreitz/autoenv
+# antigen apply
+
+autoload -U compinit
+compinit -u
 
 # $PATH changes are done in .zprofile
-
-export LANG=en_US.UTF-8
-autoload -U compinit
-compinit
 
 # Prompts
 #export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
@@ -92,8 +112,8 @@ if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
     xhost +$(hostname -f) > /dev/null
 fi
 
-if [ -x ./bin/start_supervisord ]; then
-    sudo ./bin/start_supervisord
+if [ -x ${ROOT_DIR}bin/start_supervisord ]; then
+    sudo ${ROOT_DIR}bin/start_supervisord
 fi
 
 # Enable keychain
@@ -121,9 +141,10 @@ if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
     alias vimdiff="reattach-to-user-namespace vimdiff"
 fi
 alias vi='vim'
+alias parallel='parallel --no-notice'
 
 # Little trick to change the name of the shell
-. ./bin/iterm2_helpers
+. ${ROOT_DIR}bin/iterm2_helpers
 function mosh(){
     if [ -n "$1" ]; then
         title "$1"
@@ -180,7 +201,7 @@ s(){
 # Auto active virtualenv for the current directory
 activate(){
     if [ -e "activate" ]; then
-        . ./activate
+        . ${ROOT_DIR}activate
     fi
     # if our current dir is the name of a virtualenv, activate
     dir=$(basename "$(pwd)")
@@ -207,7 +228,8 @@ activate(){
 export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 export DISPLAY=:0
-. ./bin/mount_workon
+
+. ${ROOT_DIR}bin/mount_workon
 
 # activate virtualenv automatically
 if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
