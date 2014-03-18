@@ -207,7 +207,7 @@ let g:jedi#show_call_signatures = "1"
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'desert256.vim'
-Bundle 'oceandeep.vim'
+Bundle 'oceandeep'
 Bundle 'vim-scripts/xorium.vim'
 
 " Enable 256 color support when available
@@ -418,8 +418,8 @@ set expandtab
 set nowrap 
 " but above all -- follow the conventions laid before us
 set preserveindent 
-" case insensitive by default
-set ignorecase 
+" case sensitive by default
+set noignorecase 
 " if there are caps, go case-sensitive
 set smartcase 
 " improve the way autocomplete works

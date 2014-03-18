@@ -1,4 +1,4 @@
-#!/bin/zsh
+#!/usr/bin/env zsh
 
 #
 # Tmux launcher
@@ -58,6 +58,10 @@ if [[ "$tmux_nb" == "0" ]]; then
     # see if there's a project to activate :)
     project_path="$PROJECT_HOME$1"
     project_image="$project_path.sparseimage"
+
+    if [ -f "$project_image.bz2" ]; then
+        pbzip2 -dvv "$project_image.bz2"
+    fi
 
     if [ -d "$project_path" ] || [ -f "$project_image" ]; then
         . ~/bin/mount_workon
