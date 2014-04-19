@@ -24,3 +24,6 @@ env/
 .zshrc
 htmlcov
 .cache
+docs/_build/
+
+.ropeproject
