@@ -112,9 +112,9 @@ if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
     xhost +$(hostname -f) > /dev/null
 fi
 
-if [ -x ${ROOT_DIR}bin/start_supervisord ]; then
-    sudo ${ROOT_DIR}bin/start_supervisord
-fi
+# if [ -x ${ROOT_DIR}bin/start_supervisord ]; then
+#     sudo ${ROOT_DIR}bin/start_supervisord
+# fi
 
 # Enable keychain
 command -v keychain >/dev/null 2>&1 && eval $(keychain -Q -q --eval ~/.ssh/id_dsa )
@@ -142,6 +142,7 @@ if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
 fi
 alias vi='vim'
 alias parallel='parallel --no-notice'
+alias vlc='open -a vlc'
 
 # Little trick to change the name of the shell
 . ${ROOT_DIR}bin/iterm2_helpers
@@ -198,30 +199,32 @@ s(){
     sudo su -m $@ -c 'exec zsh'
 }
 
+_workon_if_possible(){
+    if [ -e "$WORKON_HOME/$1" ] || [ -e "$WORKON_HOME/$1.sparseimage*" ]; then
+        echo "Working on $1"
+        workon "$1"
+        _virtualenv_tmux_name
+        return true
+    fi
+    return false
+}
+
+_virtualenv_tmux_name(){
+    if [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ] && [ -z "$session_name" ]; then
+        export PS1="($session_name)$ORIGINAL_PS1"
+    fi
+}
+
 # Auto active virtualenv for the current directory
 activate(){
     if [ -e "activate" ]; then
         . ${ROOT_DIR}activate
+        _virtualenv_tmux_name
+        return
     fi
     # if our current dir is the name of a virtualenv, activate
-    dir=$(basename "$(pwd)")
-    virtualenv="${WORKON_HOME}/${dir}/bin/activate"
-    if [ -e "$virtualenv" ]; then
-        . "$virtualenv"
-        echo "Working on $(basename $VIRTUAL_ENV)"
-    fi
-    # if our parent dir is the name of a virtualenv, activate
-    dir=$(basename $(dirname "$(pwd)"))
-    virtualenv="${WORKON_HOME}/${dir}/bin/activate"
-    if [ -e "$virtualenv" ]; then
-        . "$virtualenv"
-        echo "Working on $(basename $VIRTUAL_ENV)"
-    elif [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ]; then
-        session_name="$(tmux display-message -p '#S') | grep -vqE '^[0-9]*$')"
-        if [ -z "$session_name" ]; then
-            export PS1="($session_name)$ORIGINAL_PS1"
-        fi
-    fi
+    _workon_if_possible $(basename "$PWD") && return
+    _workon_if_possible $(basename $(dirname "$(pwd)")) && return
 }
 
 # Virtualenvwrapper stuff
