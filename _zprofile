@@ -28,7 +28,7 @@ _append_to_path /sbin
 _append_to_path /bin
 _append_to_path /usr/sbin
 _append_to_path /usr/bin
-_append_to_path /Users/rick/bin/Sencha/Cmd/*
+[ -d "/Users/rick/bin/Sencha/Cmd/" ] && _append_to_path /Users/rick/bin/Sencha/Cmd/*
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 
 _insert_to_path /usr/local/sbin ~/bin $HOME/.rvm/bin /usr/local/bin
