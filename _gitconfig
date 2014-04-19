@@ -35,6 +35,8 @@
 	file-view-hpane-position = 350
 [push]
 	default = matching
+[hub]
+	protocol = https
 [difftool "sourcetree"]
 	cmd = opendiff \"$LOCAL\" \"$REMOTE\"
 	path = 
