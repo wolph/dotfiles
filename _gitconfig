@@ -18,6 +18,16 @@
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
 	global-gc = !git-global-gc
+
+    repo = !gh repo \"$@\"
+    user = !gh user \"$@\"
+    alias = !gh alias \"$@\"
+    gists = !gh gists \"$@\"
+    hello = !gh hello \"$@\"
+    issue = !gh issue \"$@\"
+    notification = !gh notification \"$@\"
+    pull-request = !gh pull-request \"$@\"
+
 [color]
 	diff = auto
 	status = auto
@@ -43,6 +53,13 @@
 [mergetool "sourcetree"]
 	cmd = /Applications/SourceTree.app/Contents/Resources/opendiff-w.sh \"$LOCAL\" \"$REMOTE\" -ancestor \"$BASE\" -merge \"$MERGED\"
 	trustExitCode = true
-[filter "media"]
-	clean = git-media-clean %f
-	smudge = git-media-smudge %f
+[ghi "highlight"]
+	style = colorful
+[credential]
+	helper = osxkeychain
+[gui]
+	recentrepo = /Users/rick/Box Sync/TU/bachelorseminarium/tex
+[diff]
+	tool = vimdiff
+[merge]
+	tool = vimdiff
