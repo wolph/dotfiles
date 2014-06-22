@@ -1,4 +1,3 @@
-
 # Load RVM into a shell session *as a function*
 [[ -s "$HOME/.rvm/scripts/rvm" ]] && source "$HOME/.rvm/scripts/rvm"
 
@@ -14,7 +13,7 @@ _append_to_path() {
 }
 
 _insert_to_path() {
-    if [ -d "$1" ] && [[ ":$PATH:" != *":$1:"* ]]; then
+    if [ -d "$1" ]; then
         PATH="$1:$PATH"
     fi
 
@@ -28,10 +27,14 @@ _append_to_path /sbin
 _append_to_path /bin
 _append_to_path /usr/sbin
 _append_to_path /usr/bin
-_append_to_path /Users/rick/bin/Sencha/Cmd/*
+# _append_to_path /Users/rick/bin/Sencha/Cmd/*
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 
-_insert_to_path /usr/local/sbin ~/bin $HOME/.rvm/bin /usr/local/bin
+_insert_to_path
+_insert_to_path /usr/local/sbin
+_insert_to_path ~/bin
+_insert_to_path $HOME/.rvm/bin
+_insert_to_path /usr/local/bin
 
 export PATH
 
