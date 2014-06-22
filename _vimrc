@@ -45,6 +45,8 @@ Bundle 'alfredodeza/coveragepy.vim'
 Bundle 'alfredodeza/pytest.vim'
 Bundle 'pig.vim'
 Bundle 'hunner/vim-plist'
+Bundle 'jmcantrell/vim-virtualenv'
+Bundle 'rizzatti/dash.vim'
 
 " Lots of snippets
 Bundle 'honza/vim-snippets'
@@ -546,3 +548,7 @@ augroup resCur
   autocmd!
   autocmd BufWinEnter * call ResCur()
 augroup END
+
+" For weird PATH stuff on OS X either enable this, or make the path_helper not
+" executable anymore: sudo chmod ugo-x /usr/libexec/path_helper
+" set shell=/bin/bash
