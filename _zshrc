@@ -1,5 +1,11 @@
 # vim: ft=zsh
 
+# Fixing OS X Path annoyances
+if [ -x /usr/libexec/path_helper ]; then
+    echo 'Removing the execute flag from the OS X path helper as it is broken'
+    sudo chmod ugo-x /usr/libexec/path_helper
+fi
+
 if [ -x ~/bin/mount_workon ]; then
     export ROOT_DIR=~/
 elif [ -x ./bin/mount_workon ]; then
@@ -134,7 +140,6 @@ alias push='git pull; git push'
 alias find='find -L'
 alias grep='grep --color=auto'
 test -x /usr/local/bin/hub && alias git=/usr/local/bin/hub
-alias gh=git
 # Link vim to the OS X clipboard
 if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
     alias vim="reattach-to-user-namespace vim"
