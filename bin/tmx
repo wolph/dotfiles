@@ -21,7 +21,7 @@ sessions=$(tmux ls 2> /dev/null)
 old_sessions=$(echo "$sessions" \
     | grep -v '(attached)' \
     | awk -F ':' '{print $1}' \
-    | grep -E '\d{14}$')
+    | grep -E -- '-[0-9]{14}$')
 
 if [ -n "$old_sessions" ]; then
     echo "$old_sessions" | xargs -L1 tmux kill-session -t
@@ -30,7 +30,7 @@ fi
 function available_sessions(){
     sessions=$(tmux ls 2> /dev/null | grep -Ei "^[a-z]")
     echo "Available sessions:"
-    echo "$sessions"
+    echo "$sessions" | grep -vE -- '-[0-9]{14}:'
     exit
 }
 
