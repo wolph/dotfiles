@@ -90,6 +90,7 @@ export RPS1='%~'
 
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
+export PIP_DOWNLOAD_CACHE="$HOME/.pip/downloads/"
 
 # Set the java home
 test -x /usr/libexec/java_home && export JAVA_HOME=$(/usr/libexec/java_home)
@@ -113,10 +114,10 @@ zstyle ':completion:*' max-errors 2
 # zstyle :compinstall filename '~/.zshrc'
 
 # Allow local X access, seems to be needed for OSX to work with X properly...
-if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
-    xhost +$(hostname -s) > /dev/null
-    xhost +$(hostname -f) > /dev/null
-fi
+#if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
+#    xhost +$(hostname -s) > /dev/null
+#    xhost +$(hostname -f) > /dev/null
+#fi
 
 # if [ -x ${ROOT_DIR}bin/start_supervisord ]; then
 #     sudo ${ROOT_DIR}bin/start_supervisord
@@ -139,15 +140,16 @@ alias push='git pull; git push'
 # search in symlinks by default
 alias find='find -L'
 alias grep='grep --color=auto'
-test -x /usr/local/bin/hub && alias git=/usr/local/bin/hub
+test -x /usr/local/bin/hub && alias git=hub
 # Link vim to the OS X clipboard
-if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
-    alias vim="reattach-to-user-namespace vim"
-    alias vimdiff="reattach-to-user-namespace vimdiff"
-fi
+#if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
+#    alias vim="reattach-to-user-namespace vim"
+#    alias vimdiff="reattach-to-user-namespace vimdiff"
+#fi
 alias vi='vim'
 alias parallel='parallel --no-notice'
 alias vlc='open -a vlc'
+#alias mplayer='open -a MplayerX.App --args '
 
 # Little trick to change the name of the shell
 . ${ROOT_DIR}bin/iterm2_helpers
@@ -235,7 +237,7 @@ activate(){
 # Virtualenvwrapper stuff
 export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
-export DISPLAY=:0
+#export DISPLAY=:0
 
 . ${ROOT_DIR}bin/mount_workon
 
@@ -370,3 +372,9 @@ if [ 1 -eq "$DEBUG" ]; then
     exec 2>&3 3>&-
 fi
 
+# The following lines were added by compinstall
+zstyle :compinstall filename '/Users/rick/.zshrc'
+
+autoload -Uz compinit
+compinit
+# End of lines added by compinstall
