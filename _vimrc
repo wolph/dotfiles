@@ -47,6 +47,9 @@ Bundle 'pig.vim'
 Bundle 'hunner/vim-plist'
 Bundle 'jmcantrell/vim-virtualenv'
 Bundle 'rizzatti/dash.vim'
+Bundle 'vim-coffee-script'
+Bundle 'tshirtman/vim-cython'
+Bundle 'clickable.vim'
 
 " Lots of snippets
 Bundle 'honza/vim-snippets'
@@ -59,8 +62,21 @@ Bundle 'zedr/zope-snipmate-bundle.git'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
 Bundle 'bonsaiben/bootstrap-snippets'
 
+" Javascript/html indending
 Bundle 'mangege/web-indent'
 Bundle 'pangloss/vim-javascript'
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enable the system clipboard if available
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("clipboard")
+  set clipboard=unnamed " copy to the system clipboard
+
+  if has("unnamedplus") " X11 support
+    set clipboard+=unnamedplus
+  endif
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Surround text/selection with tags
@@ -161,8 +177,8 @@ let g:pymode_rope_always_show_complete_menu = 1
 let g:pymode_rope_short_prefix = "<C-x>t"
 
 " Documentation
-let g:pymode_doc = 1
-let g:pymode_doc_key = 'K'
+" let g:pymode_doc = 1
+" let g:pymode_doc_key = 'K'
 
 "Linting
 let g:pymode_lint = 1
@@ -244,7 +260,7 @@ syntax on
 " General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " How many lines of history to remember
-set history=25000 
+set history=10000 
 " enable error files and error jumping
 set cf 
 " turns out I do like is sharing windows clipboard
@@ -292,6 +308,9 @@ set sessionoptions+=winpos
 if version >= 703
     set undofile
     set undodir=~/.vim/undo
+    set undolevels=10000
+
+    call system('mkdir ' . expand('~/.vim/undo'))
 endif
 " Tell vim to remember certain things when we exit
 " '1000 :  marks will be remembered for up to 10 previously edited files
@@ -533,7 +552,6 @@ if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
     endif
 endif
 
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Save and restore the cursor
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -552,3 +570,7 @@ augroup END
 " For weird PATH stuff on OS X either enable this, or make the path_helper not
 " executable anymore: sudo chmod ugo-x /usr/libexec/path_helper
 " set shell=/bin/bash
+
+" Fixing crontab issues on OS X
+au BufEnter /private/tmp/crontab.* setl backupcopy=yes
+
