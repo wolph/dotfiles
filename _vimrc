@@ -32,31 +32,50 @@ Bundle 'scrooloose/nerdtree'
 Bundle 'tpope/vim-fugitive'
 " Easier way to move around in Vim
 Bundle 'Lokaltog/vim-easymotion'
-" Uber awesome syntax and errors highlighter
-Bundle 'Syntastic' 
 " Snipmate and requirements for TextMate snippets
-Bundle "MarcWeber/vim-addon-mw-utils"
-Bundle "tomtom/tlib_vim"
-" Bundle "garbas/vim-snipmate"
-Bundle "tpope/vim-eunuch"
-Bundle "tpope/vim-repeat"
+Bundle 'MarcWeber/vim-addon-mw-utils'
+Bundle 'tomtom/tlib_vim'
+Bundle 'garbas/vim-snipmate'
+Bundle 'tpope/vim-eunuch'
+Bundle 'tpope/vim-repeat'
 Bundle 'Jinja'
 Bundle 'thiderman/vim-supervisor'
 Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'alfredodeza/coveragepy.vim'
 Bundle 'alfredodeza/pytest.vim'
 Bundle 'pig.vim'
+Bundle 'jmcantrell/vim-virtualenv'
+Bundle 'rizzatti/dash.vim'
+Bundle 'vim-coffee-script'
+Bundle 'tshirtman/vim-cython'
+Bundle 'clickable.vim'
 
 " Lots of snippets
-Bundle "honza/vim-snippets"
+Bundle 'honza/vim-snippets'
 " snippets for BibTeX files
-Bundle "rbonvall/snipmate-snippets-bib"
+Bundle 'rbonvall/snipmate-snippets-bib'
 " snippets for Arduino files
-Bundle "sudar/vim-arduino-snippets"
+Bundle 'sudar/vim-arduino-snippets'
 " snippets for Python, TAL and ZCML
-Bundle "zedr/zope-snipmate-bundle.git"
+Bundle 'zedr/zope-snipmate-bundle.git'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
-Bundle "bonsaiben/bootstrap-snippets"
+Bundle 'bonsaiben/bootstrap-snippets'
+
+" Javascript/html indending
+Bundle 'mangege/web-indent'
+Bundle 'pangloss/vim-javascript'
+
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enable the system clipboard if available
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("clipboard")
+  set clipboard=unnamed " copy to the system clipboard
+
+  if has("unnamedplus") " X11 support
+    set clipboard+=unnamedplus
+  endif
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Surround text/selection with tags
@@ -90,6 +109,14 @@ Bundle 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "<c-n>"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Syntastic, uber awesome syntax and errors highlighter
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Bundle 'Syntastic' 
+
+" shouldn't do Python for us
+let g:syntastic_python_checkers = []
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlP is a plugin to quickly open files
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'kien/ctrlp.vim'
@@ -104,6 +131,7 @@ let g:ctrlp_map = '<c-t>'
 " etc... Essential package for Python development
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'klen/python-mode'
+Bundle 'klen/rope-vim'
 " Python-mode
 " Activate rope
 " Keys:
@@ -148,8 +176,8 @@ let g:pymode_rope_always_show_complete_menu = 1
 let g:pymode_rope_short_prefix = "<C-x>t"
 
 " Documentation
-let g:pymode_doc = 1
-let g:pymode_doc_key = 'K'
+" let g:pymode_doc = 1
+" let g:pymode_doc_key = 'K'
 
 "Linting
 let g:pymode_lint = 1
@@ -190,7 +218,7 @@ Bundle 'davidhalter/jedi-vim'
 " Load rope plugin
 let g:pymode_rope = 0
 
-" Due to a bug(?) in Jedi I'm currently using buffers
+" I find buffer to be quite convenient, but tabs or splits are also an option
 let g:jedi#use_tabs_not_buffers = 0
 let g:jedi#use_splits_not_buffers = 1
 
@@ -209,17 +237,6 @@ let g:jedi#show_call_signatures = "1"
 Bundle 'desert256.vim'
 Bundle 'oceandeep'
 Bundle 'vim-scripts/xorium.vim'
-
-" Enable 256 color support when available
-if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
-    set t_Co=256
-    set t_Sb=[4%dm
-    set t_Sf=[3%dm
-    colo desert256
-    if &diff
-        colorscheme xorium
-    endif
-endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " If we just installed Vundle, install the bundles automatically
@@ -242,7 +259,7 @@ syntax on
 " General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " How many lines of history to remember
-set history=25000 
+set history=10000 
 " enable error files and error jumping
 set cf 
 " turns out I do like is sharing windows clipboard
@@ -289,7 +306,10 @@ set sessionoptions+=winpos
 " Enable global undo even after closing Vim
 if version >= 703
     set undofile
-    set undodir=~/.vim/undo/
+    set undodir=~/.vim/undo
+    set undolevels=10000
+
+    call system('mkdir ' . expand('~/.vim/undo'))
 endif
 " Tell vim to remember certain things when we exit
 " '1000 :  marks will be remembered for up to 10 previously edited files
@@ -357,7 +377,7 @@ endif
 " show matching brackets
 set showmatch 
 " how many tenths of a second to blink matching brackets for
-set mat=5 
+set matchtime=2 
 " do not highlight searched for phrases
 set nohlsearch 
 " BUT do highlight as you type you search phrase
@@ -499,6 +519,10 @@ inoremap <F5> <C-R>=strftime("%F")<CR>
 " Insert the current filename
 nnoremap <F6> "=expand("%:t:r")<CR>P
 inoremap <F6> <C-R>=expand("%:t:r")<CR>
+" Going to matching braces
+inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
+inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autocommands 
@@ -510,9 +534,24 @@ augroup filetypedetect
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
     au BufNewFile,BufRead */templates/*.html setf htmljinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
+    au BufNewFile,BufRead *.qvpp set filetype=html
 augroup END
 
 autocmd Filetype python setlocal suffixesadd=.py
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Colors 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enable 256 color support when available
+if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
+    set t_Co=256
+    set t_Sb=[4%dm
+    set t_Sf=[3%dm
+    colo desert256
+    if &diff
+        colorscheme xorium
+    endif
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Save and restore the cursor
@@ -528,3 +567,11 @@ augroup resCur
   autocmd!
   autocmd BufWinEnter * call ResCur()
 augroup END
+
+" For weird PATH stuff on OS X either enable this, or make the path_helper not
+" executable anymore: sudo chmod ugo-x /usr/libexec/path_helper
+" set shell=/bin/bash
+
+" Fixing crontab issues on OS X
+au BufEnter /private/tmp/crontab.* setl backupcopy=yes
+

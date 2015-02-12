@@ -1,0 +1,10 @@
+#!/usr/bin/env awk -f
+{
+    if(min=="")min=max=$1;
+    if($1>max)max=$1;
+    if($1<min)min=$1;
+    total+=$1;
+}
+END {
+    printf "Total: %d, min: %.3f, avg: %.3f, max: %.3f", NR, min, total/NR, max
+}
