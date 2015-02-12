@@ -227,7 +227,7 @@ activate(){
 # Virtualenvwrapper stuff
 export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
-export DISPLAY=:0
+#export DISPLAY=:0
 
 . ${ROOT_DIR}bin/mount_workon
 
