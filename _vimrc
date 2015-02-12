@@ -311,9 +311,11 @@ set wildmode=list:full
 " ignore formats
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyo,*.pyc,*.swp,*.jpg,*.gif,*.png 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*\\tmp\\*,*.swp,*.zip,*.exe,*.dll
+if version >= 703
+    set wildignorecase
+endif
 if version >= 704
-    set nowildignorecase
-    set nofileignorecase 
+    set fileignorecase 
 endif
 " Always show current positions along the bottom 
 set ruler 
