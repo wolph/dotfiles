@@ -33,9 +33,6 @@ Bundle 'tpope/vim-fugitive'
 " Easier way to move around in Vim
 Bundle 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
-Bundle 'MarcWeber/vim-addon-mw-utils'
-Bundle 'tomtom/tlib_vim'
-Bundle 'garbas/vim-snipmate'
 Bundle 'tpope/vim-eunuch'
 Bundle 'tpope/vim-repeat'
 Bundle 'Jinja'
@@ -50,6 +47,16 @@ Bundle 'vim-coffee-script'
 Bundle 'tshirtman/vim-cython'
 Bundle 'clickable.vim'
 
+" Javascript/html indending
+Bundle 'mangege/web-indent'
+Bundle 'pangloss/vim-javascript'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Snippets
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Track the engine.
+Plugin 'SirVer/ultisnips'
+
 " Lots of snippets
 Bundle 'honza/vim-snippets'
 " snippets for BibTeX files
@@ -61,10 +68,13 @@ Bundle 'zedr/zope-snipmate-bundle.git'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
 Bundle 'bonsaiben/bootstrap-snippets'
 
-" Javascript/html indending
-Bundle 'mangege/web-indent'
-Bundle 'pangloss/vim-javascript'
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
+" " If you want :UltiSnipsEdit to split your window.
+" let g:UltiSnipsEditSplit="vertical"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
