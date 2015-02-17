@@ -34,7 +34,7 @@ function mount_file(){
 }
 
 function unmount_file(){
-    if [ -d "$1" ]; then
+    if [ -d "$1" ] && [ -f "$1.sparseimage*" ]; then
         echo "Unmounting $1"
         ~/bin/unmount_image "$1" &
     fi
