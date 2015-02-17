@@ -55,8 +55,6 @@
 	trustExitCode = true
 [ghi "highlight"]
 	style = colorful
-[credential]
-	helper = osxkeychain
 [gui]
 	recentrepo = /Users/rick/Box Sync/TU/bachelorseminarium/tex
 [diff]
