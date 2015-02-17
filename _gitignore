@@ -1,20 +1,22 @@
+# Just some standard files/globs to ignore
 .DS_Store
 
 *.pyc
 *.pyo
-cache/*
-cache.db
-config.ini
-Logs/*
-sickbeard.db*
-autoProcessTV/autoProcessTV.cfg
-*~
 .*.swp
 .*.swo
-env/
+*~
 *.egg
 *.egg-info
-.idea
+
+# Test stuff
+/.tox/
+/.coverage
+
+cache/*
+.cache/*
+
+newrelic.ini
 
 .fseventsd
 .todo_cache

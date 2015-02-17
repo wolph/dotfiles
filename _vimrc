@@ -22,6 +22,15 @@ if !filereadable(vundle_readme)
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Check python version if available
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("python")
+    python import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
+else
+    let python_version=0
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Load and install the Bundles using Vundle
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set rtp+=~/.vim/bundle/vundle/
@@ -33,9 +42,6 @@ Bundle 'tpope/vim-fugitive'
 " Easier way to move around in Vim
 Bundle 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
-Bundle 'MarcWeber/vim-addon-mw-utils'
-Bundle 'tomtom/tlib_vim'
-Bundle 'garbas/vim-snipmate'
 Bundle 'tpope/vim-eunuch'
 Bundle 'tpope/vim-repeat'
 Bundle 'Jinja'
@@ -44,11 +50,32 @@ Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'alfredodeza/coveragepy.vim'
 Bundle 'alfredodeza/pytest.vim'
 Bundle 'pig.vim'
-Bundle 'jmcantrell/vim-virtualenv'
+if python_version >= 205
+    " Uses with_statement so python 2.5 or higher
+    Bundle 'jmcantrell/vim-virtualenv'
+endif
 Bundle 'rizzatti/dash.vim'
 Bundle 'vim-coffee-script'
 Bundle 'tshirtman/vim-cython'
-Bundle 'clickable.vim'
+" Bundle 'clickable.vim'
+
+" Javascript/html indending
+Bundle 'mangege/web-indent'
+Bundle 'pangloss/vim-javascript'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Snippets
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Track the engine.
+
+if python_version >= 205
+    " Uses with_statement so python 2.5 or higher
+    Plugin 'SirVer/ultisnips'
+else
+    Bundle "MarcWeber/vim-addon-mw-utils"
+    Bundle "tomtom/tlib_vim"
+    Bundle "garbas/vim-snipmate"
+endif
 
 " Lots of snippets
 Bundle 'honza/vim-snippets'
@@ -61,10 +88,13 @@ Bundle 'zedr/zope-snipmate-bundle.git'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
 Bundle 'bonsaiben/bootstrap-snippets'
 
-" Javascript/html indending
-Bundle 'mangege/web-indent'
-Bundle 'pangloss/vim-javascript'
+" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
+let g:UltiSnipsExpandTrigger="<tab>"
+let g:UltiSnipsJumpForwardTrigger="<c-b>"
+let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 
+" " If you want :UltiSnipsEdit to split your window.
+" let g:UltiSnipsEditSplit="vertical"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
@@ -111,10 +141,12 @@ let g:SuperTabDefaultCompletionType = "<c-n>"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'Syntastic' 
+if version >= 702
+    Bundle 'Syntastic' 
 
-" shouldn't do Python for us
-let g:syntastic_python_checkers = []
+    " shouldn't do Python for us
+    let g:syntastic_python_checkers = []
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlP is a plugin to quickly open files
@@ -331,9 +363,11 @@ set wildmode=list:full
 " ignore formats
 set wildignore=*.dll,*.o,*.obj,*.bak,*.exe,*.pyo,*.pyc,*.swp,*.jpg,*.gif,*.png 
 set wildignore+=*/tmp/*,*.so,*.swp,*.zip,*\\tmp\\*,*.swp,*.zip,*.exe,*.dll
+if version >= 703
+    set wildignorecase
+endif
 if version >= 704
-    set nowildignorecase
-    set nofileignorecase 
+    set fileignorecase 
 endif
 " Always show current positions along the bottom 
 set ruler 
