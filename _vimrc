@@ -22,6 +22,15 @@ if !filereadable(vundle_readme)
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Check python version if available
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("python")
+    python import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
+else
+    let python_version=0
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Load and install the Bundles using Vundle
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 set rtp+=~/.vim/bundle/vundle/
@@ -41,11 +50,14 @@ Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'alfredodeza/coveragepy.vim'
 Bundle 'alfredodeza/pytest.vim'
 Bundle 'pig.vim'
-Bundle 'jmcantrell/vim-virtualenv'
+if python_version >= 205
+    " Uses with_statement so python 2.5 or higher
+    Bundle 'jmcantrell/vim-virtualenv'
+endif
 Bundle 'rizzatti/dash.vim'
 Bundle 'vim-coffee-script'
 Bundle 'tshirtman/vim-cython'
-Bundle 'clickable.vim'
+" Bundle 'clickable.vim'
 
 " Javascript/html indending
 Bundle 'mangege/web-indent'
@@ -55,7 +67,15 @@ Bundle 'pangloss/vim-javascript'
 " Snippets
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Track the engine.
-Plugin 'SirVer/ultisnips'
+
+if python_version >= 205
+    " Uses with_statement so python 2.5 or higher
+    Plugin 'SirVer/ultisnips'
+else
+    Bundle "MarcWeber/vim-addon-mw-utils"
+    Bundle "tomtom/tlib_vim"
+    Bundle "garbas/vim-snipmate"
+endif
 
 " Lots of snippets
 Bundle 'honza/vim-snippets'
@@ -121,10 +141,12 @@ let g:SuperTabDefaultCompletionType = "<c-n>"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'Syntastic' 
+if version >= 702
+    Bundle 'Syntastic' 
 
-" shouldn't do Python for us
-let g:syntastic_python_checkers = []
+    " shouldn't do Python for us
+    let g:syntastic_python_checkers = []
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlP is a plugin to quickly open files
