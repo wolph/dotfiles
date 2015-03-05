@@ -63,6 +63,8 @@ Bundle 'tshirtman/vim-cython'
 Bundle 'mangege/web-indent'
 Bundle 'pangloss/vim-javascript'
 
+Bundle 'markcornick/vim-vagrant'
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Snippets
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
