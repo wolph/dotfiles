@@ -2,8 +2,8 @@
 
 VIRTUALENVWRAPPER_PYTHON=$(which python)
 
-if [ ! $(command -v original_workon >/dev/null 2>&1) ]; then
-    if [ $(command -v virtualenvwrapper_lazy.sh >/dev/null 2>&1) ]; then
+if [ ! $(command -v original_workon >/dev/null) ]; then
+    if [[ $(command -v virtualenvwrapper_lazy.sh >/dev/null) -eq 0 ]]; then
         . $(which virtualenvwrapper_lazy.sh)
         eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
     fi
