@@ -164,8 +164,10 @@ let g:ctrlp_map = '<c-t>'
 " Lint, code completion, documentation lookup, jumping to classes/methods,
 " etc... Essential package for Python development
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'klen/python-mode'
-Bundle 'klen/rope-vim'
+if python_version >= 205
+    Bundle 'klen/python-mode'
+    Bundle 'klen/rope-vim'
+endif
 " Python-mode
 " Activate rope
 " Keys:
@@ -247,7 +249,9 @@ let g:pymode_folding = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Jedi plugin for better autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'davidhalter/jedi-vim'
+if python_version >= 205
+    Bundle 'davidhalter/jedi-vim'
+endif
 
 " Load rope plugin
 let g:pymode_rope = 0
