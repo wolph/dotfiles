@@ -300,8 +300,6 @@ syntax on
 set history=10000 
 " enable error files and error jumping
 set cf 
-" turns out I do like is sharing windows clipboard
-set clipboard+=unnamed 
 " support all three, in this order
 set ffs=unix,dos,mac 
 " make sure it can save viminfo
