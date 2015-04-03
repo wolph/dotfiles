@@ -67,6 +67,7 @@ export LANG=en_US.UTF-8
 
 # Adding my own completion functions
 fpath=(/usr/local/share/zsh-completions $fpath)
+fpath=(/usr/local/share/zsh/site-functions/ $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 
