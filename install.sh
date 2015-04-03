@@ -3,6 +3,9 @@
 delete=false
 replace=false
 
+git submodule init
+git submodule update
+
 while getopts dr o
 do
     case "$o" in
