@@ -1,9 +1,5 @@
 # vim: ft=zsh
 
-if [ -e '/usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh' ]; then
-    source /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-fi
-
 # Fixing OS X Path annoyances
 if [ -x /usr/libexec/path_helper ]; then
     echo 'Removing the execute flag from the OS X path helper as it is broken'
