@@ -229,6 +229,10 @@ activate(){
     if [ -e "activate" ]; then
         . ${ROOT_DIR}activate
         _virtualenv_tmux_name
+
+        if [ -f "${VIRTUAL_ENV}/.project" ]; then
+            cd $(cat "${VIRTUAL_ENV}/.project")
+        fi
         return
     fi
     # if our current dir is the name of a virtualenv, activate
