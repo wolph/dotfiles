@@ -14,6 +14,8 @@ Installation
 
 If you are brave enough to give it a try, the install is fairly simple:
 
+::
+
     git clone https://github.com/WoLpH/dotfiles.git
     cd dotfiles
     ./install.sh
@@ -25,6 +27,8 @@ Uninstallation
 ==============================================================================
 
 If you don't like it anymore, there's always the uninstall script.
+
+::
 
     cd dotfiles
     ./uninstall.sh
