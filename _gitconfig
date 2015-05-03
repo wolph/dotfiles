@@ -17,6 +17,7 @@
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
 	global-gc = !git-global-gc
+	pull = pull --rebase
 
     repo = !gh repo \"$@\"
     user = !gh user \"$@\"
