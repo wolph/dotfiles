@@ -1,0 +1,7 @@
+#!/usr/bin/osascript
+
+tell application "/Applications/Google Chrome.app"
+	tell the active tab of its first window
+		reload
+	end tell
+end tell
