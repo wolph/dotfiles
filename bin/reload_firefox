@@ -1,0 +1,7 @@
+#!/usr/bin/osascript
+
+tell application "Firefox"
+	activate
+	delay 0.3
+	tell application "System Events" to keystroke "r" using command down
+end tell
