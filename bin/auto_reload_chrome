@@ -6,33 +6,32 @@
 trap("SIGINT") { exit }
 
 if ARGV.length < 2
-  puts "Usage: #{$0} watch_folder keyword"
-  puts "Example: #{$0} . mywebproject"
-  exit
+    puts "Usage: #{$0} watch_folder keyword"
+    puts "Example: #{$0} . mywebproject"
+    exit
 end
 
-dev_extension = 'dev'
 filetypes = ['css','html','htm','php','rb','erb','less','js']
 watch_folder = ARGV[0]
 keyword = ARGV[1]
 puts "Watching #{watch_folder} and subfolders for changes in project files..."
 
 while true do
-  files = []
-  filetypes.each {|type|
-    files += Dir.glob( File.join( watch_folder, "**", "*.#{type}" ) )
-  }
-  new_hash = files.collect {|f| [ f, File.stat(f).mtime.to_i ] }
-  hash ||= new_hash
-  diff_hash = new_hash - hash
+    files = []
+    filetypes.each {|type|
+        files += Dir.glob( File.join( watch_folder, "**", "*.#{type}" ) )
+    }
+    new_hash = files.collect {|f| [ f, File.stat(f).mtime.to_i ] }
+    hash ||= new_hash
+    diff_hash = new_hash - hash
 
-  unless diff_hash.empty?
-    hash = new_hash
+    unless diff_hash.empty?
+        hash = new_hash
 
-    diff_hash.each do |df|
-      puts "Detected change in #{df[0]}, refreshing"
-      %x{osascript<<ENDGAME
-            tell application "Google Chrome"
+        diff_hash.each do |df|
+            puts "Detected change in #{df[0]}, refreshing"
+            %x{osascript<<ENDGAME
+            tell application "/Applications/Google Chrome.app"
             	set windowList to every window
             	repeat with aWindow in windowList
             		set tabList to every tab of aWindow
@@ -44,11 +43,12 @@ while true do
             	end repeat
             end tell
 ENDGAME
-}
+            }
+            break
+        end
     end
-  end
 
-  sleep 1
+    sleep 1
 end
 
 #       	tell application "Safari"
