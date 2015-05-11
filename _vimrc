@@ -61,7 +61,6 @@ Bundle 'logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
-Bundle 'mangege/web-indent'
 Bundle 'pangloss/vim-javascript'
 
 Bundle 'markcornick/vim-vagrant'
