@@ -103,7 +103,8 @@ let g:UltiSnipsJumpBackwardTrigger="<c-z>"
 " Enable the system clipboard if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("clipboard")
-  set clipboard=unnamed " copy to the system clipboard
+  set clipboard=unnamed " copy to the system clipboardA
+  set mouse=n
 
   if has("unnamedplus") " X11 support
     set clipboard+=unnamedplus
@@ -391,7 +392,8 @@ set bs=indent,eol,start
 " backspace and cursor keys wrap to
 set whichwrap+=<,>,h,l  
 " use mouse for help but not everywhere
-set mouse=n 
+set mouse=h
+
 " shortens messages to avoid 'press a key' prompt 
 set shortmess=atI 
 " tell us when anything is changed via :...
