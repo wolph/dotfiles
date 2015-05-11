@@ -57,6 +57,7 @@ endif
 Bundle 'rizzatti/dash.vim'
 Bundle 'vim-coffee-script'
 Bundle 'tshirtman/vim-cython'
+Bundle 'logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
