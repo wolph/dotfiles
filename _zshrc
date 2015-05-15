@@ -59,12 +59,6 @@ zmodload -a colors
 zmodload -a autocomplete
 zmodload -a complist
 
-if [ ! -d "~/.zsh/plugins" ]; then
-    for f in ~/.zsh/plugins/*; do
-        . "$f"
-    done
-fi
-
 export LANG=en_US.UTF-8
 
 # Adding my own completion functions
@@ -84,9 +78,6 @@ fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 # antigen bundle sharat87/zsh-vim-mode
 # antigen bundle kennethreitz/autoenv
 # antigen apply
-
-autoload -U compinit
-compinit -u
 
 # $PATH changes are done in .zprofile
 
@@ -408,9 +399,14 @@ if [ 1 -eq "$DEBUG" ]; then
     exec 2>&3 3>&-
 fi
 
-# The following lines were added by compinstall
-zstyle :compinstall filename '/Users/rick/.zshrc'
-
+autoload bashcompinit
+bashcompinit
 autoload -Uz compinit
 compinit
-# End of lines added by compinstall
+
+if [ ! -d "~/.zsh/plugins" ]; then
+    for f in ~/.zsh/plugins/*; do
+        . "$f"
+    done
+fi
+
