@@ -27,6 +27,10 @@ if [ 1 -eq "$DEBUG" ]; then
     setopt xtrace prompt_subst
 fi
 
+function command_exists(){
+    type $1 2>/dev/null | grep -vq ' not found'
+}
+
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
     alias gdate=date
