@@ -487,6 +487,10 @@ set smartcase
 set completeopt=menu,longest,preview 
 " set cursorcolumn " show the current column
 
+" Make sure # doesn't start at the beginning of the line
+set cinkeys-=0#
+set indentkeys-=0#
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Folding
 "    Enable folding, but by default make it act like folding is 
