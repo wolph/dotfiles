@@ -111,6 +111,9 @@ if has("clipboard")
   endif
 endif
 
+" Toggle paste mode with ctrl+i
+set pastetoggle=<C-i>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Surround text/selection with tags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
