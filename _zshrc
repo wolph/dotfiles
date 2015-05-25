@@ -281,16 +281,16 @@ bindkey '^[[6~' end-of-history
 bindkey '\e[5~' insert-last-word
 
 # History search should use patterns on 5.x and normal search on 4.x or lower
-if [[ $ZSH_VERSION == 5.* ]]; then
-    bindkey '^R' history-incremental-pattern-search-backward
-    bindkey '^S' history-incremental-pattern-search-forward
-    bindkey '^Xr' history-incremental-pattern-search-backward
-    bindkey '^Xs' history-incremental-pattern-search-forward
-else
+if [[ "$ZSH_VERSION" < 5 ]]; then
     bindkey '^R' history-incremental-search-backward
     bindkey '^S' history-incremental-search-forward
     bindkey '^Xr' history-incremental-search-backward
     bindkey '^Xs' history-incremental-search-forward
+else
+    bindkey '^R' history-incremental-pattern-search-backward
+    bindkey '^S' history-incremental-pattern-search-forward
+    bindkey '^Xr' history-incremental-pattern-search-backward
+    bindkey '^Xs' history-incremental-pattern-search-forward
 fi
 
 bindkey '^[[A' up-line-or-history
