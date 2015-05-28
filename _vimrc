@@ -17,7 +17,7 @@ if !filereadable(vundle_readme)
     echo "Installing Vundle.."
     echo ""
     silent !mkdir -p ~/.vim/bundle
-    silent !git clone https://github.com/gmarik/vundle ~/.vim/bundle/vundle
+    silent !git clone https://github.com/WoLpH/Vundle.vim ~/.vim/bundle/vundle
     let iCanHazVundle=0
 endif
 
@@ -36,7 +36,7 @@ endif
 set rtp+=~/.vim/bundle/vundle/
 call vundle#rc()
 " Tree like file browser
-Bundle 'scrooloose/nerdtree'
+Bundle 'WoLpH/nerdtree@patch-1'
 " A Git wrapper so awesome, it should be illegal
 Bundle 'tpope/vim-fugitive'
 " Easier way to move around in Vim
@@ -90,6 +90,8 @@ Bundle 'sudar/vim-arduino-snippets'
 Bundle 'zedr/zope-snipmate-bundle.git'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
 Bundle 'bonsaiben/bootstrap-snippets'
+
+Bundle 'vim-flake8'
 
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 let g:UltiSnipsExpandTrigger="<tab>"
