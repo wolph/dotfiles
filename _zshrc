@@ -93,7 +93,6 @@ export RPS1='%~'
 
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
-export PIP_DOWNLOAD_CACHE="$HOME/.pip/downloads/"
 
 # Set the java home
 test -x /usr/libexec/java_home && export JAVA_HOME=$(/usr/libexec/java_home)
