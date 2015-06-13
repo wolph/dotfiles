@@ -71,9 +71,9 @@ Bundle 'chase/vim-ansible-yaml'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Track the engine.
 
-if python_version >= 205
+if python_version >= 205 && version >= 704
     " Uses with_statement so python 2.5 or higher
-    Plugin 'SirVer/ultisnips'
+    Bundle 'SirVer/ultisnips'
 else
     Bundle "MarcWeber/vim-addon-mw-utils"
     Bundle "tomtom/tlib_vim"
@@ -94,10 +94,13 @@ Bundle 'bonsaiben/bootstrap-snippets'
 Bundle 'vim-flake8'
 
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<tab>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-
+if python_version >= 205 && version >= 704
+    " Uses with_statement so python 2.5 or higher
+    let g:UltiSnipsExpandTrigger="<tab>"
+    let g:UltiSnipsJumpForwardTrigger="<c-b>"
+    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+endif
+    
 " " If you want :UltiSnipsEdit to split your window.
 " let g:UltiSnipsEditSplit="vertical"
 
