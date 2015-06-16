@@ -255,6 +255,9 @@ fi
 # reset all bindkeys, this makes vi mode work _much_ faster
 bindkey -rpM viins '\e'
 
+# Vim mode
+bindkey -v
+
 #Rebind HOME and END to do the decent thing:
 bindkey '^[[1~' beginning-of-line
 bindkey '^[[4~' end-of-line
