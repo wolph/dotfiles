@@ -69,8 +69,9 @@ Bundle 'chase/vim-ansible-yaml'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Gudo, the holy grail in undos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'Gundo'
+Bundle 'dsummersl/gundo.vim'
 nnoremap U :silent GundoToggle<CR>
+let g:gundo_verbose_graph=0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Snippets
