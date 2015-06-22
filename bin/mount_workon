@@ -43,8 +43,8 @@ function unmount_file(){
 }
 
 function workon(){
-    project_dir="$HOME/workspace/$1"
-    env_dir="$HOME/envs/$1"
+    project_dir="${PROJECT_HOME}$1"
+    env_dir="${WORKON_HOME}$1"
     mount_file "$project_dir"
     mount_file "$env_dir"
     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
@@ -62,8 +62,8 @@ function workoff(){
     # Make sure we don't block anything by changing directory
     cd
 
-    project_dir="$HOME/workspace/$1"
-    env_dir="$HOME/envs/$1"
+    project_dir="${PROJECT_HOME}$1"
+    env_dir="${WORKON_HOME}$1"
     unmount_file "$project_dir"
     unmount_file "$env_dir"
 }
