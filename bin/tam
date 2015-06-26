@@ -1,0 +1,111 @@
+#!/usr/bin/env zsh
+# Tmate launcher/wrapper, similar to tmux wrapper but with tmate
+#
+# To install tmate:
+#  brew update
+#  brew tap nviennot/tmate
+#  brew install tmate
+
+# Works because zsh automatically trims by assigning to variables and passing
+# arguments
+trim() { echo $1; }
+
+# List all sessions only if there is a server running
+sessions=$(tmate ls 2> /dev/null)
+
+# Clean up old sessions
+old_sessions=$(echo "$sessions" \
+    | grep -v '(attached)' \
+    | awk -F ':' '{print $1}' \
+    | grep -E -- '-[0-9]{14}$')
+
+if [ -n "$old_sessions" ]; then
+    echo "$old_sessions" | xargs -L1 tmate kill-session -t
+fi
+
+function available_sessions(){
+    sessions=$(tmate ls 2> /dev/null | grep -Ei "^[a-z]")
+    echo "Available sessions:"
+    echo "$sessions" | grep -vE -- '-[0-9]{14}:'
+    exit
+}
+
+if [[ -z "$1" ]]; then
+    echo "Specify session name as the first argument"
+    echo
+    available_sessions
+    exit
+fi
+
+base_session="$1"
+
+[ -n "$ITERM_PROFILE" ] && echo -ne "\e]1;$base_session\a"
+
+# This actually works without the trim() on all systems except OSX
+tmate_nb=$(trim `echo "$sessions" | grep "^$base_session:" | wc -l`)
+if [[ "$tmate_nb" == "0" ]]; then
+
+    # Virtualenvwrapper stores the projects in the $PROJECT_HOME directory so
+    # see if there's a project to activate :)
+    project_path="$PROJECT_HOME$1"
+    project_image="$project_path.sparseimage"
+
+    if [ -f "$project_image.bz2" ]; then
+        pbzip2 -dvv "$project_image.bz2"
+    fi
+
+    if [ -d "$project_path" ] || [ -f "$project_image" ]; then
+        . ~/bin/mount_workon
+        workon "$1"
+        cd "$PROJECT_HOME$1"
+    fi
+
+    if [ -d "$project_path" ]; then
+        export HISTFILE="$PROJECT_HOME$1/.zshhistory"
+        if [ ! -f "$HISTFILE" ]; then
+            cp ~/.zshhistory "$HISTFILE"
+        fi
+    fi
+
+    echo "Launching tmate base session $base_session ..."
+    rc="$project_path/.tmuxrc"
+    if [ -f $rc ]; then
+        . $rc
+    else
+        tmate -2 new-session -s $base_session
+    fi
+else
+    # Make sure we are not already in a tmate session
+    if [[ -z "$TMUX" ]]; then
+        # Kill defunct sessions first
+        old_sessions=$(tmate ls 2>/dev/null | egrep "^[0-9]{14}.*[0-9]+\)$" | cut -f 1 -d:)
+        for old_session_id in $old_sessions; do
+            tmate kill-session -t $old_session_id
+        done
+
+        echo "Launching copy of base session $base_session ..."
+        # Session is is date and time to prevent conflict
+        session_id="${base_session}-$(date +%Y%m%d%H%M%S)"
+
+        # Create a new session (without attaching it) and link to base session 
+        # to share windows
+        tmate new-session -d -t $base_session -s $session_id
+
+        # Attach to the new session
+        echo "Attaching tmate -2 attach-session -t $session_id"
+        tmate -2 attach-session -t $session_id
+
+        # When we detach from it, kill the session
+        #tmate kill-session -t $session_id
+    fi
+fi 
+
+sessions=$(tmate ls 2> /dev/null && tmate ls)
+sessions=$(echo "$sessions" | grep "$1")
+if [[ -z "$sessions" ]]; then
+    . ~/bin/mount_workon
+    workoff "$1"
+fi
+
+test -n "$ITERM_PROFILE" && echo -ne "\e]0;\a"
+
