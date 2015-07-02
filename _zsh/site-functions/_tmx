@@ -1,4 +1,4 @@
-#compdef tmx
+#compdef tmx rtmx tmate
 
 local active_sessions all_sessions
 
