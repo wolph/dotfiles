@@ -82,3 +82,20 @@
 	required = true
 [http]
 	postBuffer = 524288000
+
+[url "http://github.com/"]
+  insteadOf = "gh:"
+  insteadOf = "gh://"
+
+[url "git@github.com:"]
+  pushInsteadOf = "https://github.com/"
+  pushInsteadOf = "http://github.com/"
+  pushInsteadOf = "gh:"
+  pushInsteadOf = "gh://"
+
+[url "https://gist.github.com/"]
+  insteadOf = "gist:"
+[url "git@gist.github.com:"]
+  pushInsteadOf = "https://gist.github.com/"
+  pushInsteadOf = "http://gist.github.com/"
+  pushInsteadOf = "gist:"
