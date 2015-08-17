@@ -46,6 +46,7 @@
 	file-view-hpane-position = 350
 [push]
 	default = matching
+	followTags = true
 [hub]
 	protocol = https
 [difftool "sourcetree"]
