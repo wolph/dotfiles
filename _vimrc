@@ -140,11 +140,14 @@ autocmd FileType rst vmap m S:math<CR>
 Bundle 'Rykka/riv.vim'
 " Set the default path for Riv (Not supported yet, will work in 0.75 and up)
 let g:riv_default_path = "~/Desktop/TU"
-let g:riv_projects = [{'path': './',  'build_path': 'build'}]
+let main_project = {'path': './',  'build_path': 'build'}
+let sphinx_project = {'path': './docs/',  'build_path': './docs/_build'}
+let g:riv_projects = [main_project, sphinx_project]
 
 " Set the default (web|file)browser for OS X
 let g:riv_ft_browser = "open"
 let g:riv_web_browser = "open"
+let g:riv_file_link_style = 2
 
 augroup filetypedetect
     au BufNewFile,BufRead *.rst set suffixesadd+=.rst
