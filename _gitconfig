@@ -63,13 +63,14 @@
 	tool = vimdiff
 [merge]
 	tool = vimdiff
+    renormalize = true
+[mergetool]
+	keepBackup = false
 
 #[filter "spabs"]
 #    clean = gexpand --initial -t 4
 #    smudge = gexpand --initial -t 4
 #    required
-[merge]
-    renormalize = true
 
 [include]
     path = .gitconfig.local
