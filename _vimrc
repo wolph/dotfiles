@@ -65,6 +65,8 @@ Bundle 'pangloss/vim-javascript'
 
 Bundle 'markcornick/vim-vagrant'
 Bundle 'chase/vim-ansible-yaml'
+Bundle 'copy-as-rtf'
+Bundle 'mikewest/vimroom'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Gudo, the holy grail in undos
