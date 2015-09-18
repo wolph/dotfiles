@@ -65,7 +65,9 @@ Bundle 'pangloss/vim-javascript'
 
 Bundle 'markcornick/vim-vagrant'
 Bundle 'chase/vim-ansible-yaml'
-Bundle 'copy-as-rtf'
+if has('mac')
+    Bundle 'copy-as-rtf'
+endif
 Bundle 'mikewest/vimroom'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
