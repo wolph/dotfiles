@@ -241,7 +241,7 @@ let g:pymode_rope_short_prefix = "<C-x>t"
 
 "Linting
 let g:pymode_lint = 1
-let g:pymode_lint_checker = "pep8,pyflakes"
+" let g:pymode_lint_checker = "pep8,pyflakes"
 " Auto check on save
 let g:pymode_lint_write = 1
 " Check while typing
