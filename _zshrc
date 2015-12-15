@@ -1,10 +1,10 @@
 # vim: ft=zsh
 
 # Fixing OS X Path annoyances
-if [ -x /usr/libexec/path_helper ]; then
-    echo 'Removing the execute flag from the OS X path helper as it is broken'
-    sudo chmod ugo-x /usr/libexec/path_helper
-fi
+# if [ -x /usr/libexec/path_helper ]; then
+#     echo 'Removing the execute flag from the OS X path helper as it is broken'
+#     sudo chmod ugo-x /usr/libexec/path_helper
+# fi
 
 if [ -x ~/bin/mount_workon ]; then
     export ROOT_DIR=~/
