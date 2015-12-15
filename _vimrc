@@ -71,7 +71,7 @@ endif
 Bundle 'mikewest/vimroom'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Gudo, the holy grail in undos
+" Gundo, the holy grail in undos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'dsummersl/gundo.vim'
 nnoremap U :silent GundoToggle<CR>
@@ -114,6 +114,10 @@ endif
     
 " " If you want :UltiSnipsEdit to split your window.
 " let g:UltiSnipsEditSplit="vertical"
+
+command! -nargs=1 Silent
+\ | execute ':silent !'.<q-args>
+\ | execute ':redraw!'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
@@ -641,7 +645,7 @@ augroup END
 au BufEnter /private/tmp/crontab.* setl backupcopy=yes
 
 " Make needed directories when writing files
-function s:MkNonExDir(file, buf)
+function! s:MkNonExDir(file, buf)
     if empty(getbufvar(a:buf, '&buftype')) && a:file!~#'\v^\w+\:\/'
         let dir=fnamemodify(a:file, ':h')
         if !isdirectory(dir)
