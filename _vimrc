@@ -62,6 +62,7 @@ Bundle 'logstash.vim'
 
 " Javascript/html indending
 Bundle 'pangloss/vim-javascript'
+Bundle 'rstacruz/sparkup'
 
 Bundle 'markcornick/vim-vagrant'
 Bundle 'chase/vim-ansible-yaml'
@@ -102,7 +103,9 @@ Bundle 'zedr/zope-snipmate-bundle.git'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
 Bundle 'bonsaiben/bootstrap-snippets'
 
-Bundle 'vim-flake8'
+" Rainbow parenthesis
+Bundle 'luochen1990/rainbow'
+let g:rainbow_active=1
 
 " Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
 if python_version >= 205 && version >= 704
@@ -120,8 +123,24 @@ command! -nargs=1 Silent
 \ | execute ':redraw!'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Check flake8 whenever a Python file is written
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Bundle 'nvie/vim-flake8'
+" autocmd BufWritePost *.py call Flake8()
+" let g:flake8_show_quickfix=0
+" let g:flake8_show_in_gutter=1
+" let g:flake8_show_in_file=0
+Bundle 'andviro/flake8-vim'
+let g:PyFlakeOnWrite = 1
+let g:PyFlakeCWindow = 0 
+let g:PyFlakeDisabledMessages = 'W391'
+
+autocmd TextChanged *.py silent PyFlake
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
 if has("clipboard")
   set clipboard=unnamed " copy to the system clipboardA
   set mouse=n
@@ -192,87 +211,87 @@ let g:ctrlp_map = '<c-t>'
 " Lint, code completion, documentation lookup, jumping to classes/methods,
 " etc... Essential package for Python development
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if python_version >= 205
-    Bundle 'klen/python-mode'
-    Bundle 'klen/rope-vim'
-endif
-" Python-mode
-" Activate rope
-" Keys:
-" K             Show python docs
-" <Ctrl-Space>  Rope autocomplete
-" <Ctrl-c>g     Rope goto definition
-" <Ctrl-c>d     Rope show documentation
-" <Ctrl-c>f     Rope find occurrences
-" <Leader>b     Set, unset breakpoint (g:pymode_breakpoint enabled)
-" [[            Jump on previous class or function (normal, visual, operator modes)
-" ]]            Jump on next class or function (normal, visual, operator modes)
-" [M            Jump on previous class or method (normal, visual, operator modes)
-" ]M            Jump on next class or method (normal, visual, operator modes)
-
-" No need for Rope completion with Jedi
-" Load rope plugin
-let g:pymode_rope = 1
-
-" Map keys for autocompletion
-let g:pymode_rope_autocomplete_map = '<C-Space>'
-
-" Auto create and open ropeproject
-let g:pymode_rope_auto_project = 1
-
-" Enable autoimport
-let g:pymode_rope_enable_autoimport = 1
-
-" Auto generate global cache
-let g:pymode_rope_autoimport_generate = 1
-let g:pymode_rope_autoimport_underlineds = 0
-let g:pymode_rope_codeassist_maxfixes = 10
-let g:pymode_rope_sorted_completions = 1
-let g:pymode_rope_extended_complete = 1
-let g:pymode_rope_autoimport_modules = ["os","shutil","datetime", "sys"]
-let g:pymode_rope_confirm_saving = 1
-let g:pymode_rope_global_prefix = "<C-x>p"
-let g:pymode_rope_local_prefix = "<C-c>r"
-let g:pymode_rope_vim_completion = 1
-let g:pymode_rope_guess_project = 1
-let g:pymode_rope_goto_def_newwin = ""
-let g:pymode_rope_always_show_complete_menu = 1
-let g:pymode_rope_short_prefix = "<C-x>t"
-
-" Documentation
-" let g:pymode_doc = 1
-" let g:pymode_doc_key = 'K'
-
-"Linting
-let g:pymode_lint = 1
-" let g:pymode_lint_checker = "pep8,pyflakes"
-" Auto check on save
-let g:pymode_lint_write = 1
-" Check while typing
-let g:pymode_lint_onfly = 0
-" Don't open the error window
-let g:pymode_lint_cwindow = 0
-" Show an error message at the cursor
-let g:pymode_lint_message = 1
-" I prefer a blank line at the end of files
-let g:pymode_lint_ignore = "W391"
-
-
-" Support virtualenv
-let g:pymode_virtualenv = 1
-
-" Enable breakpoints plugin
-let g:pymode_breakpoint = 1
-let g:pymode_breakpoint_key = '<leader>b'
-
-" syntax highlighting
-let g:pymode_syntax = 1
-let g:pymode_syntax_all = 1
-let g:pymode_syntax_indent_errors = g:pymode_syntax_all
-let g:pymode_syntax_space_errors = g:pymode_syntax_all
-
-" Don't autofold code
-let g:pymode_folding = 0
+" if python_version >= 205
+"     Bundle 'klen/python-mode'
+"     Bundle 'klen/rope-vim'
+" endif
+" " Python-mode
+" " Activate rope
+" " Keys:
+" " K             Show python docs
+" " <Ctrl-Space>  Rope autocomplete
+" " <Ctrl-c>g     Rope goto definition
+" " <Ctrl-c>d     Rope show documentation
+" " <Ctrl-c>f     Rope find occurrences
+" " <Leader>b     Set, unset breakpoint (g:pymode_breakpoint enabled)
+" " [[            Jump on previous class or function (normal, visual, operator modes)
+" " ]]            Jump on next class or function (normal, visual, operator modes)
+" " [M            Jump on previous class or method (normal, visual, operator modes)
+" " ]M            Jump on next class or method (normal, visual, operator modes)
+" 
+" " No need for Rope completion with Jedi
+" " Load rope plugin
+" let g:pymode_rope = 1
+" 
+" " Map keys for autocompletion
+" let g:pymode_rope_autocomplete_map = '<C-Space>'
+" 
+" " Auto create and open ropeproject
+" let g:pymode_rope_auto_project = 1
+" 
+" " Enable autoimport
+" let g:pymode_rope_enable_autoimport = 1
+" 
+" " Auto generate global cache
+" let g:pymode_rope_autoimport_generate = 1
+" let g:pymode_rope_autoimport_underlineds = 0
+" let g:pymode_rope_codeassist_maxfixes = 10
+" let g:pymode_rope_sorted_completions = 1
+" let g:pymode_rope_extended_complete = 1
+" let g:pymode_rope_autoimport_modules = ["os","shutil","datetime", "sys"]
+" let g:pymode_rope_confirm_saving = 1
+" let g:pymode_rope_global_prefix = "<C-x>p"
+" let g:pymode_rope_local_prefix = "<C-c>r"
+" let g:pymode_rope_vim_completion = 1
+" let g:pymode_rope_guess_project = 1
+" let g:pymode_rope_goto_def_newwin = ""
+" let g:pymode_rope_always_show_complete_menu = 1
+" let g:pymode_rope_short_prefix = "<C-x>t"
+" 
+" " Documentation
+" " let g:pymode_doc = 1
+" " let g:pymode_doc_key = 'K'
+" 
+" "Linting
+" let g:pymode_lint = 1
+" " let g:pymode_lint_checker = "pep8,pyflakes"
+" " Auto check on save
+" let g:pymode_lint_write = 1
+" " Check while typing
+" let g:pymode_lint_onfly = 0
+" " Don't open the error window
+" let g:pymode_lint_cwindow = 0
+" " Show an error message at the cursor
+" let g:pymode_lint_message = 1
+" " I prefer a blank line at the end of files
+" let g:pymode_lint_ignore = "W391"
+" 
+" 
+" " Support virtualenv
+" let g:pymode_virtualenv = 1
+" 
+" " Enable breakpoints plugin
+" let g:pymode_breakpoint = 1
+" let g:pymode_breakpoint_key = '<leader>b'
+" 
+" " syntax highlighting
+" let g:pymode_syntax = 1
+" let g:pymode_syntax_all = 1
+" let g:pymode_syntax_indent_errors = g:pymode_syntax_all
+" let g:pymode_syntax_space_errors = g:pymode_syntax_all
+" 
+" " Don't autofold code
+" let g:pymode_folding = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Jedi plugin for better autocompletion
@@ -353,6 +372,8 @@ set timeout timeoutlen=5000 ttimeoutlen=50
 " Write all files on `make`
 set autowrite
 set autowriteall
+
+au FocusLost * silent! wa
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
