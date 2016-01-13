@@ -292,6 +292,9 @@ let g:ctrlp_map = '<c-t>'
 " 
 " " Don't autofold code
 " let g:pymode_folding = 0
+" 
+" " Load rope plugin
+" let g:pymode_rope = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Jedi plugin for better autocompletion
@@ -299,9 +302,6 @@ let g:ctrlp_map = '<c-t>'
 if python_version >= 205
     Bundle 'davidhalter/jedi-vim'
 endif
-
-" Load rope plugin
-let g:pymode_rope = 0
 
 " I find buffer to be quite convenient, but tabs or splits are also an option
 let g:jedi#use_tabs_not_buffers = 0
