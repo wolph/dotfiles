@@ -333,14 +333,6 @@ if iCanHazVundle == 0
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" After loading the bundles we can enable the plugins again
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" load filetype plugins and indent settings
-filetype plugin indent on 
-" syntax highlighting on
-syntax on 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " How many lines of history to remember
@@ -678,3 +670,11 @@ augroup BWCCreateDir
     autocmd!
     autocmd BufWritePre * :call s:MkNonExDir(expand('<afile>'), +expand('<abuf>'))
 augroup END
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" After loading the bundles we can enable the plugins again
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" load filetype plugins and indent settings
+filetype plugin indent on 
+" syntax highlighting on
+syntax on 
