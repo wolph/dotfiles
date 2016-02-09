@@ -617,6 +617,7 @@ augroup filetypedetect
     au BufNewFile,BufRead */templates/*.html setf htmljinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
+    autocmd BufRead *.py silent PyFlake
 augroup END
 
 autocmd Filetype python setlocal suffixesadd=.py
