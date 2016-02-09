@@ -617,7 +617,6 @@ augroup filetypedetect
     au BufNewFile,BufRead */templates/*.html setf htmljinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
-    autocmd BufRead *.py silent PyFlake
 augroup END
 
 autocmd Filetype python setlocal suffixesadd=.py
@@ -677,5 +676,6 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " load filetype plugins and indent settings
 filetype plugin indent on 
+autocmd BufRead *.py silent PyFlake
 " syntax highlighting on
 syntax on 

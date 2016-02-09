@@ -153,10 +153,8 @@ alias find='find -L'
 alias grep='grep --color=auto'
 test -x /usr/local/bin/hub && alias git=hub
 # Link vim to the OS X clipboard
-#if [ -x "/usr/local/bin/reattach-to-user-namespace" ]; then
-#    alias vim="reattach-to-user-namespace vim"
-#    alias vimdiff="reattach-to-user-namespace vimdiff"
-#fi
+alias vim="safe-reattach-to-user-namespace vim"
+alias vimdiff="safe-reattach-to-user-namespace vimdiff"
 alias vi='vim'
 alias parallel='parallel --no-notice'
 alias vlc='open -a vlc'
