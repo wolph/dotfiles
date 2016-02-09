@@ -92,12 +92,12 @@ export ORIGINAL_PS1="$PS1"
 export RPS1='%~'
 
 # Show the vim mode
-function zle-line-init zle-keymap-select {
-    RPS1="%~ ${${KEYMAP/vicmd/[NORMAL]}/(main|viins)/[INSERT]} $EPS1"
-    zle reset-prompt
-}
-zle -N zle-line-init
-zle -N zle-keymap-select
+# function zle-line-init zle-keymap-select {
+#     RPS1="%~ ${${KEYMAP/vicmd/[NORMAL]}/(main|viins)/[INSERT]} $EPS1"
+#     zle reset-prompt
+# }
+# zle -N zle-line-init
+# zle -N zle-keymap-select
 
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
