@@ -272,8 +272,8 @@ if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
     activate
 fi
 
-# reset all bindkeys, this makes vi mode work _much_ faster
-bindkey -rpM viins '\e'
+# # reset all bindkeys, this makes vi mode work _much_ faster
+# bindkey -rpM viins '\e'
 
 # Vim mode
 bindkey -v
