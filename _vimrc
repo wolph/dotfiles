@@ -135,8 +135,6 @@ let g:PyFlakeOnWrite = 1
 let g:PyFlakeCWindow = 0 
 let g:PyFlakeDisabledMessages = 'W391'
 
-autocmd TextChanged *.py silent PyFlake
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -676,6 +674,6 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " load filetype plugins and indent settings
 filetype plugin indent on 
-autocmd BufRead *.py silent PyFlake
+" autocmd BufRead *.py silent PyFlake|silent redraw
 " syntax highlighting on
 syntax on 
