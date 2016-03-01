@@ -528,6 +528,9 @@ set completeopt=menu,longest,preview
 set cinkeys-=0#
 set indentkeys-=0#
 
+" Don't scroll when splitting windows
+nnoremap <C-W>s Hmx`` \|:split<CR>`xzt``
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Folding
 "    Enable folding, but by default make it act like folding is 
