@@ -358,6 +358,13 @@ hosts=(
   "$HOST"
   localhost
 )
+
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*:complete:mpv:*' tag-order '!urls'
+zstyle ':completion:*:complete:mplayer:*' tag-order '!urls'
+zstyle ':completion:*:complete:vlc:*' tag-order '!urls'
+
+
 zstyle ':completion:*:ssh:*' hosts $hosts
 zstyle ':completion:*:slogin:*' hosts $hosts
 
@@ -388,6 +395,8 @@ zstyle ':completion:*:complete:-command-::commands' ignored-patterns '*\~'
 
 # Don't complete files that vim shouldn't handle
 zstyle ':completion:*:*:vi:*:*files' ignored-patterns '*?.pyc' '*?.pyo' \
+        '*?.pdf' '*?.o'
+zstyle ':completion:*:*:vim:*:*files' ignored-patterns '*?.pyc' '*?.pyo' \
         '*?.pdf' '*?.o'
 
 # Separate matches into groups
