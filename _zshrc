@@ -84,6 +84,7 @@ fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 # antigen apply
 
 # $PATH changes are done in .zprofile
+export PATH="$PATH:~/bin:${ROOT_DIR}bin"
 
 # Prompts
 #export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
