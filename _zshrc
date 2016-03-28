@@ -71,6 +71,8 @@ fpath=(/usr/local/share/zsh/site-functions/ $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 
+if which pyenv > /dev/null; then eval "$(pyenv init -)"; fi
+
 # # Antigen bundles
 # . ${ROOT_DIR}.antigen.zsh
 # antigen bundle WoLpH/zsh-completions src
