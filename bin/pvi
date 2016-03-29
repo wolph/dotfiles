@@ -1,0 +1,255 @@
+#!/usr/bin/env python
+# -*- coding: utf-8 -*-
+
+__description__ = ''
+
+# ---------------------------------------------------------------------------
+# Standard imports:
+import sys
+import argparse
+import subprocess
+import os
+import multiprocessing.dummy as multiprocessing_api
+import multiprocessing
+import logging
+import tempfile
+import json
+
+# Third party imports
+
+# Local imports
+
+# ---------------------------------------------------------------------------
+
+BUNDLES_DIR = '~/.vim/bundle'
+logger = multiprocessing.log_to_stderr()
+
+class Bundle(object):
+
+    def __init__(self, bundle_spec):
+        self.uri = bundle_spec['uri']
+        self.name = bundle_spec['name']
+        self.pinned = bool(bundle_spec['is_pinned'])
+
+    def __unicode__(self):
+        return unicode(vars(self))
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+class Result(object):
+    def __init__(self, bundle, command, action):
+        self.bundle = bundle
+        self.command = command
+        self.action = action
+        self.is_error = False
+        self.output = ''
+        self.rc = 0
+
+    def was_up_to_date(self):
+        return self.output.startswith('Already up-to-date.')
+
+    def was_updated(self):
+        return self.action == 'update' and not self.was_up_to_date()
+
+    @property
+    def action_name(self):
+        if self.is_error:
+            return 'ERROR'
+        elif self.action == 'update':
+            if self.was_up_to_date():
+                return 'UP TO DATE'
+            return 'UPDATED'
+        elif self.action == 'install':
+            return 'INSTALLED'
+        elif self.action == 'pinned':
+            return 'PINNED'
+
+
+    def __unicode__(self):
+        return unicode(vars(self))
+
+    def __str__(self):
+        return unicode(self).encode('utf-8')
+
+class Tracker(object):
+    def start_task(self, bundle):
+        pass
+
+    def end_task(self, bundle):
+        sys.stdout.write('#')
+        sys.stdout.flush()
+
+    def start_all(self, size):
+        print "Processing %d plugins" % size
+        sys.stdout.write(('_' * (size + 1)) + ']' + '\r[')
+
+    def end_all(self):
+        sys.stdout.write('] DONE!\n')
+        sys.stdout.flush()
+
+
+class Task(object):
+
+    def __init__(self, bundles_dir, tracker=None):
+        self._bundles_dir = bundles_dir
+        self._tracker = tracker
+
+    def __call__(self, bundle):
+        try:
+            self.track_start(bundle)
+            if bundle.pinned:
+                logger.info("Not doing anything for %s. Pinned", bundle)
+                return Result(bundle, 'noop', 'pinned')
+            git_command, action = self.make_git_command(bundle.uri, bundle.name)
+            res = Result(bundle, git_command, action)
+            logger.info("Processing ({}) {}".format(action, bundle))
+
+            try:
+                output = subprocess.check_output(git_command, stderr=subprocess.STDOUT)
+                res.output = output
+                return res
+            except subprocess.CalledProcessError as cpe:
+                res.output = cpe.output
+                res.rc = cpe.returncode
+                res.is_error = True
+                logger.error("Error code %d. Output: %s", cpe.returncode, cpe.output)
+                return res
+        except KeyboardInterrupt:
+            pass
+        finally:
+            self.track_end(bundle)
+
+    def track_start(self, bundle):
+        if self._tracker is not None:
+            self._tracker.start_task(bundle)
+
+    def track_end(self, bundle):
+        if self._tracker is not None:
+            self._tracker.end_task(bundle)
+
+    def make_git_command(self, uri, name):
+        bundle_dir = os.path.join(os.path.expanduser(self._bundles_dir), name)
+        if os.path.isdir(os.path.join(bundle_dir, '.git')):
+            os.chdir(bundle_dir)
+            return ['git', 'pull'], 'update'
+        return [
+                'git',
+                'clone',
+                uri,
+                os.path.join(os.path.expanduser(BUNDLES_DIR), name)
+                ], 'install'
+
+
+
+def process_queue(queue, args):
+
+    simple_tracker = Tracker()
+    simple_tracker.start_all(len(queue))
+    pool = multiprocessing_api.Pool(args.jobs)
+
+    action = Task(args.bundles_dir, tracker=simple_tracker)
+
+    p = pool.map_async(action, queue, 1)
+    results = p.get(0xFFFF) # Give C-C a chance
+    simple_tracker.end_all()
+    return results
+
+def report(results, args):
+    installed = 0
+    updated = 0
+    errors = 0
+    up_to_date = 0
+    for res in results:
+        if res.was_up_to_date():
+            up_to_date += 1
+            if not args.verbose:
+                continue
+        elif res.is_error:
+            errors += 1
+        elif res.action == 'install':
+            installed += 1
+        elif res.action == 'update':
+
+            updated += 1
+
+        print "[%10s] Plugin '%s'" %(
+                res.action_name,
+                res.bundle.name)
+        if args.verbose:
+            if res.was_updated() or res.is_error:
+                print '----------- OUPUT --------------'
+                print res.output
+                print '----------- /OUPUT --------------'
+
+    if up_to_date == len(results):
+        print "All %d plugins were up to date" % up_to_date
+    else:
+        if errors:
+            print "%d errors" % errors
+        if installed:
+            print "%d installed" % installed
+        if updated:
+            print "%d updated" % updated
+        if up_to_date:
+            print "%d already up to date" % up_to_date
+
+
+
+def parse_args(argv):
+    """ Parse and validate command line arguments """
+    parser = argparse.ArgumentParser(description=__description__)
+    parser.add_argument('--jobs', '-j', default=64, type=int, help='Number of simultaneous operations')
+    parser.add_argument('--bundles-dir', '-b', default=BUNDLES_DIR, help='Where the bundles are installed (Default: %s)' % BUNDLES_DIR)
+    parser.add_argument('--debug', '-d', default=False, action='store_true', help=argparse.SUPPRESS)
+    parser.add_argument('--verbose', '-v', default=False, action='store_true', help='Show more output')
+    args = parser.parse_args(argv[1:])
+
+    return args
+
+
+def get_bundles():
+    logger.info('Getting list of plugins from Vim (assumes Vundle use)')
+    with tempfile.NamedTemporaryFile() as tempf:
+        tempf.write("""
+            let nbs = []
+            for b in vundle#bundles
+                let nb = copy(b)
+                let nb.is_pinned = b.is_pinned()
+                let nb.path = b.path()
+                call add(nbs, nb)
+            endfor
+            let bundles_json = '[' . join(nbs, ', ') . ']'
+            put! =bundles_json
+            %s/'/"/g
+            w! /tmp/bundles.json
+            """)
+        tempf.file.flush()
+        subprocess.check_call(['vim', '-X', '+so %s' % tempf.name, '+qa'])
+    with open("/tmp/bundles.json", "r") as fin:
+        bundles = json.load(fin)
+        if bundles:
+            bundles = [ Bundle(bundle_data) for bundle_data in bundles]
+            return bundles
+
+
+
+def main(argv=[__name__]):
+    """ Run this program """
+    args = parse_args(argv)
+    try:
+
+        if args.debug:
+            logger.setLevel(logging.DEBUG)
+
+        bundles = get_bundles()
+        if not bundles:
+            logger.error("No plugins found from Vim. Do you use Vundle?")
+        results = process_queue(bundles, args)
+        report(results, args)
+
+    except KeyboardInterrupt:
+        sys.exit(-1)
+
+if __name__ == '__main__':
+    sys.exit(main(sys.argv) or 0)

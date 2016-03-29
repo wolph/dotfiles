@@ -18,6 +18,7 @@ if !filereadable(vundle_readme)
     echo ""
     silent !mkdir -p ~/.vim/bundle
     silent !git clone https://github.com/WoLpH/Vundle.vim ~/.vim/bundle/vundle
+    silent !pvi
     let iCanHazVundle=0
 endif
 
@@ -322,15 +323,6 @@ Bundle 'oceandeep'
 Bundle 'vim-scripts/xorium.vim'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" If we just installed Vundle, install the bundles automatically
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if iCanHazVundle == 0
-    echo "Installing Bundles, please ignore key map error messages"
-    echo ""
-    :BundleInstall
-endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " How many lines of history to remember
@@ -630,7 +622,7 @@ if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
     set t_Co=256
     set t_Sb=[4%dm
     set t_Sf=[3%dm
-    colo desert256
+    silent! colo desert256
     if &diff
         colorscheme xorium
     endif
