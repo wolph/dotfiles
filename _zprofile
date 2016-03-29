@@ -27,7 +27,6 @@ _append_to_path /sbin
 _append_to_path /bin
 _append_to_path /usr/sbin
 _append_to_path /usr/bin
-[ -d "/Users/rick/bin/Sencha/Cmd/" ] && _append_to_path /Users/rick/bin/Sencha/Cmd/*
 [ -d "/usr/local/Cellar/ruby/" ] && _append_to_path /usr/local/Cellar/ruby/*/bin
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 
@@ -36,7 +35,9 @@ _insert_to_path /usr/local/sbin
 _insert_to_path ~/bin
 _insert_to_path $HOME/.rvm/bin
 _insert_to_path /usr/local/bin
+_insert_to_path "$PYENV_ROOT/bin"
 
+export PYENV_ROOT="$HOME/.pyenv"
 export PATH
 
 export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2
