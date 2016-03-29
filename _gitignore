@@ -12,6 +12,8 @@
 # Test stuff
 /.tox/
 /.coverage
+*.py,cover
+*.orig
 
 cache/*
 .cache/*
@@ -31,3 +33,5 @@ htmlcov
 docs/_build/
 
 .ropeproject
+.idea
+
