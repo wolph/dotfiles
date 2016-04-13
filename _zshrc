@@ -163,6 +163,7 @@ alias parallel='parallel --no-notice'
 alias vlc='open -a vlc'
 alias feh='/usr/local/bin/feh --auto-zoom --draw-filename --fullscreen --recursive'
 alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
+alias tb='nc termbin.com 9999'
 #alias mplayer='open -a MplayerX.App --args '
 
 # Little trick to change the name of the shell
