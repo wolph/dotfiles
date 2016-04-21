@@ -152,7 +152,7 @@ alias qmv='qmv -f do'
 alias push='git pull; git push'
 # Some people might not like this but I find it convenient. It makes find
 # search in symlinks by default
-alias find='find -LE'
+alias find='find -L'
 alias grep='grep --color=auto'
 test -x /usr/local/bin/hub && alias git=hub
 # Link vim to the OS X clipboard
