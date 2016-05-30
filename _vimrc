@@ -66,11 +66,17 @@ Bundle 'pangloss/vim-javascript'
 Bundle 'rstacruz/sparkup'
 
 Bundle 'markcornick/vim-vagrant'
-Bundle 'chase/vim-ansible-yaml'
 if has('mac')
     Bundle 'copy-as-rtf'
 endif
 Bundle 'mikewest/vimroom'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Ansible Vim syntax
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Bundle 'chase/vim-ansible-yaml'
+let g:ansible_options = {'ignore_blank_lines': 0}
+let g:ansible_options = {'documentation_mapping': '<C-K>'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Gundo, the holy grail in undos
@@ -135,6 +141,9 @@ Bundle 'andviro/flake8-vim'
 let g:PyFlakeOnWrite = 1
 let g:PyFlakeCWindow = 0 
 let g:PyFlakeDisabledMessages = 'W391'
+
+" Remove trailing whitespace in Python before saving
+autocmd BufWritePre *.py :%s/\s\+$//e
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
