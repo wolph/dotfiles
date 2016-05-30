@@ -104,3 +104,7 @@
     pushInsteadOf = "https://gist.github.com/"
     pushInsteadOf = "http://gist.github.com/"
     pushInsteadOf = "gist:"
+[filter "hawser"]
+	clean = git hawser clean %f
+	smudge = git hawser smudge %f
+	required = true

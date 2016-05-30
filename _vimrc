@@ -70,6 +70,7 @@ if has('mac')
     Bundle 'copy-as-rtf'
 endif
 Bundle 'mikewest/vimroom'
+Bundle 'guns/xterm-color-table.vim'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
@@ -445,7 +446,7 @@ set listchars=tab:>-,trail:-
 " add the pretty line at 80 characters
 if version >= 703
     set colorcolumn=80
-    hi ColorColumn ctermbg=234 guibg=234
+    hi ColorColumn ctermbg=52
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -484,7 +485,7 @@ set statusline+=%b,0x%-8B\                   " current char
 set statusline+=%-14.(%l,%c%V%)\ %<%P        " offset
 
 " Make the autocomplete menu a pretty color
-highlight Pmenu ctermbg=234 ctermfg=lightyellow
+highlight Pmenu ctermbg=52 ctermfg=lightyellow
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Indent Related
