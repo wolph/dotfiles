@@ -72,6 +72,8 @@ endif
 Bundle 'mikewest/vimroom'
 Bundle 'guns/xterm-color-table.vim'
 
+Bundle 'tfnico/vim-gradle'
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""

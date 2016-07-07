@@ -108,3 +108,6 @@
 	clean = git hawser clean %f
 	smudge = git hawser smudge %f
 	required = true
+[ghi]
+	editor = vim
+	pager = less -X -F -R
