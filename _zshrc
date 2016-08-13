@@ -450,3 +450,6 @@ if [ ! -d "~/.zsh/plugins" ]; then
     done
 fi
 
+
+# added by travis gem
+[ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
