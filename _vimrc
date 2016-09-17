@@ -675,3 +675,20 @@ filetype plugin indent on
 " autocmd BufRead *.py silent PyFlake|silent redraw
 " syntax highlighting on
 syntax on 
+
+" Full recalculation function
+autocmd VimEnter * call UpdateBufferCount() 
+function UpdateBufferCount() 
+    let buffers = range(1, bufnr('$')) 
+    call filter(buffers, 'buflisted(v:val)') 
+    let g:buffer_count = len(buffers) 
+endfunction 
+
+" Update count
+call UpdateBufferCount()
+
+" Increment and decrement when needed
+autocmd BufAdd * let g:buffer_count += 1 
+autocmd BufDelete * let g:buffer_count -= 1 
+
+set rulerformat+=%n/%{g:buffer_count}
