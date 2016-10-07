@@ -18,6 +18,7 @@ if !filereadable(vundle_readme)
     echo ""
     silent !mkdir -p ~/.vim/bundle
     silent !git clone https://github.com/WoLpH/Vundle.vim ~/.vim/bundle/vundle
+    silent !pvi
     let iCanHazVundle=0
 endif
 
@@ -44,7 +45,7 @@ Bundle 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
 Bundle 'tpope/vim-eunuch'
 Bundle 'tpope/vim-repeat'
-Bundle 'Jinja'
+Bundle 'lepture/vim-jinja'
 Bundle 'thiderman/vim-supervisor'
 Bundle 'evanmiller/nginx-vim-syntax'
 Bundle 'alfredodeza/coveragepy.vim'
@@ -65,11 +66,20 @@ Bundle 'pangloss/vim-javascript'
 Bundle 'rstacruz/sparkup'
 
 Bundle 'markcornick/vim-vagrant'
-Bundle 'chase/vim-ansible-yaml'
 if has('mac')
     Bundle 'copy-as-rtf'
 endif
 Bundle 'mikewest/vimroom'
+Bundle 'guns/xterm-color-table.vim'
+
+Bundle 'tfnico/vim-gradle'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Ansible Vim syntax
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Bundle 'chase/vim-ansible-yaml'
+let g:ansible_options = {'ignore_blank_lines': 0}
+let g:ansible_options = {'documentation_mapping': '<C-K>'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Gundo, the holy grail in undos
@@ -83,14 +93,9 @@ let g:gundo_verbose_graph=0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Track the engine.
 
-if python_version >= 205 && version >= 704
-    " Uses with_statement so python 2.5 or higher
-    Bundle 'SirVer/ultisnips'
-else
-    Bundle "MarcWeber/vim-addon-mw-utils"
-    Bundle "tomtom/tlib_vim"
-    Bundle "garbas/vim-snipmate"
-endif
+Bundle "MarcWeber/vim-addon-mw-utils"
+Bundle "tomtom/tlib_vim"
+Bundle "garbas/vim-snipmate"
 
 " Lots of snippets
 Bundle 'honza/vim-snippets'
@@ -107,14 +112,6 @@ Bundle 'bonsaiben/bootstrap-snippets'
 Bundle 'luochen1990/rainbow'
 let g:rainbow_active=1
 
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-if python_version >= 205 && version >= 704
-    " Uses with_statement so python 2.5 or higher
-    let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<c-b>"
-    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-endif
-    
 " " If you want :UltiSnipsEdit to split your window.
 " let g:UltiSnipsEditSplit="vertical"
 
@@ -134,6 +131,9 @@ Bundle 'andviro/flake8-vim'
 let g:PyFlakeOnWrite = 1
 let g:PyFlakeCWindow = 0 
 let g:PyFlakeDisabledMessages = 'W391'
+
+" Remove trailing whitespace in Python before saving
+autocmd BufWritePre *.py :%s/\s\+$//e
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
@@ -162,7 +162,7 @@ autocmd FileType rst vmap m S:math<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " reStructuedText in Vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'Rykka/riv.vim'
+" Bundle 'Rykka/riv.vim'
 " Set the default path for Riv (Not supported yet, will work in 0.75 and up)
 let g:riv_default_path = "~/Desktop/TU"
 let main_project = {'path': './',  'build_path': 'build'}
@@ -182,8 +182,11 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'ervandew/supertab'
 
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
+
 " I prefer to let the completion go from top to bottom
-let g:SuperTabDefaultCompletionType = "<c-n>"
+" let g:SuperTabDefaultCompletionType = "<c-n>"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
@@ -313,6 +316,7 @@ let g:jedi#usages_command = "<leader>n"
 let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>r"
 let g:jedi#show_call_signatures = "2"
+let g:jedi#smart_auto_mappings = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Really nice color schemes for 256 colors shell
@@ -320,15 +324,6 @@ let g:jedi#show_call_signatures = "2"
 Bundle 'desert256.vim'
 Bundle 'oceandeep'
 Bundle 'vim-scripts/xorium.vim'
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" If we just installed Vundle, install the bundles automatically
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if iCanHazVundle == 0
-    echo "Installing Bundles, please ignore key map error messages"
-    echo ""
-    :BundleInstall
-endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
@@ -444,7 +439,7 @@ set listchars=tab:>-,trail:-
 " add the pretty line at 80 characters
 if version >= 703
     set colorcolumn=80
-    hi ColorColumn ctermbg=234 guibg=234
+    hi ColorColumn ctermbg=52
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -483,7 +478,7 @@ set statusline+=%b,0x%-8B\                   " current char
 set statusline+=%-14.(%l,%c%V%)\ %<%P        " offset
 
 " Make the autocomplete menu a pretty color
-highlight Pmenu ctermbg=234 ctermfg=lightyellow
+highlight Pmenu ctermbg=52 ctermfg=lightyellow
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Indent Related
@@ -615,7 +610,7 @@ augroup filetypedetect
     au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
     au BufNewFile,BufRead /etc/supervisor/* setf supervisor
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
-    au BufNewFile,BufRead */templates/*.html setf htmljinja
+    au BufNewFile,BufRead */templates/*.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
 augroup END
@@ -630,7 +625,7 @@ if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
     set t_Co=256
     set t_Sb=[4%dm
     set t_Sf=[3%dm
-    colo desert256
+    silent! colo desert256
     if &diff
         colorscheme xorium
     endif
@@ -680,3 +675,20 @@ filetype plugin indent on
 " autocmd BufRead *.py silent PyFlake|silent redraw
 " syntax highlighting on
 syntax on 
+
+" Full recalculation function
+autocmd VimEnter * call UpdateBufferCount() 
+function UpdateBufferCount() 
+    let buffers = range(1, bufnr('$')) 
+    call filter(buffers, 'buflisted(v:val)') 
+    let g:buffer_count = len(buffers) 
+endfunction 
+
+" Update count
+call UpdateBufferCount()
+
+" Increment and decrement when needed
+autocmd BufAdd * let g:buffer_count += 1 
+autocmd BufDelete * let g:buffer_count -= 1 
+
+set rulerformat+=%n/%{g:buffer_count}

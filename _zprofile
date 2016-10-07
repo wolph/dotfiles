@@ -36,7 +36,10 @@ _insert_to_path ~/bin
 _insert_to_path $HOME/.rvm/bin
 _insert_to_path /usr/local/bin
 _insert_to_path /usr/lib/ccache/
+_insert_to_path "$PYENV_ROOT/bin"
+_insert_to_path /usr/local/opt/ccache/libexec
 
+export PYENV_ROOT="$HOME/.pyenv"
 export PATH
 
 export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2

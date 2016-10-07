@@ -71,6 +71,8 @@ fpath=(/usr/local/share/zsh/site-functions/ $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 
+if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
+
 # # Antigen bundles
 # . ${ROOT_DIR}.antigen.zsh
 # antigen bundle WoLpH/zsh-completions src
@@ -143,7 +145,7 @@ alias mv='nocorrect mv'       # no spelling correction on mv
 alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
 alias less='/usr/bin/less -R'
-alias ls=/bin/ls
+export LS_OPTIONS='--color=auto'
 alias l='ls -A'
 alias ll='l -l'
 alias qmv='qmv -f do'
@@ -161,6 +163,8 @@ alias parallel='parallel --no-notice'
 alias vlc='open -a vlc'
 alias feh='/usr/local/bin/feh --auto-zoom --draw-filename --fullscreen --recursive'
 alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
+alias tb='nc termbin.com 9999'
+alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
 #alias mplayer='open -a MplayerX.App --args '
 
 # Little trick to change the name of the shell
@@ -446,3 +450,6 @@ if [ ! -d "~/.zsh/plugins" ]; then
     done
 fi
 
+
+# added by travis gem
+[ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
