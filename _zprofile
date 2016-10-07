@@ -35,6 +35,7 @@ _insert_to_path /usr/local/sbin
 _insert_to_path ~/bin
 _insert_to_path $HOME/.rvm/bin
 _insert_to_path /usr/local/bin
+_insert_to_path /usr/lib/ccache/
 
 export PATH
 
