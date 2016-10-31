@@ -138,7 +138,7 @@ zstyle ':completion:*' max-errors 2
 # fi
 
 # Enable keychain
-command -v keychain >/dev/null 2>&1 && eval $(keychain -Q -q --eval ~/.ssh/id_dsa )
+command -v keychain >/dev/null 2>&1 && eval $(keychain -Q -q --eval ~/.ssh/id_dsa ~/.ssh/id_rsa)
 
 # Some convenient aliases
 alias mv='nocorrect mv'       # no spelling correction on mv
@@ -445,7 +445,7 @@ bashcompinit
 autoload -Uz compinit
 compinit
 
-if [ ! -d "~/.zsh/plugins" ]; then
+if [ -d "~/.zsh/plugins" ]; then
     for f in ~/.zsh/plugins/*; do
         . "$f"
     done
