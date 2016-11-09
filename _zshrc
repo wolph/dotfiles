@@ -177,13 +177,19 @@ function mosh(){
     title ""
 }
 
-# function ssh(){
-#     if [ -n "$1" ]; then
-#         title "$1"
-#     fi
-#     /usr/bin/ssh $*
-#     title ""
-# }
+# Little trick to change the name of the shell
+function ssh(){
+    if [[ "$@" =~ "BatchMode" ]]; then
+        /usr/bin/ssh $*
+    else
+        if [ -n "$1" ]; then
+            title "$1"
+        fi
+        /usr/bin/ssh $*
+        title ""
+    fi
+}
+
 
 function autossh(){
     if [ -n "$1" ]; then
