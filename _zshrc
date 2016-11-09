@@ -138,7 +138,7 @@ zstyle ':completion:*' max-errors 2
 # fi
 
 # Enable keychain
-command -v keychain >/dev/null 2>&1 && eval $(keychain -Q -q --eval ~/.ssh/id_dsa ~/.ssh/id_rsa)
+command -v keychain >/dev/null 2>&1 && eval $(keychain --ignore-missing -Q -q --eval ~/.ssh/id_dsa ~/.ssh/id_rsa )
 
 # Some convenient aliases
 alias mv='nocorrect mv'       # no spelling correction on mv
@@ -177,13 +177,13 @@ function mosh(){
     title ""
 }
 
-function ssh(){
-    if [ -n "$1" ]; then
-        title "$1"
-    fi
-    /usr/bin/ssh $*
-    title ""
-}
+# function ssh(){
+#     if [ -n "$1" ]; then
+#         title "$1"
+#     fi
+#     /usr/bin/ssh $*
+#     title ""
+# }
 
 function autossh(){
     if [ -n "$1" ]; then
