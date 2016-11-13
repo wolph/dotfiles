@@ -75,6 +75,11 @@ Bundle 'guns/xterm-color-table.vim'
 Bundle 'tfnico/vim-gradle'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" YouCompleteMe
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Bundle 'Valloric/YouCompleteMe'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Bundle 'chase/vim-ansible-yaml'
@@ -678,11 +683,14 @@ syntax on
 
 " Full recalculation function
 autocmd VimEnter * call UpdateBufferCount() 
-function UpdateBufferCount() 
-    let buffers = range(1, bufnr('$')) 
-    call filter(buffers, 'buflisted(v:val)') 
-    let g:buffer_count = len(buffers) 
-endfunction 
+
+if !exists('*UpdateBufferCount')
+    function UpdateBufferCount() 
+        let buffers = range(1, bufnr('$')) 
+        call filter(buffers, 'buflisted(v:val)') 
+        let g:buffer_count = len(buffers) 
+    endfunction 
+endif
 
 " Update count
 call UpdateBufferCount()
