@@ -55,6 +55,7 @@ if python_version >= 205
     " Uses with_statement so python 2.5 or higher
     Bundle 'jmcantrell/vim-virtualenv'
 endif
+" Dash support
 Bundle 'rizzatti/dash.vim'
 Bundle 'vim-coffee-script'
 Bundle 'tshirtman/vim-cython'
@@ -77,7 +78,7 @@ Bundle 'tfnico/vim-gradle'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'Valloric/YouCompleteMe'
+" Bundle 'Valloric/YouCompleteMe'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
@@ -113,6 +114,7 @@ Bundle 'zedr/zope-snipmate-bundle.git'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
 Bundle 'bonsaiben/bootstrap-snippets'
 
+
 " Rainbow parenthesis
 Bundle 'luochen1990/rainbow'
 let g:rainbow_active=1
@@ -132,13 +134,13 @@ command! -nargs=1 Silent
 " let g:flake8_show_quickfix=0
 " let g:flake8_show_in_gutter=1
 " let g:flake8_show_in_file=0
-Bundle 'andviro/flake8-vim'
-let g:PyFlakeOnWrite = 1
-let g:PyFlakeCWindow = 0 
-let g:PyFlakeDisabledMessages = 'W391'
-
-" Remove trailing whitespace in Python before saving
-autocmd BufWritePre *.py :%s/\s\+$//e
+" Bundle 'andviro/flake8-vim'
+" let g:PyFlakeOnWrite = 1
+" let g:PyFlakeCWindow = 0 
+" let g:PyFlakeDisabledMessages = 'W391'
+" 
+" " Remove trailing whitespace in Python before saving
+" autocmd BufWritePre *.py :%s/\s\+$//e
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
