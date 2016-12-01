@@ -9,18 +9,18 @@ set background=dark
 filetype off 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Install Vundle if it's not installed
+" Install Plug if it's not installed
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let iCanHazVundle=1
-let vundle_readme=expand('~/.vim/bundle/vundle/README.md')
-if !filereadable(vundle_readme)
-    echo "Installing Vundle.."
+let iCanHazPlug=1
+if !filereadable(expand('~/.vim/autoload/plug.vim'))
+    echo "Installing Plug.."
     echo ""
-    silent !mkdir -p ~/.vim/bundle
-    silent !git clone https://github.com/WoLpH/Vundle.vim ~/.vim/bundle/vundle
-    silent !pvi
-    let iCanHazVundle=0
+    silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    source ~/.vim/autoload/plug.vim
+    let iCanHazPlug=0
 endif
+
+let g:plug_threads=64
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check python version if available
@@ -32,59 +32,65 @@ else
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Load and install the Bundles using Vundle
+" Load and install the Plugs using Plug
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+call plug#begin('~/.vim/bundle')
 " Tree like file browser
-Bundle 'WoLpH/nerdtree@patch-1'
+" Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
+Plug 'scrooloose/nerdtree'
 " A Git wrapper so awesome, it should be illegal
-Bundle 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive'
 " Easier way to move around in Vim
-Bundle 'Lokaltog/vim-easymotion'
+Plug 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
-Bundle 'tpope/vim-eunuch'
-Bundle 'tpope/vim-repeat'
-Bundle 'lepture/vim-jinja'
-Bundle 'thiderman/vim-supervisor'
-Bundle 'evanmiller/nginx-vim-syntax'
-Bundle 'alfredodeza/coveragepy.vim'
-Bundle 'alfredodeza/pytest.vim'
-Bundle 'pig.vim'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-repeat'
+Plug 'lepture/vim-jinja'
+Plug 'thiderman/vim-supervisor'
+Plug 'evanmiller/nginx-vim-syntax'
+Plug 'alfredodeza/coveragepy.vim'
+Plug 'alfredodeza/pytest.vim'
+Plug 'pig.vim'
 if python_version >= 205
     " Uses with_statement so python 2.5 or higher
-    Bundle 'jmcantrell/vim-virtualenv'
+    Plug 'jmcantrell/vim-virtualenv'
 endif
-Bundle 'rizzatti/dash.vim'
-Bundle 'vim-coffee-script'
-Bundle 'tshirtman/vim-cython'
-Bundle 'logstash.vim'
-" Bundle 'clickable.vim'
+" Dash support
+Plug 'rizzatti/dash.vim'
+Plug 'vim-coffee-script'
+Plug 'tshirtman/vim-cython'
+Plug 'logstash.vim'
+" Plug 'clickable.vim'
 
 " Javascript/html indending
-Bundle 'pangloss/vim-javascript'
-Bundle 'rstacruz/sparkup'
+Plug 'pangloss/vim-javascript'
+Plug 'rstacruz/sparkup'
 
-Bundle 'markcornick/vim-vagrant'
+Plug 'markcornick/vim-vagrant'
 if has('mac')
-    Bundle 'copy-as-rtf'
+    Plug 'copy-as-rtf'
 endif
-Bundle 'mikewest/vimroom'
-Bundle 'guns/xterm-color-table.vim'
+Plug 'mikewest/vimroom'
+Plug 'guns/xterm-color-table.vim'
 
-Bundle 'tfnico/vim-gradle'
+Plug 'tfnico/vim-gradle'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" YouCompleteMe
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plug 'Valloric/YouCompleteMe'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'chase/vim-ansible-yaml'
+Plug 'chase/vim-ansible-yaml'
 let g:ansible_options = {'ignore_blank_lines': 0}
 let g:ansible_options = {'documentation_mapping': '<C-K>'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Gundo, the holy grail in undos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'dsummersl/gundo.vim'
+Plug 'dsummersl/gundo.vim'
 nnoremap U :silent GundoToggle<CR>
 let g:gundo_verbose_graph=0
 
@@ -93,38 +99,24 @@ let g:gundo_verbose_graph=0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Track the engine.
 
-if python_version >= 205 && version >= 704
-    " Uses with_statement so python 2.5 or higher
-    Bundle 'SirVer/ultisnips'
-else
-    Bundle "MarcWeber/vim-addon-mw-utils"
-    Bundle "tomtom/tlib_vim"
-    Bundle "garbas/vim-snipmate"
-endif
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'garbas/vim-snipmate'
 
 " Lots of snippets
-Bundle 'honza/vim-snippets'
+Plug 'honza/vim-snippets'
 " snippets for BibTeX files
-Bundle 'rbonvall/snipmate-snippets-bib'
+Plug 'rbonvall/snipmate-snippets-bib'
 " snippets for Arduino files
-Bundle 'sudar/vim-arduino-snippets'
-" snippets for Python, TAL and ZCML
-Bundle 'zedr/zope-snipmate-bundle.git'
+Plug 'sudar/vim-arduino-snippets'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
-Bundle 'bonsaiben/bootstrap-snippets'
+Plug 'bonsaiben/bootstrap-snippets'
+
 
 " Rainbow parenthesis
-Bundle 'luochen1990/rainbow'
+Plug 'luochen1990/rainbow'
 let g:rainbow_active=1
 
-" Trigger configuration. Do not use <tab> if you use https://github.com/Valloric/YouCompleteMe.
-if python_version >= 205 && version >= 704
-    " Uses with_statement so python 2.5 or higher
-    let g:UltiSnipsExpandTrigger="<tab>"
-    let g:UltiSnipsJumpForwardTrigger="<c-b>"
-    let g:UltiSnipsJumpBackwardTrigger="<c-z>"
-endif
-    
 " " If you want :UltiSnipsEdit to split your window.
 " let g:UltiSnipsEditSplit="vertical"
 
@@ -135,18 +127,18 @@ command! -nargs=1 Silent
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check flake8 whenever a Python file is written
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Bundle 'nvie/vim-flake8'
+" Plug 'nvie/vim-flake8'
 " autocmd BufWritePost *.py call Flake8()
 " let g:flake8_show_quickfix=0
 " let g:flake8_show_in_gutter=1
 " let g:flake8_show_in_file=0
-Bundle 'andviro/flake8-vim'
-let g:PyFlakeOnWrite = 1
-let g:PyFlakeCWindow = 0 
-let g:PyFlakeDisabledMessages = 'W391'
-
-" Remove trailing whitespace in Python before saving
-autocmd BufWritePre *.py :%s/\s\+$//e
+" Plug 'andviro/flake8-vim'
+" let g:PyFlakeOnWrite = 1
+" let g:PyFlakeCWindow = 0 
+" let g:PyFlakeDisabledMessages = 'W391'
+" 
+" " Remove trailing whitespace in Python before saving
+" autocmd BufWritePre *.py :%s/\s\+$//e
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
@@ -167,7 +159,7 @@ set pastetoggle=<C-i>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Surround text/selection with tags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle "tpope/vim-surround"
+Plug 'tpope/vim-surround'
 
 autocmd FileType rst let g:surround_{char2nr(':')} = ":\1command\1:`\r`"
 autocmd FileType rst vmap m S:math<CR>
@@ -175,7 +167,7 @@ autocmd FileType rst vmap m S:math<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " reStructuedText in Vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Bundle 'Rykka/riv.vim'
+" Plug 'Rykka/riv.vim'
 " Set the default path for Riv (Not supported yet, will work in 0.75 and up)
 let g:riv_default_path = "~/Desktop/TU"
 let main_project = {'path': './',  'build_path': 'build'}
@@ -193,16 +185,19 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Supertab so we can <Tab> for autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'ervandew/supertab'
+Plug 'ervandew/supertab'
+
+let g:SuperTabDefaultCompletionType = "context"
+let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 
 " I prefer to let the completion go from top to bottom
-let g:SuperTabDefaultCompletionType = "<c-n>"
+" let g:SuperTabDefaultCompletionType = "<c-n>"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if version >= 702
-    Bundle 'Syntastic' 
+    Plug 'Syntastic' 
 
     " shouldn't do Python for us
     let g:syntastic_python_checkers = []
@@ -211,7 +206,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlP is a plugin to quickly open files
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'kien/ctrlp.vim'
+Plug 'kien/ctrlp.vim'
 
 " Change mapping since I prefer ^t
 let g:ctrlp_map = '<c-t>'
@@ -223,8 +218,8 @@ let g:ctrlp_map = '<c-t>'
 " etc... Essential package for Python development
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " if python_version >= 205
-"     Bundle 'klen/python-mode'
-"     Bundle 'klen/rope-vim'
+"     Plug 'klen/python-mode'
+"     Plug 'klen/rope-vim'
 " endif
 " " Python-mode
 " " Activate rope
@@ -311,7 +306,7 @@ let g:ctrlp_map = '<c-t>'
 " Python Jedi plugin for better autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if python_version >= 205
-    Bundle 'davidhalter/jedi-vim'
+    Plug 'davidhalter/jedi-vim'
 endif
 
 " I find buffer to be quite convenient, but tabs or splits are also an option
@@ -326,13 +321,25 @@ let g:jedi#usages_command = "<leader>n"
 let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>r"
 let g:jedi#show_call_signatures = "2"
+let g:jedi#smart_auto_mappings = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'desert256.vim'
-Bundle 'oceandeep'
-Bundle 'vim-scripts/xorium.vim'
+Plug 'desert256.vim'
+Plug 'oceandeep'
+Plug 'vim-scripts/xorium.vim'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Initialize Plug
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call plug#end()
+
+if iCanHazPlug == 0
+    PlugUpdate
+endif
+
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
@@ -359,7 +366,7 @@ set modelines=4
 " also load settings from files in your current working directory from files
 " you might not trust. Beware of this if you regularly open directories from
 " untrusted sources
-set exrc
+" set exrc
 set secure
 " Lower the timeout for mappings, they are annoyingly slow otherwise
 set timeout timeoutlen=5000 ttimeoutlen=50
@@ -684,3 +691,23 @@ filetype plugin indent on
 " autocmd BufRead *.py silent PyFlake|silent redraw
 " syntax highlighting on
 syntax on 
+
+" Full recalculation function
+autocmd VimEnter * call UpdateBufferCount() 
+
+if !exists('*UpdateBufferCount')
+    function UpdateBufferCount() 
+        let buffers = range(1, bufnr('$')) 
+        call filter(buffers, 'buflisted(v:val)') 
+        let g:buffer_count = len(buffers) 
+    endfunction 
+endif
+
+" Update count
+call UpdateBufferCount()
+
+" Increment and decrement when needed
+autocmd BufAdd * let g:buffer_count += 1 
+autocmd BufDelete * let g:buffer_count -= 1 
+
+set rulerformat+=%n/%{g:buffer_count}

@@ -29,13 +29,17 @@ _append_to_path /usr/sbin
 _append_to_path /usr/bin
 [ -d "/usr/local/Cellar/ruby/" ] && _append_to_path /usr/local/Cellar/ruby/*/bin
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
+# Anaconda breaks virtualenvwrapper
+# _append_to_path ~/anaconda3/bin
 
 _insert_to_path
 _insert_to_path /usr/local/sbin
 _insert_to_path ~/bin
 _insert_to_path $HOME/.rvm/bin
 _insert_to_path /usr/local/bin
+_insert_to_path /usr/lib/ccache/
 _insert_to_path "$PYENV_ROOT/bin"
+_insert_to_path /usr/local/opt/ccache/libexec
 
 export PYENV_ROOT="$HOME/.pyenv"
 export PATH
