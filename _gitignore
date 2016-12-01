@@ -1,5 +1,6 @@
 # Just some standard files/globs to ignore
 .DS_Store
+Thumbs.db
 
 *.pyc
 *.pyo

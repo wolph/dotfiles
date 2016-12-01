@@ -89,6 +89,28 @@
   insteadOf = "gh:"
   insteadOf = "gh://"
 
+[url "git@github.com:WoLpH"]
+    pushInsteadOf = git@github.com:wolph
+
+[url "git@github.com:"]
+    pushInsteadOf = "https://github.com/"
+    pushInsteadOf = "http://github.com/"
+    pushInsteadOf = "gh:"
+    pushInsteadOf = "gh://"
+
+# [url "https://github.com/"]
+#     pushInsteadOf = "git@github.com:"
+#     pushInsteadOf = "http://github.com/"
+#     pushInsteadOf = "gh:"
+#     pushInsteadOf = "gh://"
+
+[url "https://gist.github.com/"]
+    insteadOf = "gist:"
+[url "git@gist.github.com:"]
+    pushInsteadOf = "https://gist.github.com/"
+    pushInsteadOf = "http://gist.github.com/"
+    pushInsteadOf = "gist:"
+
 [filter "hawser"]
 	clean = git hawser clean %f
 	smudge = git hawser smudge %f
