@@ -460,5 +460,3 @@ fi
 
 # added by travis gem
 [ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
-
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
