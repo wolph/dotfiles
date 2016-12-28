@@ -156,8 +156,13 @@ alias push='git pull; git push'
 alias grep='grep --color=auto'
 test -x /usr/local/bin/hub && alias git=hub
 # Link vim to the OS X clipboard
-alias vim="safe-reattach-to-user-namespace vim"
-alias vimdiff="safe-reattach-to-user-namespace vimdiff"
+if [ -x /usr/local/bin/nvim ]; then
+    alias vim="safe-reattach-to-user-namespace nvim"
+    alias vimdiff="safe-reattach-to-user-namespace nvim -d"
+else
+    alias vim="safe-reattach-to-user-namespace vim"
+    alias vimdiff="safe-reattach-to-user-namespace vimdiff"
+fi
 alias vi='vim'
 alias parallel='parallel --no-notice'
 alias vlc='open -a vlc'
@@ -168,7 +173,13 @@ alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
 #alias mplayer='open -a MplayerX.App --args '
 
 # Little trick to change the name of the shell
-. ${ROOT_DIR}bin/iterm2_helpers
+# . ${ROOT_DIR}bin/iterm2_helpers
+
+function title(){
+    echo -ne "\033]0;$1\007"
+    printf "\033k$1\033\\"
+}
+
 function mosh(){
     if [ -n "$1" ]; then
         title "$1"
@@ -182,8 +193,9 @@ function ssh(){
     if [[ "$@" =~ "BatchMode" ]]; then
         /usr/bin/ssh $*
     else
+	printf "\033k$1\033\\"
         if [ -n "$1" ]; then
-            title "$1"
+            title "$*"
         fi
         /usr/bin/ssh $*
         title ""

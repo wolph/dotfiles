@@ -23,6 +23,14 @@ endif
 let g:plug_threads=64
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Make sure neovim doesn't use the virtualenv
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim")
+    let g:python_host_prog = '/usr/local/bin/python2'
+    let g:python3_host_prog = '/usr/local/bin/python3'
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check python version if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("python")
@@ -404,7 +412,9 @@ endif
 " :1000 :  up to 20 lines of command-line history will be remembered
 " %     :  saves and restores the buffer list
 " n...  :  where to save the viminfo files
-set viminfo='1000,\"100,:1000,%,n~/.viminfo
+if !has('nvim')
+    set viminfo='1000,\"100,:1000,%,n~/.viminfo
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
@@ -638,7 +648,7 @@ autocmd Filetype python setlocal suffixesadd=.py
 " Colors 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable 256 color support when available
-if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
+if ((&term == 'xterm-256color') || (&term == 'screen-256color' || &term == 'nvim'))
     set t_Co=256
     set t_Sb=[4%dm
     set t_Sf=[3%dm
