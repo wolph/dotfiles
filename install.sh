@@ -50,3 +50,7 @@ for file in bin/*; do
     link "$source" "$destination"
 done
 
+mkdir -p "$HOME/.config"
+ln -s "$HOME/.vim" "$HOME/.config/nvim"
+ln -s "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
+
