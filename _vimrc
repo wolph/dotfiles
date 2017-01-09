@@ -15,9 +15,18 @@ let iCanHazPlug=1
 if !filereadable(expand('~/.vim/autoload/plug.vim'))
     echo "Installing Plug.."
     echo ""
-    silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    source ~/.vim/autoload/plug.vim
+    if has("win32")
+        silent !curl -Lqo .vim\autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        source .vim\autoload\plug.vim
+    else
+        silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        source ~/.vim/autoload/plug.vim
+    endif
     let iCanHazPlug=0
+endif
+
+if has("win32")
+    source .vim\autoload\plug.vim
 endif
 
 let g:plug_threads=64
@@ -42,7 +51,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Load and install the Plugs using Plug
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/bundle')
+call plug#begin(expand('~/.vim/bundle'))
 " Tree like file browser
 " Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
 Plug 'scrooloose/nerdtree'
@@ -656,6 +665,8 @@ if ((&term == 'xterm-256color') || (&term == 'screen-256color' || &term == 'nvim
     if &diff
         colorscheme xorium
     endif
+else
+    silent! colo desert
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
