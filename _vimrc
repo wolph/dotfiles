@@ -93,10 +93,70 @@ Plug 'guns/xterm-color-table.vim'
 Plug 'tfnico/vim-gradle'
 Plug 'zainin/vim-mikrotik'
 
+if isdirectory('/usr/local/opt/fzf')
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Fuzzy finder (fzf)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    set rtp+=/usr/local/opt/fzf
+    " This is the default extra key bindings
+    let g:fzf_action = {
+    \ 'ctrl-t': 'tab split',
+    \ 'ctrl-x': 'split',
+    \ 'ctrl-v': 'vsplit' }
+
+    nmap <c-t> :FZF<cr>
+else
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CtrlP is a plugin to quickly open files
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    Plug 'kien/ctrlp.vim'
+
+    " Change mapping since I prefer ^t
+    let g:ctrlp_map = '<c-t>'
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plug 'Valloric/YouCompleteMe'
+" if has("nvim")
+"     Plug 'Valloric/YouCompleteMe'
+"     let g:ycm_path_to_python_interpreter = '/usr/local/bin/python2'
+" endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Deoplete autocompleter 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim")
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+	let g:deoplete#enable_at_startup = 1
+	if !exists('g:deoplete#omni#input_patterns')
+  		let g:deoplete#omni#input_patterns = {}
+	endif
+	" let g:deoplete#disable_auto_complete = 1
+	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+
+	" omnifuncs
+	augroup omnifuncs
+  		autocmd!
+  		autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+  		autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+  		autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+  		autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+  		autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	augroup end
+	" tern
+	if exists('g:plugs["tern_for_vim"]')
+  		let g:tern_show_argument_hints = 'on_hold'
+  		let g:tern_show_signature_in_pum = 1
+  		autocmd FileType javascript setlocal omnifunc=tern#Complete
+	endif
+
+	" deoplete tab-complete
+	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	" tern
+	autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+endif
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
@@ -214,21 +274,14 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Syntastic is awesome, but slow as ...
+" Syntastic is awesome, but slow as ... on Vim
 " if version >= 702
-"     Plug 'Syntastic' 
-" 
-"     " shouldn't do Python for us
-"     let g:syntastic_python_checkers = []
-" endif
+if has("nvim")
+    Plug 'Syntastic' 
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" CtrlP is a plugin to quickly open files
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'kien/ctrlp.vim'
-
-" Change mapping since I prefer ^t
-let g:ctrlp_map = '<c-t>'
+    " shouldn't do Python for us
+    let g:syntastic_python_checkers = []
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode
