@@ -170,6 +170,7 @@ alias feh='/usr/local/bin/feh --auto-zoom --draw-filename --fullscreen --recursi
 alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
 alias tb='nc termbin.com 9999'
 alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
+alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 #alias mplayer='open -a MplayerX.App --args '
 
 # Little trick to change the name of the shell
