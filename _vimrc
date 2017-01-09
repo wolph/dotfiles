@@ -91,6 +91,7 @@ Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
+Plug 'zainin/vim-mikrotik'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
