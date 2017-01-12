@@ -12,14 +12,20 @@ filetype off
 " Install Plug if it's not installed
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let iCanHazPlug=1
-if !filereadable(expand('~/.vim/autoload/plug.vim'))
-    echo "Installing Plug.."
+let plugPath=expand('~/.vim/autoload/plug.vim')
+if !filereadable(plugPath)
+    echo "Installing Plug to " . plugPath 
     echo ""
     if has("win32")
         silent !curl -Lqo .vim\autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         source .vim\autoload\plug.vim
     else
-        silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        if executable('curl')
+            silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        else
+            silent !curl -qO ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        endif
+
         source ~/.vim/autoload/plug.vim
     endif
     let iCanHazPlug=0
@@ -35,8 +41,17 @@ let g:plug_threads=64
 " Make sure neovim doesn't use the virtualenv
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("nvim")
-    let g:python_host_prog = '/usr/local/bin/python2'
-    let g:python3_host_prog = '/usr/local/bin/python3'
+    if filereadable('/usr/local/bin/python2')
+        let g:python_host_prog = '/usr/local/bin/python2'
+    else
+        let g:python_host_prog = '/usr/bin/python2'
+    endif
+
+    if filereadable('/usr/local/bin/python3')
+        let g:python_host_prog = '/usr/local/bin/python3'
+    else
+        let g:python_host_prog = '/usr/bin/python3'
+    endif
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -92,6 +107,7 @@ Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
 Plug 'zainin/vim-mikrotik'
+Plug 'Chiel92/vim-autoformat'
 
 if isdirectory('/usr/local/opt/fzf')
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
