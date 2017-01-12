@@ -474,4 +474,14 @@ fi
 # added by travis gem
 [ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f ~/.fzf.zsh ]; then
+    source ~/.fzf.zsh
+
+    fzf-history-widget-accept() {
+        fzf-history-widget
+        zle accept-line
+    }
+    zle     -N      fzf-history-widget-accept
+    bindkey '^R'    fzf-history-widget-accept
+fi
+
