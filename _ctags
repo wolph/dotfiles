@@ -1,0 +1,9 @@
+-R
+--exclude=*.js
+--exclude=.git/*
+--exclude=build/
+--exclude=dist/
+--exclude=*.egg-info
+--exclude=.tox/*
+--python-kinds=-i
+--tag-relative=yes

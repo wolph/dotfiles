@@ -108,19 +108,89 @@ Plug 'guns/xterm-color-table.vim'
 Plug 'tfnico/vim-gradle'
 Plug 'zainin/vim-mikrotik'
 Plug 'Chiel92/vim-autoformat'
+Plug 'indentpython.vim'
+Plug 'gorkunov/smartpairs.vim'
 
-if isdirectory('/usr/local/opt/fzf')
+" Easy import sorting for Python
+map <leader>i :Isort<cr>
+command! -range=% Isort :<line1>,<line2>! isort -
+
+if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fuzzy finder (fzf)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-    set rtp+=/usr/local/opt/fzf
+    if isdirectory('/usr/local/opt/fzf')
+        Plug '/usr/local/opt/fzf'
+    else
+        Plug expand('~/.fzf')
+    endif
+
+    Plug 'junegunn/fzf.vim'
+
     " This is the default extra key bindings
     let g:fzf_action = {
     \ 'ctrl-t': 'tab split',
     \ 'ctrl-x': 'split',
     \ 'ctrl-v': 'vsplit' }
 
+    let g:fzf_command_prefix = ''
+
+    " [Tags] Command to generate tags file
+    let g:fzf_tags_command = 'ctags -R'
+
+    " Default fzf layout
+    " - down / up / left / right
+    let g:fzf_layout = { 'down': '~40%' }
+
+    " In Neovim, you can set up fzf window using a Vim command
+    let g:fzf_layout = { 'window': 'enew' }
+    let g:fzf_layout = { 'window': '-tabnew' }
+
+    " Customize fzf colors to match your color scheme
+    let g:fzf_colors =
+        \ {'fg':      ['fg', 'Normal'],
+         \ 'bg':      ['bg', 'Normal'],
+         \ 'hl':      ['fg', 'Comment'],
+         \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+         \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+         \ 'hl+':     ['fg', 'Statement'],
+         \ 'info':    ['fg', 'PreProc'],
+         \ 'prompt':  ['fg', 'Conditional'],
+         \ 'pointer': ['fg', 'Exception'],
+         \ 'marker':  ['fg', 'Keyword'],
+         \ 'spinner': ['fg', 'Label'],
+         \ 'header':  ['fg', 'Comment'] }
+
+    " Enable per-command history.
+    " CTRL-N and CTRL-P will be automatically bound to next-history and
+    " previous-history instead of down and up. If you don't like the change,
+    " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
+    let g:fzf_history_dir = '~/.local/share/fzf-history'
+
+    " [Files] Extra options for fzf
+    "   e.g. File preview using Highlight
+    "        (http://www.andre-simon.de/doku/highlight/en/highlight.html)
+    let g:fzf_files_options =
+    \ '--preview "(highlight -O ansi {} || cat {}) 2> /dev/null | head -'.&lines.'"'
+
+    " [Buffers] Jump to the existing window if possible
+    let g:fzf_buffers_jump = 1
+
+    " [[B]Commits] Customize the options used by 'git log':
+    let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
+    " [Tags] Command to generate tags file
+    let g:fzf_tags_command = 'ctags -R'
+
+    " [Commands] --expect expression for directly executing the command
+    let g:fzf_commands_expect = 'alt-enter,ctrl-x'
+
     nmap <c-t> :FZF<cr>
+    imap <c-x><c-o> <plug>(fzf-complete-line)
+    map <leader>b :Buffers<cr>
+    map <leader>f :Files<cr>
+    map <leader>g :GFiles<cr>
+    map <leader>t :Tags<cr>
 else
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CtrlP is a plugin to quickly open files
@@ -541,7 +611,8 @@ set noerrorbells
 " we do what to show tabs, to ensure we get them out of my files
 set nolist 
 " show tabs and trailing whitespace
-set listchars=tab:>-,trail:- 
+set listchars=tab:\ \ ,trail:·,eol:¬,nbsp:_
+
 " add the pretty line at 80 characters
 if version >= 703
     set colorcolumn=80
@@ -708,6 +779,9 @@ inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
+" Disable Ex mode
+nnoremap Q <nop>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autocommands 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -803,3 +877,9 @@ autocmd BufAdd * let g:buffer_count += 1
 autocmd BufDelete * let g:buffer_count -= 1 
 
 set rulerformat+=%n/%{g:buffer_count}
+
+" auto-reload vimrc on save
+augroup reload_vimrc " {
+  autocmd!
+  autocmd BufWritePost $MYVIMRC source $MYVIMRC
+augroup END " }
