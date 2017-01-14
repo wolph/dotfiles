@@ -136,11 +136,13 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     let g:fzf_command_prefix = ''
 
     " [Tags] Command to generate tags file
-    let g:fzf_tags_command = 'ctags -R'
+    " let g:fzf_tags_command = 'ctags -R'
+    " let g:fzf_tags_command = 'ctags -R $VIRTUAL_ENV/lib/python2.7/site-packages $VIRTUAL_ENV/lib/python3.4/site-packages $VIRTUAL_ENV/lib/python3.5/site-packages $VIRTUAL_ENV/lib/python3.6/site-packages ${PWD}'
+    let g:fzf_tags_command = 'ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./tags $(python -c "import os, sys; print('' ''.join(''{}''.format(d) for d in sys.path if os.path.isdir(d)))")'
 
     " Default fzf layout
     " - down / up / left / right
-    let g:fzf_layout = { 'down': '~40%' }
+    let g:fzf_layout = { 'down': '~70%' }
 
     " In Neovim, you can set up fzf window using a Vim command
     let g:fzf_layout = { 'window': 'enew' }
