@@ -41,7 +41,7 @@ let g:plug_threads=64
 " Make sure neovim doesn't use the virtualenv
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("nvim")
-    if filereadable(expand('~/envs/neovim2/bin/python')
+    if filereadable(expand('~/envs/neovim2/bin/python'))
         let g:python_host_prog = expand('~/envs/neovim2/bin/python')
     elseif filereadable('/usr/local/bin/python2')
         let g:python_host_prog = '/usr/local/bin/python2'
@@ -51,9 +51,9 @@ if has("nvim")
         echom "WARNING: no valid python2 install found"
     endif
 
-    if filereadable(expand('~/envs/neovim3/bin/python')
+    if filereadable(expand('~/envs/neovim3/bin/python'))
         let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
-    if filereadable('/usr/local/bin/python3')
+    elseif filereadable('/usr/local/bin/python3')
         let g:python3_host_prog = '/usr/local/bin/python3'
     elseif filereadable('/usr/bin/python3')
         let g:python3_host_prog = '/usr/bin/python3'
