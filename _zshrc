@@ -14,6 +14,10 @@ else;
     export ROOT_DIR=~rick/
 fi
 
+if [ "$TERM" = "xterm" ]; then
+    export TERM=xterm-256color
+fi
+
 #DEBUG=1
 if [ 1 -eq "$DEBUG" ]; then
     # set the trace prompt to include seconds, nanoseconds, script name and
@@ -119,9 +123,6 @@ if [ $(hostname | grep -E '^ip-10-') ]; then
     fi
 fi
 
-if [ "$TERM" = "xterm" ]; then
-    export TERM=xterm-256color
-fi
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
 zstyle ':completion:*' max-errors 2
@@ -474,4 +475,14 @@ fi
 # added by travis gem
 [ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
 
-[ -f ~/.fzf.zsh ] && source ~/.fzf.zsh
+if [ -f ~/.fzf.zsh ]; then
+    source ~/.fzf.zsh
+
+    fzf-history-widget-accept() {
+        fzf-history-widget
+        zle accept-line
+    }
+    zle     -N      fzf-history-widget-accept
+    bindkey '^R'    fzf-history-widget-accept
+fi
+
