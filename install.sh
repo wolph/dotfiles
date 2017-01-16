@@ -51,7 +51,7 @@ for file in bin/*; do
 done
 
 mkdir -p "$HOME/.config"
-mkdir -p "$HOME/.vim"
+mkdir -p "$HOME/.vim/autoload"
 ln -sf "$HOME/.vim" "$HOME/.config/nvim"
 ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 
