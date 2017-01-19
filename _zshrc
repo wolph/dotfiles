@@ -35,6 +35,12 @@ function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
 
+ticfile="$TERM.ti"
+if [[ -f "$ticfile" && $(command_exists tic) ]]; then
+    tic "$ticfile"
+fi
+
+
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
     alias gdate=date
@@ -484,5 +490,9 @@ if [ -f ~/.fzf.zsh ]; then
     }
     zle     -N      fzf-history-widget-accept
     bindkey '^R'    fzf-history-widget-accept
+
+    if [ $(command_exists pt ) ]; then
+        export FZF_DEFAULT_COMMAND='pt --global-gitignore -g ""'
+    fi
 fi
 
