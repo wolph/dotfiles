@@ -36,7 +36,8 @@ function command_exists(){
 }
 
 ticfile="$TERM.ti"
-if [[ -f "$ticfile" && $(command_exists tic) ]]; then
+command_exists tic
+if [[ $? -eq 0 && -f "$ticfile" ]]; then
     tic "$ticfile"
 fi
 
