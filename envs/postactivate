@@ -1,3 +1,3 @@
 # This hook is sourced after every virtualenv is activated.
-find . -maxdepth 1 -mtime -1 -name tags || ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./.tags $(python -c "import os, sys; print(' '.join('{}'.format(d) for d in sys.path if os.path.isdir(d)))") $PWD
+find . -maxdepth 1 -mtime -1 -name tags || ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./.tags $(python -c "import os, sys; print(' '.join('{}'.format(d) for d in sys.path if os.path.isdir(d)))") $VIRTUAL_ENV/lib/python*/site-packages $PWD & disown
 rehash
