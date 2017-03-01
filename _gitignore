@@ -35,4 +35,4 @@ docs/_build/
 
 .ropeproject
 .idea
-
+/tags
