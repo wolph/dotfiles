@@ -35,6 +35,13 @@ function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
 
+ticfile="$TERM.ti"
+command_exists tic
+if [[ $? -eq 0 && -f "$ticfile" ]]; then
+    tic "$ticfile"
+fi
+
+
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
     alias gdate=date
@@ -479,10 +486,40 @@ if [ -f ~/.fzf.zsh ]; then
     source ~/.fzf.zsh
 
     fzf-history-widget-accept() {
-        fzf-history-widget
-        zle accept-line
+        local selected num
+        setopt localoptions noglobsubst pipefail 2> /dev/null
+        # selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
+        selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r --expect=tab,ctrl-e,left,right $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
+
+        local ret=$?
+        if [ -n "$selected" ]; then
+            local accept=1
+            local edit=0
+            if [[ $selected[1] = tab || $selected[1] = left || $selected[1] = right ]]; then
+                accept=0
+                shift selected
+            elif [[ $selected[1] = ctrl-e ]]; then
+                edit=1
+                shift selected
+            fi
+
+            num=$selected[1]
+            if [ -n "$num" ]; then
+                zle vi-fetch-history -n $num
+                [[ $accept = 1 ]] && zle accept-line
+                [[ $edit = 1 ]] && zle edit-command-line
+            fi
+        fi
+        zle redisplay
+        typeset -f zle-line-init >/dev/null && zle zle-line-init
+        return $ret
     }
     zle     -N      fzf-history-widget-accept
     bindkey '^R'    fzf-history-widget-accept
+
+    if [ $(command_exists pt ) ]; then
+        export FZF_DEFAULT_COMMAND='pt --global-gitignore -g ""'
+    fi
+    export FZF_DEFAULT_OPTS='--no-mouse'
 fi
 
