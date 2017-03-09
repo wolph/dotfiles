@@ -76,6 +76,12 @@ Plug 'guns/xterm-color-table.vim'
 Plug 'tfnico/vim-gradle'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enhanced diffs
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'chrisbra/vim-diff-enhanced'
+let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Plug 'Valloric/YouCompleteMe'
