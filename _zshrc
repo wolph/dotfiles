@@ -154,6 +154,7 @@ alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
 alias less='/usr/bin/less -R'
 export LS_OPTIONS='--color=auto'
+alias ls="ls $LS_OPTIONS"
 alias l='ls -A'
 alias ll='l -l'
 alias qmv='qmv -f do'
