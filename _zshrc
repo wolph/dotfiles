@@ -14,6 +14,10 @@ else;
     export ROOT_DIR=~rick/
 fi
 
+if [ "$TERM" = "xterm" ]; then
+    export TERM=xterm-256color
+fi
+
 #DEBUG=1
 if [ 1 -eq "$DEBUG" ]; then
     # set the trace prompt to include seconds, nanoseconds, script name and
@@ -30,6 +34,13 @@ fi
 function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
+
+ticfile="$TERM.ti"
+command_exists tic
+if [[ $? -eq 0 && -f "$ticfile" ]]; then
+    tic "$ticfile"
+fi
+
 
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
@@ -119,9 +130,6 @@ if [ $(hostname | grep -E '^ip-10-') ]; then
     fi
 fi
 
-if [ "$TERM" = "xterm" ]; then
-    export TERM=xterm-256color
-fi
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
 zstyle ':completion:*' max-errors 2
@@ -156,8 +164,13 @@ alias push='git pull; git push'
 alias grep='grep --color=auto'
 test -x /usr/local/bin/hub && alias git=hub
 # Link vim to the OS X clipboard
-alias vim="safe-reattach-to-user-namespace vim"
-alias vimdiff="safe-reattach-to-user-namespace vimdiff"
+if [ -x /usr/local/bin/nvim ]; then
+    alias vim="safe-reattach-to-user-namespace nvim"
+    alias vimdiff="safe-reattach-to-user-namespace nvim -d"
+else
+    alias vim="safe-reattach-to-user-namespace vim"
+    alias vimdiff="safe-reattach-to-user-namespace vimdiff"
+fi
 alias vi='vim'
 alias parallel='parallel --no-notice'
 alias vlc='open -a vlc'
@@ -165,10 +178,17 @@ alias feh='/usr/local/bin/feh --auto-zoom --draw-filename --fullscreen --recursi
 alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
 alias tb='nc termbin.com 9999'
 alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
+alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 #alias mplayer='open -a MplayerX.App --args '
 
 # Little trick to change the name of the shell
-. ${ROOT_DIR}bin/iterm2_helpers
+# . ${ROOT_DIR}bin/iterm2_helpers
+
+function title(){
+    echo -ne "\033]0;$1\007"
+    printf "\033k$1\033\\"
+}
+
 function mosh(){
     if [ -n "$1" ]; then
         title "$1"
@@ -182,8 +202,9 @@ function ssh(){
     if [[ "$@" =~ "BatchMode" ]]; then
         /usr/bin/ssh $*
     else
+	printf "\033k$1\033\\"
         if [ -n "$1" ]; then
-            title "$1"
+            title "$*"
         fi
         /usr/bin/ssh $*
         title ""
@@ -460,3 +481,45 @@ fi
 
 # added by travis gem
 [ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
+
+if [ -f ~/.fzf.zsh ]; then
+    source ~/.fzf.zsh
+
+    fzf-history-widget-accept() {
+        local selected num
+        setopt localoptions noglobsubst pipefail 2> /dev/null
+        # selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
+        selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r --expect=tab,ctrl-e,left,right $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
+
+        local ret=$?
+        if [ -n "$selected" ]; then
+            local accept=1
+            local edit=0
+            if [[ $selected[1] = tab || $selected[1] = left || $selected[1] = right ]]; then
+                accept=0
+                shift selected
+            elif [[ $selected[1] = ctrl-e ]]; then
+                edit=1
+                shift selected
+            fi
+
+            num=$selected[1]
+            if [ -n "$num" ]; then
+                zle vi-fetch-history -n $num
+                [[ $accept = 1 ]] && zle accept-line
+                [[ $edit = 1 ]] && zle edit-command-line
+            fi
+        fi
+        zle redisplay
+        typeset -f zle-line-init >/dev/null && zle zle-line-init
+        return $ret
+    }
+    zle     -N      fzf-history-widget-accept
+    bindkey '^R'    fzf-history-widget-accept
+
+    if [ $(command_exists pt ) ]; then
+        export FZF_DEFAULT_COMMAND='pt --global-gitignore -g ""'
+    fi
+    export FZF_DEFAULT_OPTS='--no-mouse'
+fi
+

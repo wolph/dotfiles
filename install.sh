@@ -50,3 +50,20 @@ for file in bin/*; do
     link "$source" "$destination"
 done
 
+mkdir -p "$HOME/envs"
+for file in envs/*; do
+    destination="$HOME/$file"
+    source=$PWD/$file
+    link "$source" "$destination"
+done
+
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/.vim/autoload"
+ln -sf "$HOME/.vim" "$HOME/.config/nvim"
+ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
+
+if [ ! -d "$HOME/.tmux/plugins" ]; then
+    mkdir -p "$HOME/.tmux/plugins"
+    git clone https://github.com/tmux-plugins/tpm "$HOME/.tmux/plugins/tpm"
+	tmux run-shell "$HOME/.tmux/plugins/tpm/bindings/install_plugins"
+fi
