@@ -118,10 +118,20 @@ Plug 'zainin/vim-mikrotik'
 Plug 'Chiel92/vim-autoformat'
 Plug 'indentpython.vim'
 Plug 'gorkunov/smartpairs.vim'
+Plug 'Vimjas/vim-python-pep8-indent'
 
 " Easy import sorting for Python
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
+
+if has("nvim")
+    let g:neomake_python_enabled_makers = ['flake8', 'pep8']
+    " E501 is line length of 80 characters
+    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+    let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
+
+    Plug 'neomake/neomake'
+endif
 
 if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -224,6 +234,8 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("nvim")
     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    Plug 'zchee/deoplete-jedi'
+
 	let g:deoplete#enable_at_startup = 1
 	if !exists('g:deoplete#omni#input_patterns')
   		let g:deoplete#omni#input_patterns = {}
