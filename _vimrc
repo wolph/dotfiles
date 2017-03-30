@@ -523,6 +523,9 @@ call plug#end()
 
 if iCanHazPlug == 0
     PlugUpdate
+    if has('nvim')
+        UpdateRemotePlugins
+    endif
 endif
 
 
