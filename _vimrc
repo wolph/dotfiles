@@ -642,7 +642,7 @@ set noerrorbells
 " we do what to show tabs, to ensure we get them out of my files
 set nolist 
 " show tabs and trailing whitespace
-set listchars=tab:\ \ ,trail:·,eol:¬,nbsp:_
+set listchars=tab:>-,trail:-
 
 " add the pretty line at 80 characters
 if version >= 703
