@@ -36,6 +36,7 @@ _insert_to_path
 _insert_to_path /usr/local/sbin
 _insert_to_path ~/bin
 _insert_to_path $HOME/.rvm/bin
+_insert_to_path $HOME/go/bin
 _insert_to_path /usr/local/bin
 _insert_to_path /usr/lib/ccache/
 _insert_to_path "$PYENV_ROOT/bin"
