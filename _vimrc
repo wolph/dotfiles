@@ -74,6 +74,8 @@ Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
+Plug 'elzr/vim-json'
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
@@ -197,10 +199,11 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if version >= 702
-    Plug 'Syntastic' 
+    Plug 'w0rp/ale'
+    " Plug 'Syntastic' 
 
-    " shouldn't do Python for us
-    let g:syntastic_python_checkers = []
+    " " shouldn't do Python for us
+    " let g:syntastic_python_checkers = []
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
