@@ -126,14 +126,15 @@ Plug 'Vimjas/vim-python-pep8-indent'
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
 
-if has("nvim")
-    let g:neomake_python_enabled_makers = ['flake8', 'pep8']
-    " E501 is line length of 80 characters
-    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
-    let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
-
-    Plug 'neomake/neomake'
-endif
+" Replaced with ALE for now
+" if has("nvim")
+"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
+"     " E501 is line length of 80 characters
+"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
+" 
+"     Plug 'neomake/neomake'
+" endif
 
 if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -394,7 +395,7 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 " if version >= 702
 if has("nvim")
     Plug 'w0rp/ale'
-    # Plug 'Syntastic' 
+    " Plug 'Syntastic' 
 
     " " shouldn't do Python for us
     " let g:syntastic_python_checkers = []
