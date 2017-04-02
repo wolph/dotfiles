@@ -36,3 +36,6 @@ docs/_build/
 .ropeproject
 .idea
 
+# Ignore ctags
+/tags
+/.tags
