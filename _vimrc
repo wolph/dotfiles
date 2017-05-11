@@ -227,8 +227,10 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enhanced diffs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'chrisbra/vim-diff-enhanced'
-let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+if has("nvim") || exists("*systemlist")
+    Plug 'chrisbra/vim-diff-enhanced'
+    let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
