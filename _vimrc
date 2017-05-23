@@ -227,8 +227,10 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enhanced diffs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'chrisbra/vim-diff-enhanced'
-let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+if has("nvim") || exists("*systemlist")
+    Plug 'chrisbra/vim-diff-enhanced'
+    let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
@@ -395,6 +397,13 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 " if version >= 702
 if has("nvim")
     Plug 'w0rp/ale'
+
+    " pylint is too whiny for my taste... disable it until I find a proper
+    " config
+    let g:ale_linters = {
+    \    'python': ['mypy', 'flake8']
+    \}
+
     " Plug 'Syntastic' 
 
     " " shouldn't do Python for us
