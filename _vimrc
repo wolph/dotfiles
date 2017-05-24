@@ -114,7 +114,6 @@ Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
-Plug 'elzr/vim-json'
 
 Plug 'zainin/vim-mikrotik'
 Plug 'Chiel92/vim-autoformat'
@@ -894,6 +893,29 @@ augroup BWCCreateDir
 augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Save and restore the session
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+fu! SaveSess()
+    execute 'mksession! ' . getcwd() . '/.session.vim'
+endfunction
+
+fu! RestoreSess()
+if filereadable(getcwd() . '/.session.vim')
+    execute 'so ' . getcwd() . '/.session.vim'
+    if bufexists(1)
+        for l in range(1, bufnr('$'))
+            if bufwinnr(l) == -1
+                exec 'sbuffer ' . l
+            endif
+        endfor
+    endif
+endif
+endfunction
+
+" autocmd VimLeave * call SaveSess()
+autocmd VimEnter * nested call RestoreSess()
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " After loading the bundles we can enable the plugins again
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " load filetype plugins and indent settings
@@ -922,8 +944,23 @@ autocmd BufDelete * let g:buffer_count -= 1
 
 set rulerformat+=%n/%{g:buffer_count}
 
+command! CloseHiddenBuffers call s:CloseHiddenBuffers()
+function! s:CloseHiddenBuffers()
+  let open_buffers = []
+
+  for i in range(tabpagenr('$'))
+    call extend(open_buffers, tabpagebuflist(i + 1))
+  endfor
+
+  for num in range(1, bufnr("$") + 1)
+    if buflisted(num) && index(open_buffers, num) == -1
+      exec "bdelete ".num
+    endif
+  endfor
+endfunction
+
 " auto-reload vimrc on save
-augroup reload_vimrc " {
-  autocmd!
-  autocmd BufWritePost $MYVIMRC source $MYVIMRC
-augroup END " }
+augroup myvimrc
+    au!
+    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+augroup END
