@@ -9,17 +9,57 @@ set background=dark
 filetype off 
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Install Vundle if it's not installed
+" Install Plug if it's not installed
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let iCanHazVundle=1
-let vundle_readme=expand('~/.vim/bundle/vundle/README.md')
-if !filereadable(vundle_readme)
-    echo "Installing Vundle.."
+let iCanHazPlug=1
+let plugPath=expand('~/.vim/autoload/plug.vim')
+if !filereadable(plugPath)
+    echo "Installing Plug to " . plugPath 
     echo ""
-    silent !mkdir -p ~/.vim/bundle
-    silent !git clone https://github.com/WoLpH/Vundle.vim ~/.vim/bundle/vundle
-    silent !pvi
-    let iCanHazVundle=0
+    if has("win32")
+        silent !curl -Lqo .vim\autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        source .vim\autoload\plug.vim
+    else
+        if executable('curl')
+            silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        else
+            silent !curl -qO ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        endif
+
+        source ~/.vim/autoload/plug.vim
+    endif
+    let iCanHazPlug=0
+endif
+
+if has("win32")
+    source .vim\autoload\plug.vim
+endif
+
+let g:plug_threads=64
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Make sure neovim doesn't use the virtualenv
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim")
+    if filereadable(expand('~/envs/neovim2/bin/python'))
+        let g:python_host_prog = expand('~/envs/neovim2/bin/python')
+    elseif filereadable('/usr/local/bin/python2')
+        let g:python_host_prog = '/usr/local/bin/python2'
+    elseif filereadable('/usr/bin/python2')
+        let g:python_host_prog = '/usr/bin/python2'
+    else
+        echom "WARNING: no valid python2 install found"
+    endif
+
+    if filereadable(expand('~/envs/neovim3/bin/python'))
+        let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
+    elseif filereadable('/usr/local/bin/python3')
+        let g:python3_host_prog = '/usr/local/bin/python3'
+    elseif filereadable('/usr/bin/python3')
+        let g:python3_host_prog = '/usr/bin/python3'
+    else
+        echom "WARNING: no valid python3 install found"
+    endif
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -32,28 +72,28 @@ else
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Load and install the Bundles using Vundle
+" Load and install the Plugs using Plug
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-set rtp+=~/.vim/bundle/vundle/
-call vundle#rc()
+call plug#begin(expand('~/.vim/bundle'))
 " Tree like file browser
-Bundle 'WoLpH/nerdtree@patch-1'
+" Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
+Plug 'scrooloose/nerdtree'
 " A Git wrapper so awesome, it should be illegal
-Bundle 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive'
 " Easier way to move around in Vim
-Bundle 'Lokaltog/vim-easymotion'
+Plug 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
-Bundle 'tpope/vim-eunuch'
-Bundle 'tpope/vim-repeat'
-Bundle 'lepture/vim-jinja'
-Bundle 'thiderman/vim-supervisor'
-Bundle 'evanmiller/nginx-vim-syntax'
-Bundle 'alfredodeza/coveragepy.vim'
-Bundle 'alfredodeza/pytest.vim'
-Bundle 'pig.vim'
+Plug 'tpope/vim-eunuch'
+Plug 'tpope/vim-repeat'
+Plug 'lepture/vim-jinja'
+Plug 'thiderman/vim-supervisor'
+Plug 'evanmiller/nginx-vim-syntax'
+Plug 'alfredodeza/coveragepy.vim'
+Plug 'alfredodeza/pytest.vim'
+Plug 'pig.vim'
 if python_version >= 205
     " Uses with_statement so python 2.5 or higher
-    Bundle 'jmcantrell/vim-virtualenv'
+    Plug 'jmcantrell/vim-virtualenv'
 endif
 Bundle 'rizzatti/dash.vim'
 Bundle 'vim-coffee-script'
@@ -62,29 +102,190 @@ Bundle 'robbles/logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
-Bundle 'pangloss/vim-javascript'
-Bundle 'rstacruz/sparkup'
+Plug 'pangloss/vim-javascript'
+Plug 'rstacruz/sparkup'
 
-Bundle 'markcornick/vim-vagrant'
+Plug 'markcornick/vim-vagrant'
 if has('mac')
-    Bundle 'copy-as-rtf'
+    Plug 'copy-as-rtf'
 endif
-Bundle 'mikewest/vimroom'
-Bundle 'guns/xterm-color-table.vim'
+Plug 'mikewest/vimroom'
+Plug 'guns/xterm-color-table.vim'
 
-Bundle 'tfnico/vim-gradle'
+Plug 'tfnico/vim-gradle'
+
+Plug 'zainin/vim-mikrotik'
+Plug 'Chiel92/vim-autoformat'
+Plug 'indentpython.vim'
+Plug 'gorkunov/smartpairs.vim'
+Plug 'Vimjas/vim-python-pep8-indent'
+
+" Easy import sorting for Python
+map <leader>i :Isort<cr>
+command! -range=% Isort :<line1>,<line2>! isort -
+
+" Replaced with ALE for now
+" if has("nvim")
+"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
+"     " E501 is line length of 80 characters
+"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
+" 
+"     Plug 'neomake/neomake'
+" endif
+
+if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Fuzzy finder (fzf)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    if isdirectory('/usr/local/opt/fzf')
+        Plug '/usr/local/opt/fzf'
+    else
+        Plug expand('~/.fzf')
+    endif
+
+    Plug 'junegunn/fzf.vim'
+
+    " This is the default extra key bindings
+    let g:fzf_action = {
+    \ 'ctrl-t': 'tab split',
+    \ 'ctrl-x': 'split',
+    \ 'ctrl-v': 'vsplit' }
+
+    let g:fzf_command_prefix = ''
+
+    " [Tags] Command to generate tags file
+    " let g:fzf_tags_command = 'ctags -R'
+    " let g:fzf_tags_command = 'ctags -R $VIRTUAL_ENV/lib/python2.7/site-packages $VIRTUAL_ENV/lib/python3.4/site-packages $VIRTUAL_ENV/lib/python3.5/site-packages $VIRTUAL_ENV/lib/python3.6/site-packages ${PWD}'
+    let g:fzf_tags_command = 'ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./.tags $(python -c "import os, sys; print('' ''.join(''{}''.format(d) for d in sys.path if os.path.isdir(d)))")'
+
+    " Default fzf layout
+    " - down / up / left / right
+    let g:fzf_layout = { 'down': '~70%' }
+
+    " In Neovim, you can set up fzf window using a Vim command
+    let g:fzf_layout = { 'window': 'enew' }
+    let g:fzf_layout = { 'window': '-tabnew' }
+
+    " Customize fzf colors to match your color scheme
+    let g:fzf_colors =
+        \ {'fg':      ['fg', 'Normal'],
+         \ 'bg':      ['bg', 'Normal'],
+         \ 'hl':      ['fg', 'Comment'],
+         \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+         \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+         \ 'hl+':     ['fg', 'Statement'],
+         \ 'info':    ['fg', 'PreProc'],
+         \ 'prompt':  ['fg', 'Conditional'],
+         \ 'pointer': ['fg', 'Exception'],
+         \ 'marker':  ['fg', 'Keyword'],
+         \ 'spinner': ['fg', 'Label'],
+         \ 'header':  ['fg', 'Comment'] }
+
+    " Enable per-command history.
+    " CTRL-N and CTRL-P will be automatically bound to next-history and
+    " previous-history instead of down and up. If you don't like the change,
+    " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
+    let g:fzf_history_dir = '~/.local/share/fzf-history'
+
+    " [Files] Extra options for fzf
+    "   e.g. File preview using Highlight
+    "        (http://www.andre-simon.de/doku/highlight/en/highlight.html)
+    let g:fzf_files_options =
+    \ '--preview "(highlight -O ansi {} || cat {}) 2> /dev/null | head -'.&lines.'"'
+
+    " [Buffers] Jump to the existing window if possible
+    let g:fzf_buffers_jump = 1
+
+    " [[B]Commits] Customize the options used by 'git log':
+    let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
+    " [Tags] Command to generate tags file
+    let g:fzf_tags_command = 'ctags -R'
+
+    " [Commands] --expect expression for directly executing the command
+    let g:fzf_commands_expect = 'alt-enter,ctrl-x'
+
+    nmap <c-t> :FZF<cr>
+    imap <c-x><c-o> <plug>(fzf-complete-line)
+    map <leader>b :Buffers<cr>
+    map <leader>f :Files<cr>
+    map <leader>g :GFiles<cr>
+    map <leader>t :Tags<cr>
+else
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CtrlP is a plugin to quickly open files
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    Plug 'kien/ctrlp.vim'
+
+    " Change mapping since I prefer ^t
+    let g:ctrlp_map = '<c-t>'
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enhanced diffs
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim") || exists("*systemlist")
+    Plug 'chrisbra/vim-diff-enhanced'
+    let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" YouCompleteMe
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" if has("nvim")
+"     Plug 'Valloric/YouCompleteMe'
+"     let g:ycm_path_to_python_interpreter = '/usr/local/bin/python2'
+" endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Deoplete autocompleter 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim")
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    Plug 'zchee/deoplete-jedi'
+
+	let g:deoplete#enable_at_startup = 1
+	if !exists('g:deoplete#omni#input_patterns')
+  		let g:deoplete#omni#input_patterns = {}
+	endif
+	" let g:deoplete#disable_auto_complete = 1
+	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+
+	" omnifuncs
+	augroup omnifuncs
+  		autocmd!
+  		autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+  		autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+  		autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+  		autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+  		autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	augroup end
+	" tern
+	if exists('g:plugs["tern_for_vim"]')
+  		let g:tern_show_argument_hints = 'on_hold'
+  		let g:tern_show_signature_in_pum = 1
+  		autocmd FileType javascript setlocal omnifunc=tern#Complete
+	endif
+
+	" deoplete tab-complete
+	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	" tern
+	autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+endif
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'chase/vim-ansible-yaml'
+Plug 'chase/vim-ansible-yaml'
 let g:ansible_options = {'ignore_blank_lines': 0}
 let g:ansible_options = {'documentation_mapping': '<C-K>'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Gundo, the holy grail in undos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'dsummersl/gundo.vim'
+Plug 'dsummersl/gundo.vim'
 nnoremap U :silent GundoToggle<CR>
 let g:gundo_verbose_graph=0
 
@@ -93,23 +294,22 @@ let g:gundo_verbose_graph=0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Track the engine.
 
-Bundle "MarcWeber/vim-addon-mw-utils"
-Bundle "tomtom/tlib_vim"
-Bundle "garbas/vim-snipmate"
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
+Plug 'garbas/vim-snipmate'
 
 " Lots of snippets
-Bundle 'honza/vim-snippets'
+Plug 'honza/vim-snippets'
 " snippets for BibTeX files
-Bundle 'rbonvall/snipmate-snippets-bib'
+Plug 'rbonvall/snipmate-snippets-bib'
 " snippets for Arduino files
-Bundle 'sudar/vim-arduino-snippets'
-" snippets for Python, TAL and ZCML
-Bundle 'zedr/zope-snipmate-bundle.git'
+Plug 'sudar/vim-arduino-snippets'
 " snippets for Twitter Bootstrap markup, in HTML and Haml
-Bundle 'bonsaiben/bootstrap-snippets'
+Plug 'bonsaiben/bootstrap-snippets'
+
 
 " Rainbow parenthesis
-Bundle 'luochen1990/rainbow'
+Plug 'luochen1990/rainbow'
 let g:rainbow_active=1
 
 " " If you want :UltiSnipsEdit to split your window.
@@ -122,18 +322,18 @@ command! -nargs=1 Silent
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check flake8 whenever a Python file is written
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Bundle 'nvie/vim-flake8'
+" Plug 'nvie/vim-flake8'
 " autocmd BufWritePost *.py call Flake8()
 " let g:flake8_show_quickfix=0
 " let g:flake8_show_in_gutter=1
 " let g:flake8_show_in_file=0
-Bundle 'andviro/flake8-vim'
-let g:PyFlakeOnWrite = 1
-let g:PyFlakeCWindow = 0 
-let g:PyFlakeDisabledMessages = 'W391'
-
-" Remove trailing whitespace in Python before saving
-autocmd BufWritePre *.py :%s/\s\+$//e
+" Plug 'andviro/flake8-vim'
+" let g:PyFlakeOnWrite = 1
+" let g:PyFlakeCWindow = 0 
+" let g:PyFlakeDisabledMessages = 'W391'
+" 
+" " Remove trailing whitespace in Python before saving
+" autocmd BufWritePre *.py :%s/\s\+$//e
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
@@ -154,7 +354,7 @@ set pastetoggle=<C-i>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Surround text/selection with tags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle "tpope/vim-surround"
+Plug 'tpope/vim-surround'
 
 autocmd FileType rst let g:surround_{char2nr(':')} = ":\1command\1:`\r`"
 autocmd FileType rst vmap m S:math<CR>
@@ -162,7 +362,7 @@ autocmd FileType rst vmap m S:math<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " reStructuedText in Vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Bundle 'Rykka/riv.vim'
+" Plug 'Rykka/riv.vim'
 " Set the default path for Riv (Not supported yet, will work in 0.75 and up)
 let g:riv_default_path = "~/Desktop/TU"
 let main_project = {'path': './',  'build_path': 'build'}
@@ -180,7 +380,7 @@ augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Supertab so we can <Tab> for autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'ervandew/supertab'
+Plug 'ervandew/supertab'
 
 let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
@@ -191,20 +391,22 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if version >= 702
-    Bundle 'Syntastic' 
+" Syntastic is awesome, but slow as ... on Vim
+" if version >= 702
+if has("nvim")
+    Plug 'w0rp/ale'
 
-    " shouldn't do Python for us
-    let g:syntastic_python_checkers = []
+    " pylint is too whiny for my taste... disable it until I find a proper
+    " config
+    let g:ale_linters = {
+    \    'python': ['mypy', 'flake8']
+    \}
+
+    " Plug 'Syntastic' 
+
+    " " shouldn't do Python for us
+    " let g:syntastic_python_checkers = []
 endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" CtrlP is a plugin to quickly open files
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'kien/ctrlp.vim'
-
-" Change mapping since I prefer ^t
-let g:ctrlp_map = '<c-t>'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode
@@ -213,8 +415,8 @@ let g:ctrlp_map = '<c-t>'
 " etc... Essential package for Python development
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " if python_version >= 205
-"     Bundle 'klen/python-mode'
-"     Bundle 'klen/rope-vim'
+"     Plug 'klen/python-mode'
+"     Plug 'klen/rope-vim'
 " endif
 " " Python-mode
 " " Activate rope
@@ -301,7 +503,7 @@ let g:ctrlp_map = '<c-t>'
 " Python Jedi plugin for better autocompletion
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if python_version >= 205
-    Bundle 'davidhalter/jedi-vim'
+    Plug 'davidhalter/jedi-vim'
 endif
 
 " I find buffer to be quite convenient, but tabs or splits are also an option
@@ -321,9 +523,23 @@ let g:jedi#smart_auto_mappings = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Bundle 'desert256.vim'
-Bundle 'oceandeep'
-Bundle 'vim-scripts/xorium.vim'
+Plug 'desert256.vim'
+Plug 'oceandeep'
+Plug 'vim-scripts/xorium.vim'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Initialize Plug
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+call plug#end()
+
+if iCanHazPlug == 0
+    PlugUpdate
+    if has('nvim')
+        UpdateRemotePlugins
+    endif
+endif
+
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " General
@@ -387,7 +603,9 @@ endif
 " :1000 :  up to 20 lines of command-line history will be remembered
 " %     :  saves and restores the buffer list
 " n...  :  where to save the viminfo files
-set viminfo='1000,\"100,:1000,%,n~/.viminfo
+if !has('nvim')
+    set viminfo='1000,\"100,:1000,%,n~/.viminfo
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
@@ -435,7 +653,8 @@ set noerrorbells
 " we do what to show tabs, to ensure we get them out of my files
 set nolist 
 " show tabs and trailing whitespace
-set listchars=tab:>-,trail:- 
+set listchars=tab:>-,trail:-
+
 " add the pretty line at 80 characters
 if version >= 703
     set colorcolumn=80
@@ -602,6 +821,9 @@ inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
+" Disable Ex mode
+nnoremap Q <nop>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autocommands 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -622,7 +844,7 @@ autocmd Filetype python setlocal suffixesadd=.py
 " Colors 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable 256 color support when available
-if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
+if ((&term == 'xterm-256color') || (&term == 'screen-256color' || &term == 'nvim'))
     set t_Co=256
     set t_Sb=[4%dm
     set t_Sf=[3%dm
@@ -630,6 +852,8 @@ if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
     if &diff
         colorscheme xorium
     endif
+else
+    silent! colo desert
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -669,6 +893,29 @@ augroup BWCCreateDir
 augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Save and restore the session
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+fu! SaveSess()
+    execute 'mksession! ' . getcwd() . '/.session.vim'
+endfunction
+
+fu! RestoreSess()
+if filereadable(getcwd() . '/.session.vim')
+    execute 'so ' . getcwd() . '/.session.vim'
+    if bufexists(1)
+        for l in range(1, bufnr('$'))
+            if bufwinnr(l) == -1
+                exec 'sbuffer ' . l
+            endif
+        endfor
+    endif
+endif
+endfunction
+
+" autocmd VimLeave * call SaveSess()
+autocmd VimEnter * nested call RestoreSess()
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " After loading the bundles we can enable the plugins again
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " load filetype plugins and indent settings
@@ -679,11 +926,14 @@ syntax on
 
 " Full recalculation function
 autocmd VimEnter * call UpdateBufferCount() 
-function UpdateBufferCount() 
-    let buffers = range(1, bufnr('$')) 
-    call filter(buffers, 'buflisted(v:val)') 
-    let g:buffer_count = len(buffers) 
-endfunction 
+
+if !exists('*UpdateBufferCount')
+    function UpdateBufferCount() 
+        let buffers = range(1, bufnr('$')) 
+        call filter(buffers, 'buflisted(v:val)') 
+        let g:buffer_count = len(buffers) 
+    endfunction 
+endif
 
 " Update count
 call UpdateBufferCount()
@@ -693,3 +943,24 @@ autocmd BufAdd * let g:buffer_count += 1
 autocmd BufDelete * let g:buffer_count -= 1 
 
 set rulerformat+=%n/%{g:buffer_count}
+
+command! CloseHiddenBuffers call s:CloseHiddenBuffers()
+function! s:CloseHiddenBuffers()
+  let open_buffers = []
+
+  for i in range(tabpagenr('$'))
+    call extend(open_buffers, tabpagebuflist(i + 1))
+  endfor
+
+  for num in range(1, bufnr("$") + 1)
+    if buflisted(num) && index(open_buffers, num) == -1
+      exec "bdelete ".num
+    endif
+  endfor
+endfunction
+
+" auto-reload vimrc on save
+augroup myvimrc
+    au!
+    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+augroup END

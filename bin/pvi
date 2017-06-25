@@ -131,11 +131,11 @@ class Task(object):
     def make_git_command(self, uri, name):
         bundle_dir = os.path.join(os.path.expanduser(self._bundles_dir), name)
         if os.path.isdir(os.path.join(bundle_dir, '.git')):
-            os.chdir(bundle_dir)
-            return ['git', 'pull'], 'update'
+            return ['git', '-C', bundle_dir, 'pull', '--recurse-submodules'], 'update'
         return [
                 'git',
                 'clone',
+                '--recursive',
                 uri,
                 os.path.join(os.path.expanduser(BUNDLES_DIR), name)
                 ], 'install'

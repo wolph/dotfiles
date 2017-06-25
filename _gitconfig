@@ -17,7 +17,7 @@
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
 	global-gc = !git-global-gc
-	pull = pull --rebase
+	# pull = pull --rebase
 
     repo = !gh repo \"$@\"
     user = !gh user \"$@\"
@@ -27,6 +27,7 @@
     issue = !gh issue \"$@\"
     notification = !gh notification \"$@\"
     pull-request = !gh pull-request \"$@\"
+	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
 
 [color]
 	diff = auto
