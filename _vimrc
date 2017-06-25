@@ -90,15 +90,15 @@ Plug 'thiderman/vim-supervisor'
 Plug 'evanmiller/nginx-vim-syntax'
 Plug 'alfredodeza/coveragepy.vim'
 Plug 'alfredodeza/pytest.vim'
-Plug 'pig.vim'
+Plug 'vim-scripts/pig.vim'
 if python_version >= 205
     " Uses with_statement so python 2.5 or higher
     Plug 'jmcantrell/vim-virtualenv'
 endif
-Bundle 'rizzatti/dash.vim'
-Bundle 'vim-coffee-script'
-Bundle 'tshirtman/vim-cython'
-Bundle 'robbles/logstash.vim'
+Plug 'rizzatti/dash.vim'
+Plug 'vim-scripts/vim-coffee-script'
+Plug 'tshirtman/vim-cython'
+Plug 'robbles/logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
@@ -107,7 +107,7 @@ Plug 'rstacruz/sparkup'
 
 Plug 'markcornick/vim-vagrant'
 if has('mac')
-    Plug 'copy-as-rtf'
+    Plug 'vim-scripts/copy-as-rtf'
 endif
 Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
@@ -116,7 +116,6 @@ Plug 'tfnico/vim-gradle'
 
 Plug 'zainin/vim-mikrotik'
 Plug 'Chiel92/vim-autoformat'
-Plug 'indentpython.vim'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 
@@ -523,8 +522,8 @@ let g:jedi#smart_auto_mappings = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'desert256.vim'
-Plug 'oceandeep'
+Plug 'vim-scripts/desert256.vim'
+Plug 'vim-scripts/oceandeep'
 Plug 'vim-scripts/xorium.vim'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
