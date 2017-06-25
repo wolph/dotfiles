@@ -58,7 +58,7 @@ endif
 Bundle 'rizzatti/dash.vim'
 Bundle 'vim-coffee-script'
 Bundle 'tshirtman/vim-cython'
-Bundle 'logstash.vim'
+Bundle 'robbles/logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
@@ -610,6 +610,7 @@ augroup filetypedetect
     au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
     au BufNewFile,BufRead /etc/supervisor/* setf supervisor
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
+    au BufNewFile,BufRead /etc/logstash/* setf logstash
     au BufNewFile,BufRead */templates/*.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
