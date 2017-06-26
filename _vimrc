@@ -90,17 +90,16 @@ Plug 'thiderman/vim-supervisor'
 Plug 'evanmiller/nginx-vim-syntax'
 Plug 'alfredodeza/coveragepy.vim'
 Plug 'alfredodeza/pytest.vim'
-Plug 'pig.vim'
+Plug 'vim-scripts/pig.vim'
 if python_version >= 205
     " Uses with_statement so python 2.5 or higher
     Plug 'jmcantrell/vim-virtualenv'
 endif
-" Dash support
 Plug 'rizzatti/dash.vim'
-Plug 'vim-coffee-script'
+Plug 'vim-scripts/vim-coffee-script'
 Plug 'tshirtman/vim-cython'
-Plug 'logstash.vim'
-" Plug 'clickable.vim'
+Plug 'robbles/logstash.vim'
+" Bundle 'clickable.vim'
 
 " Javascript/html indending
 Plug 'pangloss/vim-javascript'
@@ -108,17 +107,15 @@ Plug 'rstacruz/sparkup'
 
 Plug 'markcornick/vim-vagrant'
 if has('mac')
-    Plug 'copy-as-rtf'
+    Plug 'vim-scripts/copy-as-rtf'
 endif
 Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
-Plug 'elzr/vim-json'
 
 Plug 'zainin/vim-mikrotik'
 Plug 'Chiel92/vim-autoformat'
-Plug 'indentpython.vim'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 
@@ -526,8 +523,8 @@ let g:jedi#smart_auto_mappings = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'desert256.vim'
-Plug 'oceandeep'
+Plug 'vim-scripts/desert256.vim'
+Plug 'vim-scripts/oceandeep'
 Plug 'vim-scripts/xorium.vim'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -835,6 +832,7 @@ augroup filetypedetect
     au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
     au BufNewFile,BufRead /etc/supervisor/* setf supervisor
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
+    au BufNewFile,BufRead /etc/logstash/* setf logstash
     au BufNewFile,BufRead */templates/*.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
@@ -895,6 +893,29 @@ augroup BWCCreateDir
 augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Save and restore the session
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+fu! SaveSess()
+    execute 'mksession! ' . getcwd() . '/.session.vim'
+endfunction
+
+fu! RestoreSess()
+if filereadable(getcwd() . '/.session.vim')
+    execute 'so ' . getcwd() . '/.session.vim'
+    if bufexists(1)
+        for l in range(1, bufnr('$'))
+            if bufwinnr(l) == -1
+                exec 'sbuffer ' . l
+            endif
+        endfor
+    endif
+endif
+endfunction
+
+" autocmd VimLeave * call SaveSess()
+autocmd VimEnter * nested call RestoreSess()
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " After loading the bundles we can enable the plugins again
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " load filetype plugins and indent settings
@@ -923,8 +944,23 @@ autocmd BufDelete * let g:buffer_count -= 1
 
 set rulerformat+=%n/%{g:buffer_count}
 
+command! CloseHiddenBuffers call s:CloseHiddenBuffers()
+function! s:CloseHiddenBuffers()
+  let open_buffers = []
+
+  for i in range(tabpagenr('$'))
+    call extend(open_buffers, tabpagebuflist(i + 1))
+  endfor
+
+  for num in range(1, bufnr("$") + 1)
+    if buflisted(num) && index(open_buffers, num) == -1
+      exec "bdelete ".num
+    endif
+  endfor
+endfunction
+
 " auto-reload vimrc on save
-augroup reload_vimrc " {
-  autocmd!
-  autocmd BufWritePost $MYVIMRC source $MYVIMRC
-augroup END " }
+augroup myvimrc
+    au!
+    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+augroup END
