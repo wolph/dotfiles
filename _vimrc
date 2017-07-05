@@ -119,6 +119,10 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 
+" Json stuff
+Plug 'Shougo/unite.vim'
+Plug 'Quramy/vison'
+
 " Easy import sorting for Python
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
