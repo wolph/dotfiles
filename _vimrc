@@ -119,6 +119,10 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 
+if has("nvim")
+    Plug 'sbdchd/neoformat'
+endif
+
 " Json stuff
 Plug 'Shougo/unite.vim'
 Plug 'Quramy/vison'
@@ -151,9 +155,10 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
 
     " This is the default extra key bindings
     let g:fzf_action = {
-    \ 'ctrl-t': 'tab split',
-    \ 'ctrl-x': 'split',
-    \ 'ctrl-v': 'vsplit' }
+        \ 'enter': 'rightbelow split',
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-x': 'rightbelow split',
+        \ 'ctrl-v': 'rightbelow vsplit' }
 
     let g:fzf_command_prefix = ''
 
