@@ -121,6 +121,7 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'indentpython.vim'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
+Plug 'AndrewRadev/linediff.vim'
 
 " Easy import sorting for Python
 map <leader>i :Isort<cr>
