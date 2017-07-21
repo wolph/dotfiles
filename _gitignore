@@ -39,3 +39,4 @@ docs/_build/
 # Ignore ctags
 /tags
 /.tags
+/.vs/
