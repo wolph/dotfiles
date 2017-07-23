@@ -1,0 +1,43 @@
+#!/bin/sh
+#
+# Runs during git flow release start
+#
+# Positional arguments:
+# $1    Version
+#
+# Return VERSION - When VERSION is returned empty, git-flow will stop as the
+# version is necessary
+#
+# The following variables are available as they are exported by git-flow:
+#
+# MASTER_BRANCH - The branch defined as Master
+# DEVELOP_BRANCH - The branch defined as Develop
+#
+VERSION=$1
+
+stderr(){
+    echo "$@" 1>&2
+}
+
+# Implement your script here.
+if [ -z "$VERSION" ]; then
+    VERSION=$(grep __version__ */__about__.py | awk -F "'" '{print $2}' | sed 's/v//g')
+    MAJOR=$(echo $VERSION | awk -F . '{print $1}')
+    MINOR=$(echo $VERSION | awk -F . '{print $2}')
+    MICRO=$(echo $VERSION | awk -F . '{print $3}')
+    while true; do
+        read -p "The current version is $VERSION, do you want a major, minor or micro release? (1, 2, 3): " size
+        case $size in
+            [1]* ) MINOR=0; MICRO=0; MAJOR=$(expr $MAJOR + 1); break;;
+            [2]* ) MICRO=0; MINOR=$(expr $MINOR + 1); break;;
+            [3]* ) MICRO=$(expr $MICRO + 1); break;;
+            * ) stderr "was expecting 1, 2 or 3"
+        esac
+    done
+    VERSION="$MAJOR.$MINOR.$MICRO"
+    stderr "New version: $VERSION"
+fi
+
+# Return the VERSION
+echo ${VERSION}
+exit 0

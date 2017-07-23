@@ -118,3 +118,7 @@
 [ghi]
 	editor = vim
 	pager = less -X -F -R
+[gitflow "prefix"]
+	versiontag = v
+[init]
+	templatedir = ~/.git_template
