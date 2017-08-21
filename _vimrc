@@ -132,16 +132,6 @@ Plug 'Quramy/vison'
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
 
-" Replaced with ALE for now
-" if has("nvim")
-"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
-"     " E501 is line length of 80 characters
-"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
-"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
-" 
-"     Plug 'neomake/neomake'
-" endif
-
 if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fuzzy finder (fzf)
@@ -401,6 +391,18 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+
+" Replaced with ALE for now
+" if has("nvim")
+"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
+"     " E501 is line length of 80 characters
+"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
+" 
+"     Plug 'neomake/neomake'
+" endif
+
+
 " Syntastic is awesome, but slow as ... on Vim
 " if version >= 702
 if has("nvim")
@@ -409,7 +411,18 @@ if has("nvim")
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
     let g:ale_linters = {
-    \    'python': ['mypy', 'flake8']
+    \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'yapf'],
+    \}
+    " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
+
+    let g:ale_fixers = {
+    \    'python': [
+    \        'add_blank_lines_for_python_control_statements',
+    \        'autopep8',
+    \        'isort',
+    \        'yapf',
+    \        'remove_trailing_lines',
+    \    ],
     \}
 
     " Plug 'Syntastic' 
