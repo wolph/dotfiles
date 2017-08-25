@@ -4,7 +4,7 @@
 
 # Bunch of excludes
 --exclude=.git
-# --exclude=*.min.js
+--exclude=*.min.js
 --exclude=*.js
 --exclude=build/
 --exclude=dist/

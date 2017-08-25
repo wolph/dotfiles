@@ -62,3 +62,11 @@ mkdir -p "$HOME/.vim/autoload"
 ln -sf "$HOME/.vim" "$HOME/.config/nvim"
 ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 
+if [ ! -d "~/.tmux/plugins/tundle" ]; then
+    git clone --depth=1 https://github.com/javier-lopez/tundle ~/.tmux/plugins/tundle
+fi
+
+if [ "$TMUX" ]; then
+    tmux source-file ~/.tmux.conf
+    ~/.tmux/plugins/tundle/scripts/install_plugins.sh
+fi
