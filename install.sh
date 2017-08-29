@@ -59,6 +59,7 @@ done
 
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.vim/autoload"
+ln -sf "$HOME/.mpv" "$HOME/.config/mpv"
 ln -sf "$HOME/.vim" "$HOME/.config/nvim"
 ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 
