@@ -1,7 +1,5 @@
 # vim: ft=zsh
 
-os=$(uname)
-
 # Fixing OS X Path annoyances
 # if [ -x /usr/libexec/path_helper ]; then
 #     echo 'Removing the execute flag from the OS X path helper as it is broken'
@@ -155,8 +153,9 @@ alias mv='nocorrect mv'       # no spelling correction on mv
 alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
 alias less='/usr/bin/less -R'
-if [ "$os" = 'Darwin' ]; then
+if [[ "$OSTYPE" =~ '^darwin' ]]; then
     export LS_OPTIONS=''
+    alias vlc='open -a vlc'
 else
     export LS_OPTIONS='--color=auto'
 fi
@@ -180,7 +179,6 @@ else
 fi
 alias vi='vim'
 alias parallel='parallel --no-notice'
-alias vlc='open -a vlc'
 alias feh='/usr/local/bin/feh --auto-zoom --draw-filename --fullscreen --recursive'
 alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
 alias tb='nc termbin.com 9999'
