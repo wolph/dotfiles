@@ -411,7 +411,7 @@ if has("nvim")
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
     let g:ale_linters = {
-    \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'yapf'],
+    \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
     \}
     " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
 
