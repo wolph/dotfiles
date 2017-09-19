@@ -17,7 +17,7 @@
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
 	global-gc = !git-global-gc
-	pull = pull --rebase
+	# pull = pull --rebase
 
     repo = !gh repo \"$@\"
     user = !gh user \"$@\"
@@ -93,11 +93,11 @@
 [url "git@github.com:WoLpH"]
     pushInsteadOf = git@github.com:wolph
 
-[url "git@github.com:"]
-    pushInsteadOf = "https://github.com/"
-    pushInsteadOf = "http://github.com/"
-    pushInsteadOf = "gh:"
-    pushInsteadOf = "gh://"
+# [url "git@github.com:"]
+#     pushInsteadOf = "https://github.com/"
+#     pushInsteadOf = "http://github.com/"
+#     pushInsteadOf = "gh:"
+#     pushInsteadOf = "gh://"
 
 # [url "https://github.com/"]
 #     pushInsteadOf = "git@github.com:"
@@ -118,3 +118,7 @@
 [ghi]
 	editor = vim
 	pager = less -X -F -R
+[gitflow "prefix"]
+	versiontag = v
+[init]
+	templatedir = ~/.git_template
