@@ -568,7 +568,7 @@ set modelines=4
 " also load settings from files in your current working directory from files
 " you might not trust. Beware of this if you regularly open directories from
 " untrusted sources
-" set exrc
+set exrc
 set secure
 " Lower the timeout for mappings, they are annoyingly slow otherwise
 set timeout timeoutlen=5000 ttimeoutlen=50
