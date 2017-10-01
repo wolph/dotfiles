@@ -17,7 +17,7 @@
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
 	global-gc = !git-global-gc
-	pull = pull --rebase
+	# pull = pull --rebase
 
     repo = !gh repo \"$@\"
     user = !gh user \"$@\"
@@ -27,6 +27,7 @@
     issue = !gh issue \"$@\"
     notification = !gh notification \"$@\"
     pull-request = !gh pull-request \"$@\"
+	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
 
 [color]
 	diff = auto
@@ -92,11 +93,11 @@
 [url "git@github.com:WoLpH"]
     pushInsteadOf = git@github.com:wolph
 
-[url "git@github.com:"]
-    pushInsteadOf = "https://github.com/"
-    pushInsteadOf = "http://github.com/"
-    pushInsteadOf = "gh:"
-    pushInsteadOf = "gh://"
+# [url "git@github.com:"]
+#     pushInsteadOf = "https://github.com/"
+#     pushInsteadOf = "http://github.com/"
+#     pushInsteadOf = "gh:"
+#     pushInsteadOf = "gh://"
 
 # [url "https://github.com/"]
 #     pushInsteadOf = "git@github.com:"
@@ -133,3 +134,7 @@
 #     pushInsteadOf = "https://gist.github.com/"
 #     pushInsteadOf = "http://gist.github.com/"
 #     pushInsteadOf = "gist:"
+[gitflow "prefix"]
+	versiontag = v
+[init]
+	templatedir = ~/.git_template

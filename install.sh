@@ -50,3 +50,24 @@ for file in bin/*; do
     link "$source" "$destination"
 done
 
+mkdir -p "$HOME/envs"
+for file in envs/*; do
+    destination="$HOME/$file"
+    source=$PWD/$file
+    link "$source" "$destination"
+done
+
+mkdir -p "$HOME/.config"
+mkdir -p "$HOME/.vim/autoload"
+ln -sf "$HOME/.mpv" "$HOME/.config/mpv"
+ln -sf "$HOME/.vim" "$HOME/.config/nvim"
+ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
+
+if [ ! -d "~/.tmux/plugins/tundle" ]; then
+    git clone --depth=1 https://github.com/javier-lopez/tundle ~/.tmux/plugins/tundle
+fi
+
+if [ "$TMUX" ]; then
+    tmux source-file ~/.tmux.conf
+    ~/.tmux/plugins/tundle/scripts/install_plugins.sh
+fi
