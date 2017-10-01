@@ -12,15 +12,55 @@ filetype off
 " Install Plug if it's not installed
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let iCanHazPlug=1
-if !filereadable(expand('~/.vim/autoload/plug.vim'))
-    echo "Installing Plug.."
+let plugPath=expand('~/.vim/autoload/plug.vim')
+if !filereadable(plugPath)
+    echo "Installing Plug to " . plugPath 
     echo ""
-    silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-    source ~/.vim/autoload/plug.vim
+    if has("win32")
+        silent !curl -Lqo .vim\autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        source .vim\autoload\plug.vim
+    else
+        if executable('curl')
+            silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        else
+            silent !curl -qO ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        endif
+
+        source ~/.vim/autoload/plug.vim
+    endif
     let iCanHazPlug=0
 endif
 
+if has("win32")
+    source .vim\autoload\plug.vim
+endif
+
 let g:plug_threads=64
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Make sure neovim doesn't use the virtualenv
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim")
+    if filereadable(expand('~/envs/neovim2/bin/python'))
+        let g:python_host_prog = expand('~/envs/neovim2/bin/python')
+    elseif filereadable('/usr/local/bin/python2')
+        let g:python_host_prog = '/usr/local/bin/python2'
+    elseif filereadable('/usr/bin/python2')
+        let g:python_host_prog = '/usr/bin/python2'
+    else
+        echom "WARNING: no valid python2 install found"
+    endif
+
+    if filereadable(expand('~/envs/neovim3/bin/python'))
+        let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
+    elseif filereadable('/usr/local/bin/python3')
+        let g:python3_host_prog = '/usr/local/bin/python3'
+    elseif filereadable('/usr/bin/python3')
+        let g:python3_host_prog = '/usr/bin/python3'
+    else
+        echom "WARNING: no valid python3 install found"
+    endif
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check python version if available
@@ -34,7 +74,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Load and install the Plugs using Plug
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-call plug#begin('~/.vim/bundle')
+call plug#begin(expand('~/.vim/bundle'))
 " Tree like file browser
 " Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
 Plug 'scrooloose/nerdtree'
@@ -50,17 +90,16 @@ Plug 'thiderman/vim-supervisor'
 Plug 'evanmiller/nginx-vim-syntax'
 Plug 'alfredodeza/coveragepy.vim'
 Plug 'alfredodeza/pytest.vim'
-Plug 'pig.vim'
+Plug 'vim-scripts/pig.vim'
 if python_version >= 205
     " Uses with_statement so python 2.5 or higher
     Plug 'jmcantrell/vim-virtualenv'
 endif
-" Dash support
 Plug 'rizzatti/dash.vim'
-Plug 'vim-coffee-script'
+Plug 'vim-scripts/vim-coffee-script'
 Plug 'tshirtman/vim-cython'
-Plug 'logstash.vim'
-" Plug 'clickable.vim'
+Plug 'robbles/logstash.vim'
+" Bundle 'clickable.vim'
 
 " Javascript/html indending
 Plug 'pangloss/vim-javascript'
@@ -68,17 +107,173 @@ Plug 'rstacruz/sparkup'
 
 Plug 'markcornick/vim-vagrant'
 if has('mac')
-    Plug 'copy-as-rtf'
+    Plug 'vim-scripts/copy-as-rtf'
 endif
 Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
 
+Plug 'zainin/vim-mikrotik'
+Plug 'Chiel92/vim-autoformat'
+Plug 'gorkunov/smartpairs.vim'
+Plug 'Vimjas/vim-python-pep8-indent'
+Plug 'AndrewRadev/linediff.vim'
+
+if has("nvim")
+    Plug 'sbdchd/neoformat'
+endif
+
+" Json stuff
+Plug 'Shougo/unite.vim'
+Plug 'Quramy/vison'
+
+" Easy import sorting for Python
+map <leader>i :Isort<cr>
+command! -range=% Isort :<line1>,<line2>! isort -
+
+if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Fuzzy finder (fzf)
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    if isdirectory('/usr/local/opt/fzf')
+        Plug '/usr/local/opt/fzf'
+    else
+        Plug expand('~/.fzf')
+    endif
+
+    Plug 'junegunn/fzf.vim'
+
+    " This is the default extra key bindings
+    let g:fzf_action = {
+        \ 'enter': 'rightbelow split',
+        \ 'ctrl-t': 'tab split',
+        \ 'ctrl-x': 'rightbelow split',
+        \ 'ctrl-v': 'rightbelow vsplit' }
+
+    let g:fzf_command_prefix = ''
+
+    " [Tags] Command to generate tags file
+    " let g:fzf_tags_command = 'ctags -R'
+    " let g:fzf_tags_command = 'ctags -R $VIRTUAL_ENV/lib/python2.7/site-packages $VIRTUAL_ENV/lib/python3.4/site-packages $VIRTUAL_ENV/lib/python3.5/site-packages $VIRTUAL_ENV/lib/python3.6/site-packages ${PWD}'
+    let g:fzf_tags_command = 'ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./.tags $(python -c "import os, sys; print('' ''.join(''{}''.format(d) for d in sys.path if os.path.isdir(d)))")'
+
+    " Default fzf layout
+    " - down / up / left / right
+    let g:fzf_layout = { 'down': '~70%' }
+
+    " In Neovim, you can set up fzf window using a Vim command
+    let g:fzf_layout = { 'window': 'enew' }
+    let g:fzf_layout = { 'window': '-tabnew' }
+
+    " Customize fzf colors to match your color scheme
+    let g:fzf_colors =
+        \ {'fg':      ['fg', 'Normal'],
+         \ 'bg':      ['bg', 'Normal'],
+         \ 'hl':      ['fg', 'Comment'],
+         \ 'fg+':     ['fg', 'CursorLine', 'CursorColumn', 'Normal'],
+         \ 'bg+':     ['bg', 'CursorLine', 'CursorColumn'],
+         \ 'hl+':     ['fg', 'Statement'],
+         \ 'info':    ['fg', 'PreProc'],
+         \ 'prompt':  ['fg', 'Conditional'],
+         \ 'pointer': ['fg', 'Exception'],
+         \ 'marker':  ['fg', 'Keyword'],
+         \ 'spinner': ['fg', 'Label'],
+         \ 'header':  ['fg', 'Comment'] }
+
+    " Enable per-command history.
+    " CTRL-N and CTRL-P will be automatically bound to next-history and
+    " previous-history instead of down and up. If you don't like the change,
+    " explicitly bind the keys to down and up in your $FZF_DEFAULT_OPTS.
+    let g:fzf_history_dir = '~/.local/share/fzf-history'
+
+    " [Files] Extra options for fzf
+    "   e.g. File preview using Highlight
+    "        (http://www.andre-simon.de/doku/highlight/en/highlight.html)
+    let g:fzf_files_options =
+    \ '--preview "(highlight -O ansi {} || cat {}) 2> /dev/null | head -'.&lines.'"'
+
+    " [Buffers] Jump to the existing window if possible
+    let g:fzf_buffers_jump = 1
+
+    " [[B]Commits] Customize the options used by 'git log':
+    let g:fzf_commits_log_options = '--graph --color=always --format="%C(auto)%h%d %s %C(black)%C(bold)%cr"'
+
+    " [Tags] Command to generate tags file
+    let g:fzf_tags_command = 'ctags -R'
+
+    " [Commands] --expect expression for directly executing the command
+    let g:fzf_commands_expect = 'alt-enter,ctrl-x'
+
+    nmap <c-t> :FZF<cr>
+    imap <c-x><c-o> <plug>(fzf-complete-line)
+    map <leader>b :Buffers<cr>
+    map <leader>f :Files<cr>
+    map <leader>g :GFiles<cr>
+    map <leader>t :Tags<cr>
+else
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" CtrlP is a plugin to quickly open files
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+    Plug 'kien/ctrlp.vim'
+
+    " Change mapping since I prefer ^t
+    let g:ctrlp_map = '<c-t>'
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Enhanced diffs
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim") || exists("*systemlist")
+    Plug 'chrisbra/vim-diff-enhanced'
+    let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plug 'Valloric/YouCompleteMe'
+" if has("nvim")
+"     Plug 'Valloric/YouCompleteMe'
+"     let g:ycm_path_to_python_interpreter = '/usr/local/bin/python2'
+" endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Deoplete autocompleter 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has("nvim")
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    Plug 'zchee/deoplete-jedi'
+
+	let g:deoplete#enable_at_startup = 1
+	let g:deoplete#auto_complete_start_length = 1
+	if !exists('g:deoplete#omni#input_patterns')
+  		let g:deoplete#omni#input_patterns = {}
+	endif
+	" let g:deoplete#disable_auto_complete = 1
+	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+
+	" omnifuncs
+	augroup omnifuncs
+  		autocmd!
+  		autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+  		autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+  		autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+  		autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+  		autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	augroup end
+	" tern
+	if exists('g:plugs["tern_for_vim"]')
+  		let g:tern_show_argument_hints = 'on_hold'
+  		let g:tern_show_signature_in_pum = 1
+  		autocmd FileType javascript setlocal omnifunc=tern#Complete
+	endif
+
+	" deoplete tab-complete
+	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	" tern
+	autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+endif
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
@@ -196,20 +391,45 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if version >= 702
-    Plug 'Syntastic' 
 
-    " shouldn't do Python for us
-    let g:syntastic_python_checkers = []
+" Replaced with ALE for now
+" if has("nvim")
+"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
+"     " E501 is line length of 80 characters
+"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
+" 
+"     Plug 'neomake/neomake'
+" endif
+
+
+" Syntastic is awesome, but slow as ... on Vim
+" if version >= 702
+if has("nvim")
+    Plug 'w0rp/ale'
+
+    " pylint is too whiny for my taste... disable it until I find a proper
+    " config
+    let g:ale_linters = {
+    \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
+    \}
+    " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
+
+    let g:ale_fixers = {
+    \    'python': [
+    \        'add_blank_lines_for_python_control_statements',
+    \        'autopep8',
+    \        'isort',
+    \        'yapf',
+    \        'remove_trailing_lines',
+    \    ],
+    \}
+
+    " Plug 'Syntastic' 
+
+    " " shouldn't do Python for us
+    " let g:syntastic_python_checkers = []
 endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" CtrlP is a plugin to quickly open files
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'kien/ctrlp.vim'
-
-" Change mapping since I prefer ^t
-let g:ctrlp_map = '<c-t>'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode
@@ -326,8 +546,8 @@ let g:jedi#smart_auto_mappings = 0
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'desert256.vim'
-Plug 'oceandeep'
+Plug 'vim-scripts/desert256.vim'
+Plug 'vim-scripts/oceandeep'
 Plug 'vim-scripts/xorium.vim'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -337,6 +557,9 @@ call plug#end()
 
 if iCanHazPlug == 0
     PlugUpdate
+    if has('nvim')
+        UpdateRemotePlugins
+    endif
 endif
 
 
@@ -366,7 +589,7 @@ set modelines=4
 " also load settings from files in your current working directory from files
 " you might not trust. Beware of this if you regularly open directories from
 " untrusted sources
-" set exrc
+set exrc
 set secure
 " Lower the timeout for mappings, they are annoyingly slow otherwise
 set timeout timeoutlen=5000 ttimeoutlen=50
@@ -403,7 +626,9 @@ endif
 " :1000 :  up to 20 lines of command-line history will be remembered
 " %     :  saves and restores the buffer list
 " n...  :  where to save the viminfo files
-set viminfo='1000,\"100,:1000,%,n~/.viminfo
+if !has('nvim')
+    set viminfo='1000,\"100,:1000,%,n~/.viminfo
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim UI
@@ -451,7 +676,8 @@ set noerrorbells
 " we do what to show tabs, to ensure we get them out of my files
 set nolist 
 " show tabs and trailing whitespace
-set listchars=tab:>-,trail:- 
+set listchars=tab:>-,trail:-
+
 " add the pretty line at 80 characters
 if version >= 703
     set colorcolumn=80
@@ -618,6 +844,9 @@ inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
+" Disable Ex mode
+nnoremap Q <nop>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Autocommands 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -626,6 +855,7 @@ augroup filetypedetect
     au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
     au BufNewFile,BufRead /etc/supervisor/* setf supervisor
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
+    au BufNewFile,BufRead /etc/logstash/* setf logstash
     au BufNewFile,BufRead */templates/*.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
@@ -637,7 +867,7 @@ autocmd Filetype python setlocal suffixesadd=.py
 " Colors 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable 256 color support when available
-if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
+if ((&term == 'xterm-256color') || (&term == 'screen-256color' || &term == 'nvim'))
     set t_Co=256
     set t_Sb=[4%dm
     set t_Sf=[3%dm
@@ -645,6 +875,8 @@ if ((&term == 'xterm-256color') || (&term == 'screen-256color'))
     if &diff
         colorscheme xorium
     endif
+else
+    silent! colo desert
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -684,6 +916,29 @@ augroup BWCCreateDir
 augroup END
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Save and restore the session
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+fu! SaveSess()
+    execute 'mksession! ' . getcwd() . '/.session.vim'
+endfunction
+
+fu! RestoreSess()
+if filereadable(getcwd() . '/.session.vim')
+    execute 'so ' . getcwd() . '/.session.vim'
+    if bufexists(1)
+        for l in range(1, bufnr('$'))
+            if bufwinnr(l) == -1
+                exec 'sbuffer ' . l
+            endif
+        endfor
+    endif
+endif
+endfunction
+
+" autocmd VimLeave * call SaveSess()
+autocmd VimEnter * nested call RestoreSess()
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " After loading the bundles we can enable the plugins again
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " load filetype plugins and indent settings
@@ -711,3 +966,24 @@ autocmd BufAdd * let g:buffer_count += 1
 autocmd BufDelete * let g:buffer_count -= 1 
 
 set rulerformat+=%n/%{g:buffer_count}
+
+command! CloseHiddenBuffers call s:CloseHiddenBuffers()
+function! s:CloseHiddenBuffers()
+  let open_buffers = []
+
+  for i in range(tabpagenr('$'))
+    call extend(open_buffers, tabpagebuflist(i + 1))
+  endfor
+
+  for num in range(1, bufnr("$") + 1)
+    if buflisted(num) && index(open_buffers, num) == -1
+      exec "bdelete ".num
+    endif
+  endfor
+endfunction
+
+" auto-reload vimrc on save
+augroup myvimrc
+    au!
+    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+augroup END
