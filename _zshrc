@@ -75,6 +75,7 @@ zmodload -a autocomplete
 zmodload -a complist
 
 export LANG=en_US.UTF-8
+export TZ=Europe/Amsterdam
 
 # Adding my own completion functions
 fpath=(/usr/local/share/zsh-completions $fpath)
