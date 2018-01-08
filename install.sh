@@ -63,11 +63,12 @@ ln -sf "$HOME/.mpv" "$HOME/.config/mpv"
 ln -sf "$HOME/.vim" "$HOME/.config/nvim"
 ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 
-if [ ! -d "~/.tmux/plugins/tundle" ]; then
+if [ ! -d ~/.tmux/plugins/tundle ]; then
     git clone --depth=1 https://github.com/javier-lopez/tundle ~/.tmux/plugins/tundle
 fi
 
 if [ "$TMUX" ]; then
     tmux source-file ~/.tmux.conf
     ~/.tmux/plugins/tundle/scripts/install_plugins.sh
+    ~/.tmux/plugins/tundle/scripts/update_plugins.sh all
 fi
