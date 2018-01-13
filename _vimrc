@@ -414,6 +414,9 @@ if has("nvim")
 
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
+    " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
+    " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
+    " pip3 install -U mypy
     let g:ale_linters = {
     \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
     \}
