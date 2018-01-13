@@ -119,6 +119,8 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'AndrewRadev/linediff.vim'
+Plug 'elzr/vim-json'
+let g:vim_json_syntax_conceal = 0
 
 if has("nvim")
     Plug 'sbdchd/neoformat'
@@ -408,6 +410,8 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 if has("nvim")
     Plug 'w0rp/ale'
 
+    " let g:ale_lint_on_text_changed = 'never';
+
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
     let g:ale_linters = {
@@ -597,7 +601,7 @@ set timeout timeoutlen=5000 ttimeoutlen=50
 set autowrite
 set autowriteall
 
-au FocusLost * silent! wa
+" au FocusLost * silent! wa
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
@@ -786,6 +790,8 @@ set foldlevel=100
 set foldopen-=search 
 " don't open folds when you undo stuff
 set foldopen-=undo 
+
+nmap < :foldclose<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CTags
