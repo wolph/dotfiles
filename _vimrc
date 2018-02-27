@@ -410,7 +410,9 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 if has("nvim")
     Plug 'w0rp/ale'
 
-    " let g:ale_lint_on_text_changed = 'never';
+    " constantly writing means constant asking whether I want to save...
+    " annoying AF
+    let g:ale_lint_on_text_changed = 'never'
 
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
@@ -994,5 +996,5 @@ endfunction
 " auto-reload vimrc on save
 augroup myvimrc
     au!
-    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | clear | endif
 augroup END
