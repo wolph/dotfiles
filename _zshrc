@@ -75,6 +75,7 @@ zmodload -a autocomplete
 zmodload -a complist
 
 export LANG=en_US.UTF-8
+export TZ=Europe/Amsterdam
 
 # Adding my own completion functions
 fpath=(/usr/local/share/zsh-completions $fpath)
@@ -168,7 +169,7 @@ alias push='git pull; git push'
 # search in symlinks by default
 # alias find='find -L'
 alias grep='grep --color=auto'
-test -x /usr/local/bin/hub && alias git=hub
+command_exists hub && alias git=hub
 # Link vim to the OS X clipboard
 if [ -x /usr/local/bin/nvim ]; then
     alias vim="safe-reattach-to-user-namespace nvim"
