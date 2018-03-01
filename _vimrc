@@ -120,6 +120,8 @@ Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'AndrewRadev/linediff.vim'
 
+Plug 'mattboehm/vim-unstack'
+
 if has("nvim")
     Plug 'sbdchd/neoformat'
 endif
