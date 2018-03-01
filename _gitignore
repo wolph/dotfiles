@@ -40,3 +40,5 @@ docs/_build/
 /tags
 /.tags
 /.vs/
+
+zwcfg*.xml*

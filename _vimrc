@@ -87,7 +87,7 @@ Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'lepture/vim-jinja'
 Plug 'thiderman/vim-supervisor'
-Plug 'evanmiller/nginx-vim-syntax'
+Plug 'chr4/nginx.vim'
 Plug 'alfredodeza/coveragepy.vim'
 Plug 'alfredodeza/pytest.vim'
 Plug 'vim-scripts/pig.vim'
@@ -119,6 +119,8 @@ Plug 'Chiel92/vim-autoformat'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'AndrewRadev/linediff.vim'
+Plug 'elzr/vim-json'
+let g:vim_json_syntax_conceal = 0
 
 Plug 'mattboehm/vim-unstack'
 
@@ -410,8 +412,15 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 if has("nvim")
     Plug 'w0rp/ale'
 
+    " constantly writing means constant asking whether I want to save...
+    " annoying AF
+    let g:ale_lint_on_text_changed = 'never'
+
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
+    " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
+    " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
+    " pip3 install -U mypy
     let g:ale_linters = {
     \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
     \}
@@ -591,7 +600,7 @@ set modelines=4
 " also load settings from files in your current working directory from files
 " you might not trust. Beware of this if you regularly open directories from
 " untrusted sources
-" set exrc
+set exrc
 set secure
 " Lower the timeout for mappings, they are annoyingly slow otherwise
 set timeout timeoutlen=5000 ttimeoutlen=50
@@ -599,7 +608,7 @@ set timeout timeoutlen=5000 ttimeoutlen=50
 set autowrite
 set autowriteall
 
-au FocusLost * silent! wa
+" au FocusLost * silent! wa
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
@@ -788,6 +797,8 @@ set foldlevel=100
 set foldopen-=search 
 " don't open folds when you undo stuff
 set foldopen-=undo 
+
+nmap < :foldclose<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CTags
@@ -987,5 +998,5 @@ endfunction
 " auto-reload vimrc on save
 augroup myvimrc
     au!
-    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
+    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | clear | endif
 augroup END
