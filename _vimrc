@@ -872,6 +872,7 @@ augroup filetypedetect
     au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
     au BufNewFile,BufRead /etc/supervisor/* setf supervisor
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
+    au BufNewFile,BufRead /etc/nginx/* setf nginx
     au BufNewFile,BufRead /etc/logstash/* setf logstash
     au BufNewFile,BufRead */templates/*.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
