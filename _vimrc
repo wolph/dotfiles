@@ -122,6 +122,8 @@ Plug 'AndrewRadev/linediff.vim'
 Plug 'elzr/vim-json'
 let g:vim_json_syntax_conceal = 0
 
+Plug 'mattboehm/vim-unstack'
+
 if has("nvim")
     Plug 'sbdchd/neoformat'
 endif
