@@ -276,8 +276,12 @@ if has("nvim")
 	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 	" tern
 	autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
 endif
-
+let g:deoplete#enable_at_startup = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
