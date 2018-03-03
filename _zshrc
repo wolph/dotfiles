@@ -540,7 +540,7 @@ if [ -f ~/.fzf.zsh ]; then
     if command_exists pt; then
         export FZF_DEFAULT_COMMAND='pt --global-gitignore -g ""'
     elif command_exists ag; then
-        export FZF_DEFAULT_COMMAND='ag --follow --color -g ""'
+        export FZF_DEFAULT_COMMAND='ag --follow --skip-vcs-ignores -g ""'
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
 fi
