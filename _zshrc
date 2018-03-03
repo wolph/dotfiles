@@ -36,8 +36,7 @@ function command_exists(){
 }
 
 ticfile="$TERM.ti"
-command_exists tic
-if [[ $? -eq 0 && -f "$ticfile" ]]; then
+if [ command_exists tic && -f "$ticfile" ]; then
     tic "$ticfile"
 fi
 
@@ -538,10 +537,10 @@ if [ -f ~/.fzf.zsh ]; then
     zle     -N      fzf-history-widget-accept
     bindkey '^R'    fzf-history-widget-accept
 
-    if [ $(command_exists pt ) ]; then
+    if command_exists pt; then
         export FZF_DEFAULT_COMMAND='pt --global-gitignore -g ""'
-    elif [ $(command_exists ag ) ]; then
-        export FZF_DEFAULT_COMMAND='ag -g ""'
+    elif command_exists ag; then
+        export FZF_DEFAULT_COMMAND='ag --follow --color -g ""'
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
 fi
