@@ -332,10 +332,10 @@ let g:ansible_options = {'ignore_blank_lines': 0}
 let g:ansible_options = {'documentation_mapping': '<C-K>'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Gundo, the holy grail in undos
+" Gundo/Mundo, the holy grail in undos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'dsummersl/gundo.vim'
-nnoremap U :silent GundoToggle<CR>
+Plug 'simnalamburt/vim-mundo'
+nnoremap U :silent MundoToggle<CR>
 let g:gundo_verbose_graph=0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -441,51 +441,51 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Replaced with ALE for now
-" if has("nvim")
-"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
-"     " E501 is line length of 80 characters
-"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
-"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
-" 
-"     Plug 'neomake/neomake'
-" endif
+" ALE is writing too much, so lets try neomake again
+if has("nvim")
+    let g:neomake_python_enabled_makers = ['flake8', 'pep8']
+    " E501 is line length of 80 characters
+    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+    let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
+
+    Plug 'neomake/neomake'
+endif
 
 
 " Syntastic is awesome, but slow as ... on Vim
 " if version >= 702
-if has("nvim")
-    Plug 'w0rp/ale'
-
-    " constantly writing means constant asking whether I want to save...
-    " annoying AF
-    let g:ale_lint_on_text_changed = 'never'
-
-    " pylint is too whiny for my taste... disable it until I find a proper
-    " config
-    " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
-    " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
-    " pip3 install -U mypy
-    let g:ale_linters = {
-    \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
-    \}
-    " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
-
-    let g:ale_fixers = {
-    \    'python': [
-    \        'add_blank_lines_for_python_control_statements',
-    \        'autopep8',
-    \        'isort',
-    \        'yapf',
-    \        'remove_trailing_lines',
-    \    ],
-    \}
-
-    " Plug 'Syntastic' 
-
-    " " shouldn't do Python for us
-    " let g:syntastic_python_checkers = []
-endif
+" if has("nvim")
+"     Plug 'w0rp/ale'
+" 
+"     " constantly writing means constant asking whether I want to save...
+"     " annoying AF
+"     let g:ale_lint_on_text_changed = 'never'
+" 
+"     " pylint is too whiny for my taste... disable it until I find a proper
+"     " config
+"     " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
+"     " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
+"     " pip3 install -U mypy
+"     let g:ale_linters = {
+"     \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
+"     \}
+"     " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
+" 
+"     let g:ale_fixers = {
+"     \    'python': [
+"     \        'add_blank_lines_for_python_control_statements',
+"     \        'autopep8',
+"     \        'isort',
+"     \        'yapf',
+"     \        'remove_trailing_lines',
+"     \    ],
+"     \}
+" 
+"     " Plug 'Syntastic' 
+" 
+"     " " shouldn't do Python for us
+"     " let g:syntastic_python_checkers = []
+" endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode
