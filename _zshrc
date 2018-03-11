@@ -169,6 +169,8 @@ alias push='git pull; git push'
 # alias find='find -L'
 alias grep='grep --color=auto'
 command_exists hub && alias git=hub
+command_exists pipenv && eval "$(pipenv --completion)"
+
 # Link vim to the OS X clipboard
 if [ -x /usr/local/bin/nvim ]; then
     alias vim="safe-reattach-to-user-namespace nvim"
