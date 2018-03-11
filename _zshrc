@@ -164,6 +164,8 @@ alias l='ls -A'
 alias ll='l -l'
 alias qmv='qmv -f do'
 alias push='git pull; git push'
+export GIT_MERGE_AUTOEDIT=no
+
 # Some people might not like this but I find it convenient. It makes find
 # search in symlinks by default
 # alias find='find -L'
