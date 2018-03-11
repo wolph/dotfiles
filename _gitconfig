@@ -140,3 +140,5 @@
 	templatedir = ~/.git_template
 [gpgit]
 	interactive = false
+[commit]
+	gpgsign = true
