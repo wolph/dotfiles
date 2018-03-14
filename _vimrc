@@ -244,85 +244,84 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete autocompleter 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if has("nvim")
-"     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-"     Plug 'zchee/deoplete-jedi'
-" 
-" 	let g:deoplete#enable_at_startup = 1
-" 	let g:deoplete#auto_complete_start_length = 1
-" 	if !exists('g:deoplete#omni#input_patterns')
-"   		let g:deoplete#omni#input_patterns = {}
-" 	endif
-" 	" let g:deoplete#disable_auto_complete = 1
-" 	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-" 
-" 	" omnifuncs
-" 	augroup omnifuncs
-"   		autocmd!
-"   		autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-"   		autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-"   		autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-"   		autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-"   		autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-" 	augroup end
-" 	" tern
-" 	if exists('g:plugs["tern_for_vim"]')
-"   		let g:tern_show_argument_hints = 'on_hold'
-"   		let g:tern_show_signature_in_pum = 1
-"   		autocmd FileType javascript setlocal omnifunc=tern#Complete
-" 	endif
-" 
-" 	" deoplete tab-complete
-" 	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-" 	" tern
-" 	autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
-" else
-"   Plug 'Shougo/deoplete.nvim'
-"   Plug 'roxma/nvim-yarp'
-"   Plug 'roxma/vim-hug-neovim-rpc'
-" endif
-" let g:deoplete#enable_at_startup = 1
+if has("nvim")
+    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+    Plug 'zchee/deoplete-jedi'
+
+	" let g:deoplete#auto_complete_start_length = 1
+	" if !exists('g:deoplete#omni#input_patterns')
+  	" 	let g:deoplete#omni#input_patterns = {}
+	" endif
+	" " let g:deoplete#disable_auto_complete = 1
+	" autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+
+	" " omnifuncs
+	" augroup omnifuncs
+  	" 	autocmd!
+  	" 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+  	" 	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+  	" 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+  	" 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+  	" 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	" augroup end
+	" " tern
+	" if exists('g:plugs["tern_for_vim"]')
+  	" 	let g:tern_show_argument_hints = 'on_hold'
+  	" 	let g:tern_show_signature_in_pum = 1
+  	" 	autocmd FileType javascript setlocal omnifunc=tern#Complete
+	" endif
+
+	" " deoplete tab-complete
+	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	" " tern
+	" autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+else
+  Plug 'Shougo/deoplete.nvim'
+  Plug 'roxma/nvim-yarp'
+  Plug 'roxma/vim-hug-neovim-rpc'
+endif
+let g:deoplete#enable_at_startup = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neovim completion manager
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("nvim")
-    Plug 'roxma/nvim-completion-manager'
-    Plug 'roxma/python-support.nvim'
-
-    " " don't give |ins-completion-menu| messages.  For example,
-    " " '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
-    " set shortmess+=c
-
-    " " When the <Enter> key is pressed while the popup menu is visible, it only
-    " " hides the menu. Use this mapping to hide the menu and also start a new
-    " " line.
-    " inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-
-    " " Here is an example for expanding snippet in the popup menu with <Enter>
-    " " key. Suppose you use the <C-U> key for expanding snippet.
-    " imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-    " imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
-
-    " " Use <TAB> to select the popup menu:
-    " inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-    " inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-    " Plug 'roxma/ncm-clang'
-    " Plug 'roxma/ncm-flow'
-    " Plug 'roxma/ncm-elm-oracle'
-    " Plug 'roxma/ncm-rct-complete'
-    " Plug 'roxma/ncm-phpactor'
-    " Plug 'roxma/ncm-github'
-    " Plug 'calebeby/ncm-css'
-    " Plug 'katsika/ncm-lbdb'
-    " Plug 'fgrsnau/ncm-otherbuf'
-    " Plug 'gaalcaras/ncm-R'
-    " Plug 'othree/csscomplete.vim'
-    " Plug 'Shougo/neco-vim'
-    " Plug 'Shougo/neco-syntax'
-    " Plug 'Shougo/neoinclude.vim'
-endif
+" if has("nvim")
+"     Plug 'roxma/nvim-completion-manager'
+"     Plug 'roxma/python-support.nvim'
+" 
+"     " don't give |ins-completion-menu| messages.  For example,
+"     " '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
+"     set shortmess+=c
+" 
+"     " When the <Enter> key is pressed while the popup menu is visible, it only
+"     " hides the menu. Use this mapping to hide the menu and also start a new
+"     " line.
+"     inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+" 
+"     " Here is an example for expanding snippet in the popup menu with <Enter>
+"     " key. Suppose you use the <C-U> key for expanding snippet.
+"     imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+"     imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+" 
+"     " Use <TAB> to select the popup menu:
+"     inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+"     inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" 
+"     Plug 'roxma/ncm-clang'
+"     Plug 'roxma/ncm-flow'
+"     Plug 'roxma/ncm-elm-oracle'
+"     Plug 'roxma/ncm-rct-complete'
+"     Plug 'roxma/ncm-phpactor'
+"     Plug 'roxma/ncm-github'
+"     Plug 'calebeby/ncm-css'
+"     Plug 'katsika/ncm-lbdb'
+"     Plug 'fgrsnau/ncm-otherbuf'
+"     Plug 'gaalcaras/ncm-R'
+"     Plug 'othree/csscomplete.vim'
+"     Plug 'Shougo/neco-vim'
+"     Plug 'Shougo/neco-syntax'
+"     Plug 'Shougo/neoinclude.vim'
+" endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
