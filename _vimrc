@@ -113,6 +113,7 @@ Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
+Plug 'MarcWeber/vim-addon-local-vimrc'
 
 Plug 'zainin/vim-mikrotik'
 Plug 'Chiel92/vim-autoformat'
