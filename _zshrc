@@ -116,6 +116,7 @@ export RPS1='%~'
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
 export PIP_DISABLE_PIP_VERSION_CHECK=1
+export PIPENV_VENV_IN_PROJECT=true
 
 # Set the java home
 test -x /usr/libexec/java_home && export JAVA_HOME=$(/usr/libexec/java_home)
@@ -543,7 +544,7 @@ if [ -f ~/.fzf.zsh ]; then
     if command_exists pt; then
         export FZF_DEFAULT_COMMAND='pt --global-gitignore -g ""'
     elif command_exists ag; then
-        export FZF_DEFAULT_COMMAND='ag --follow -g ""'
+        export FZF_DEFAULT_COMMAND='ag --follow -g "" . site-packages '
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
 fi

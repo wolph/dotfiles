@@ -167,9 +167,9 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     " - down / up / left / right
     let g:fzf_layout = { 'down': '~70%' }
 
-    " In Neovim, you can set up fzf window using a Vim command
-    let g:fzf_layout = { 'window': 'enew' }
-    let g:fzf_layout = { 'window': '-tabnew' }
+    " " In Neovim, you can set up fzf window using a Vim command
+    " let g:fzf_layout = { 'window': 'enew' }
+    " let g:fzf_layout = { 'window': '-tabnew' }
 
     " Customize fzf colors to match your color scheme
     let g:fzf_colors =
@@ -211,7 +211,7 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     let g:fzf_commands_expect = 'alt-enter,ctrl-x'
 
     nmap <c-t> :FZF<cr>
-    imap <c-x><c-o> <plug>(fzf-complete-line)
+    " imap <c-x><c-o> <plug>(fzf-complete-line)
     map <leader>b :Buffers<cr>
     map <leader>f :Files<cr>
     map <leader>g :GFiles<cr>
@@ -248,6 +248,7 @@ endif
 if has("nvim")
     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
     Plug 'zchee/deoplete-jedi'
+    let g:jedi#completions_enabled = 0
 
 	" let g:deoplete#auto_complete_start_length = 1
 	" if !exists('g:deoplete#omni#input_patterns')
