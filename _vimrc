@@ -277,12 +277,12 @@ if has("nvim")
 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
 	" " tern
 	" autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
-else
-  Plug 'Shougo/deoplete.nvim'
-  Plug 'roxma/nvim-yarp'
-  Plug 'roxma/vim-hug-neovim-rpc'
+    let g:deoplete#enable_at_startup = 1
+" else
+"   Plug 'Shougo/deoplete.nvim'
+"   Plug 'roxma/nvim-yarp'
+"   Plug 'roxma/vim-hug-neovim-rpc'
 endif
-let g:deoplete#enable_at_startup = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neovim completion manager
@@ -443,50 +443,50 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
 " ALE is writing too much, so lets try neomake again
-if has("nvim")
-    let g:neomake_python_enabled_makers = ['flake8', 'pep8']
-    " E501 is line length of 80 characters
-    let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
-    let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
-
-    Plug 'neomake/neomake'
-endif
+" if has("nvim")
+"     Plug 'neomake/neomake'
+" 
+"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
+"     " E501 is line length of 80 characters
+"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
+"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
+" endif
 
 
 " Syntastic is awesome, but slow as ... on Vim
 " if version >= 702
-" if has("nvim")
-"     Plug 'w0rp/ale'
-" 
-"     " constantly writing means constant asking whether I want to save...
-"     " annoying AF
-"     let g:ale_lint_on_text_changed = 'never'
-" 
-"     " pylint is too whiny for my taste... disable it until I find a proper
-"     " config
-"     " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
-"     " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
-"     " pip3 install -U mypy
-"     let g:ale_linters = {
-"     \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
-"     \}
-"     " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
-" 
-"     let g:ale_fixers = {
-"     \    'python': [
-"     \        'add_blank_lines_for_python_control_statements',
-"     \        'autopep8',
-"     \        'isort',
-"     \        'yapf',
-"     \        'remove_trailing_lines',
-"     \    ],
-"     \}
-" 
-"     " Plug 'Syntastic' 
-" 
-"     " " shouldn't do Python for us
-"     " let g:syntastic_python_checkers = []
-" endif
+if has("nvim")
+    Plug 'w0rp/ale'
+
+    " constantly writing means constant asking whether I want to save...
+    " annoying AF
+    let g:ale_lint_on_text_changed = 'never'
+
+    " pylint is too whiny for my taste... disable it until I find a proper
+    " config
+    " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
+    " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
+    " pip3 install -U mypy
+    let g:ale_linters = {
+    \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
+    \}
+    " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
+
+    let g:ale_fixers = {
+    \    'python': [
+    \        'add_blank_lines_for_python_control_statements',
+    \        'autopep8',
+    \        'isort',
+    \        'yapf',
+    \        'remove_trailing_lines',
+    \    ],
+    \}
+
+    " Plug 'Syntastic' 
+
+    " " shouldn't do Python for us
+    " let g:syntastic_python_checkers = []
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode
@@ -614,10 +614,8 @@ call plug#end()
 
 if iCanHazPlug == 0
     PlugInstall
-    if has('nvim')
-        PythonSupportInitPython2
-        PythonSupportInitPython3
-    endif
+
+    " call neomake#configure#automake('nw')
 endif
 
 
@@ -651,9 +649,10 @@ set exrc
 set secure
 " Lower the timeout for mappings, they are annoyingly slow otherwise
 set timeout timeoutlen=5000 ttimeoutlen=50
-" Write all files on `make`
-set autowrite
-set autowriteall
+" Write all files on `make` disabled because it causes automatic writes when
+" backgrounding neovim
+" set autowrite
+" set autowriteall
 
 " au FocusLost * silent! wa
 
