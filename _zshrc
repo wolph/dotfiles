@@ -72,6 +72,7 @@ setopt extendedglob
 zmodload -a colors
 zmodload -a autocomplete
 zmodload -a complist
+# autoload -U colors && colors
 
 export LANG=en_US.UTF-8
 export TZ=Europe/Amsterdam
@@ -150,6 +151,10 @@ zstyle ':completion:*' max-errors 2
 command -v keychain >/dev/null 2>&1 && eval $(keychain --ignore-missing -Q -q --eval ~/.ssh/id_dsa ~/.ssh/id_rsa )
 
 # Some convenient aliases
+# Enable spellcheck/autocorrect?
+# setopt correct
+# export SPROMPT="Correct $fg[red]%R$reset_color to $fg[green]%r?$reset_color (Yes, No, Abort, Edit) "
+
 alias mv='nocorrect mv'       # no spelling correction on mv
 alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
