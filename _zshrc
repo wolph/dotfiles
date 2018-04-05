@@ -174,9 +174,10 @@ alias grep='grep --color=auto'
 command_exists hub && alias git=hub
 
 # Link vim to the OS X clipboard
-if [ -x /usr/local/bin/nvim ]; then
+if command_exists nvim; then
     alias vim="safe-reattach-to-user-namespace nvim"
     alias vimdiff="safe-reattach-to-user-namespace nvim -d"
+    alias view="safe-reattach-to-user-namespace nvim -R"
 else
     alias vim="safe-reattach-to-user-namespace vim"
     alias vimdiff="safe-reattach-to-user-namespace vimdiff"
@@ -286,6 +287,15 @@ _virtualenv_tmux_name(){
 
 # Auto active virtualenv for the current directory
 activate(){
+    if [ -e ".venv/bin/activate" ]; then
+        . .venv/bin/activate
+        _virtualenv_tmux_name
+
+        if [ -f "${VIRTUAL_ENV}/.project" ]; then
+            cd $(cat "${VIRTUAL_ENV}/.project")
+        fi
+        return
+    fi
     if [ -e "activate" ]; then
         . ${ROOT_DIR}activate
         _virtualenv_tmux_name
