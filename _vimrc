@@ -103,6 +103,7 @@ Plug 'robbles/logstash.vim'
 
 " Javascript/html indending
 Plug 'pangloss/vim-javascript'
+Plug 'polpo/vim-html-js-indent'
 Plug 'rstacruz/sparkup'
 
 Plug 'markcornick/vim-vagrant'
