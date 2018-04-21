@@ -91,10 +91,6 @@ Plug 'chr4/nginx.vim'
 Plug 'alfredodeza/coveragepy.vim'
 Plug 'alfredodeza/pytest.vim'
 Plug 'vim-scripts/pig.vim'
-if python_version >= 205
-    " Uses with_statement so python 2.5 or higher
-    Plug 'jmcantrell/vim-virtualenv'
-endif
 Plug 'rizzatti/dash.vim'
 Plug 'vim-scripts/vim-coffee-script'
 Plug 'tshirtman/vim-cython'
@@ -488,6 +484,38 @@ if has("nvim")
     " " shouldn't do Python for us
     " let g:syntastic_python_checkers = []
 endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Virtualenv support
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" in your plugin list (assuming you use vim-plug):
+if python_version >= 205
+    " Uses with_statement so python 2.5 or higher
+    " Plug 'jmcantrell/vim-virtualenv'
+    "
+    " WARNING: jedi currently has a bug that the dominant system python
+    " decides the Python path so symlink venv/lib/python3.x to
+    " venv/lib/python3.4 (or whatever your system python is)
+
+    python << EOF
+import os
+import sys
+import glob
+
+venv = os.getenv('VIRTUAL_ENV')
+if venv:
+    paths = glob.glob(os.path.join(venv, 'lib', 'python*', 'site-packages'))
+
+    for path in paths:
+        sys.path.insert(0, path)
+
+    vim.command('let g:deoplete#sources#jedi#extra_path="%s"' % paths[0])
+EOF
+
+endif
+
+" in your plugin constants configuration section
+" let g:virtualenv_auto_activate = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode

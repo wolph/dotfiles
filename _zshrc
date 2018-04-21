@@ -296,6 +296,10 @@ activate(){
         . .venv/bin/activate
         _virtualenv_tmux_name
 
+        # the pipenv shell normally enables these as well
+        export PYTHONDONTWRITEBYTECODE=1
+        export PIPENV_ACTIVE=1
+
         if [ -f "${VIRTUAL_ENV}/.project" ]; then
             cd $(cat "${VIRTUAL_ENV}/.project")
         fi
