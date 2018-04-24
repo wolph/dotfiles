@@ -11,6 +11,7 @@ filetype off
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Install Plug if it's not installed
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" TODO: replace with dein? https://github.com/Shougo/dein.vim
 let iCanHazPlug=1
 let plugPath=expand('~/.vim/autoload/plug.vim')
 if !filereadable(plugPath)
@@ -98,8 +99,7 @@ Plug 'robbles/logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
-Plug 'pangloss/vim-javascript'
-Plug 'polpo/vim-html-js-indent'
+" Plug 'polpo/vim-html-js-indent'
 Plug 'rstacruz/sparkup'
 
 Plug 'markcornick/vim-vagrant'
@@ -134,10 +134,20 @@ Plug 'Quramy/vison'
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
 
-if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" javascript highlighting and indenting
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'pangloss/vim-javascript'
+let g:javascript_plugin_jsdoc = 1
+let g:javascript_plugin_ngdoc = 1
+let g:javascript_plugin_flow = 1
+
+Plug 'jelera/vim-javascript-syntax'
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fuzzy finder (fzf)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     if isdirectory('/usr/local/opt/fzf')
         Plug '/usr/local/opt/fzf'
     else
@@ -945,7 +955,7 @@ augroup filetypedetect
     au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
     au BufNewFile,BufRead /etc/nginx/* setf nginx
     au BufNewFile,BufRead /etc/logstash/* setf logstash
-    au BufNewFile,BufRead */templates/*.html setf jinja
+    au BufNewFile,BufRead *.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
 augroup END
