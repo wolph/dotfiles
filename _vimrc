@@ -753,7 +753,7 @@ set whichwrap+=<,>,h,l
 set mouse=h
 
 " shortens messages to avoid 'press a key' prompt 
-set shortmess=atI 
+set shortmess=atIF 
 " tell us when anything is changed via :...
 set report=0 
 " don't make noise
