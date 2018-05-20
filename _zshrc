@@ -285,8 +285,12 @@ _workon_if_possible(){
 }
 
 _virtualenv_tmux_name(){
-    if [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ] && [ -z "$session_name" ]; then
+    if [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ]; then
+        session_name=${VIRTUAL_ENV%%/.venv}
+        session_name=${session_name##.*/}
+        echo "session name: $session_name"
         export PS1="($session_name)$ORIGINAL_PS1"
+        echo -ne "\e]0;$session_name\a"
     fi
 }
 
@@ -295,6 +299,10 @@ activate(){
     if [ -e ".venv/bin/activate" ]; then
         . .venv/bin/activate
         _virtualenv_tmux_name
+
+        # the pipenv shell normally enables these as well
+        export PYTHONDONTWRITEBYTECODE=1
+        export PIPENV_ACTIVE=1
 
         if [ -f "${VIRTUAL_ENV}/.project" ]; then
             cd $(cat "${VIRTUAL_ENV}/.project")
