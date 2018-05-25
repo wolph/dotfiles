@@ -159,6 +159,7 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     " This is the default extra key bindings
     let g:fzf_action = {
         \ 'enter': 'rightbelow split',
+        \ 'ctrl-e': 'edit',
         \ 'ctrl-t': 'tab split',
         \ 'ctrl-x': 'rightbelow split',
         \ 'ctrl-v': 'rightbelow vsplit' }
