@@ -18,6 +18,10 @@ if [ "$TERM" = "xterm" ]; then
     export TERM=xterm-256color
 fi
 
+if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ]; then
+    ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
+fi
+
 #DEBUG=1
 if [ 1 -eq "$DEBUG" ]; then
     # set the trace prompt to include seconds, nanoseconds, script name and
