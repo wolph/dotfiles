@@ -135,7 +135,7 @@ fi
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
 zstyle ':completion:*' max-errors 2
-# zstyle :compinstall filename '~/.zshrc'
+zstyle :compinstall filename '~/.zshrc'
 
 # Allow local X access, seems to be needed for OSX to work with X properly...
 #if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
@@ -515,7 +515,7 @@ bashcompinit
 autoload -Uz compinit
 compinit
 
-if [ -d "~/.zsh/plugins" ]; then
+if [ -d ~/.zsh/plugins/ ]; then
     for f in ~/.zsh/plugins/*; do
         . "$f"
     done
@@ -567,4 +567,3 @@ if [ -f ~/.fzf.zsh ]; then
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
 fi
-
