@@ -159,6 +159,7 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     " This is the default extra key bindings
     let g:fzf_action = {
         \ 'enter': 'rightbelow split',
+        \ 'ctrl-e': 'edit',
         \ 'ctrl-t': 'tab split',
         \ 'ctrl-x': 'rightbelow split',
         \ 'ctrl-v': 'rightbelow vsplit' }
@@ -764,7 +765,7 @@ set whichwrap+=<,>,h,l
 set mouse=h
 
 " shortens messages to avoid 'press a key' prompt 
-set shortmess=atI 
+set shortmess=atIF 
 " tell us when anything is changed via :...
 set report=0 
 " don't make noise
