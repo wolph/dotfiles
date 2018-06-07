@@ -1,0 +1,57 @@
+#!/usr/bin/env python
+from __future__ import print_function
+
+import os
+import shutil
+import subprocess
+
+def get_width(default=80):
+    try:
+        columns, rows = shutil.get_terminal_size()
+    except AttributeError:
+        try:
+            _, columns = subprocess.check_output(['stty', 'size']).split()
+        except OSError:
+            columns = os.environ.get('COLUMNS', default)
+
+    columns = int(columns) - 80
+    return max(0, columns / 12)
+
+
+colored = [0] + [0x5F + 40 * n for n in range(0, 5)]
+colored_palette = [
+    (r, g, b) 
+    for r in colored
+    for g in colored
+    for b in colored
+]
+
+grayscale = [0x08 + 10 * n for n in range(0, 24)]
+grayscale_palette = [
+    (a, a, a)
+    for a in grayscale 
+]
+
+esc = '\033['
+reset = esc + '0m'
+normal = esc + '38;5;{i}m'
+bold = esc + '1;' + normal
+background = esc + '48;5;{i}m'
+base_context = dict(reset=reset, nothing='', width=get_width())
+
+for i, (r, g, b) in enumerate(colored_palette + grayscale_palette, 16):
+    color = r + g + b
+    context = dict(i=i, r=r, g=g, b=b, color=color, **base_context)
+    context.update(bold=bold.format(**context))
+    context.update(background=background.format(**context))
+    if max(r, g, b) > 0xCC:
+        context.update(normal=normal.format(i=0))
+    else:
+        context.update(normal=normal.format(i=255))
+
+    print(('{normal} {background}{nothing:^{width}}'
+           '{i:^3d} {r:02X}/{g:02X}/{b:02X}'
+           '{nothing:^{width}}{reset}').format(**context),
+          end='')
+    if i % 6 == 3:
+        print()
