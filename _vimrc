@@ -118,6 +118,13 @@ Plug 'AndrewRadev/linediff.vim'
 Plug 'elzr/vim-json'
 let g:vim_json_syntax_conceal = 0
 
+Plug 'junegunn/vim-easy-align'
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
+
+Plug 'tomtom/tcomment_vim'
+vmap / gc<cr>
+
 Plug 'mattboehm/vim-unstack'
 
 if has("nvim")
@@ -131,6 +138,32 @@ Plug 'Quramy/vison'
 " Easy import sorting for Python
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
+
+Plug 'mattn/emmet-vim'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Split one-liners or join multi-line statements
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'AndrewRadev/splitjoin.vim'
+nmap <Leader>j :SplitjoinJoin<cr>
+nmap <Leader>s :SplitjoinSplit<cr>
+nmap gj :SplitjoinSplit<cr>
+nmap gs :SplitjoinJoin<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Toggle between values such as true/false
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'AndrewRadev/switch.vim'
+let g:switch_mapping = '"'
+" let g:switch_custom_definitions =
+"     \ [
+"     \   ['true', 'false']
+"     \ ]
+autocmd FileType python let b:switch_custom_definitions =
+            \ [
+            \ {'"""': '\'\'\''},
+            \ {'"': '\''},
+            \ ]
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Mirror tasks on multiple machines
@@ -153,8 +186,8 @@ map <Leader>k <Plug>(easymotion-k)
 map <Leader>h <Plug>(easymotion-linebackward)
 
 let g:incsearch#auto_nohlsearch = 1
-map / <Plug>(incsearch-stay)
-map ? <Plug>(incsearch-backwards)
+nmap /  <Plug>(incsearch-stay)
+nmap ?  <Plug>(incsearch-backwards)
 map n  <Plug>(incsearch-nohl-n)
 map N  <Plug>(incsearch-nohl-N)
 map *  <Plug>(incsearch-nohl-*)
@@ -434,10 +467,9 @@ command! -nargs=1 Silent
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 if has("clipboard")
   set clipboard=unnamed " copy to the system clipboardA
-  set mouse=n
+  set mouse= 
 
   if has("unnamedplus") " X11 support
     set clipboard+=unnamedplus
@@ -1123,7 +1155,7 @@ endfunction
 " auto-reload vimrc on save
 if has ('autocmd') " Remain compatible with earlier versions
  augroup vimrc     " Source vim configuration upon save
-    autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC | redraw
-    autocmd! BufWritePost $MYGVIMRC if has('gui_running') | so % | echom "Reloaded " . $MYGVIMRC | endif | redraw
+    autocmd! BufWritePost ~/.vimrc source % | redraw
+    autocmd! BufWritePost ~/.gvimrc if has('gui_running') | source % | endif | redraw
   augroup END
 endif " has autocmd
