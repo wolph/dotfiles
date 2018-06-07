@@ -144,6 +144,9 @@ Plug 'mattn/emmet-vim'
 Plug 'othree/javascript-libraries-syntax.vim'
 let g:used_javascript_libs = 'jquery'
 
+Plug 'ap/vim-css-color'
+Plug 'junegunn/vim-peekaboo'
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split one-liners or join multi-line statements
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
