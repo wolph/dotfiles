@@ -145,6 +145,12 @@ let g:javascript_plugin_flow = 1
 Plug 'jelera/vim-javascript-syntax'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Vim indent guides
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'nathanaelkane/vim-indent-guides'
+let g:indent_guides_enable_on_vim_startup = 1
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fuzzy finder (fzf)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
