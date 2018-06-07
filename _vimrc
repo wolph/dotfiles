@@ -141,6 +141,9 @@ command! -range=% Isort :<line1>,<line2>! isort -
 
 Plug 'mattn/emmet-vim'
 
+Plug 'othree/javascript-libraries-syntax.vim'
+let g:used_javascript_libs = 'jquery'
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split one-liners or join multi-line statements
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
