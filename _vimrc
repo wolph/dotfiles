@@ -81,8 +81,6 @@ call plug#begin(expand('~/.vim/bundle'))
 Plug 'scrooloose/nerdtree'
 " A Git wrapper so awesome, it should be illegal
 Plug 'tpope/vim-fugitive'
-" Easier way to move around in Vim
-Plug 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
@@ -133,6 +131,36 @@ Plug 'Quramy/vison'
 " Easy import sorting for Python
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Mirror tasks on multiple machines
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'zenbro/mirror.vim'
+
+let g:mirror#ssh_auto_cd = 1
+let g:mirror#diff_layout = 'vsplit'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Easier way to move around in Vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'haya14busa/incsearch.vim'
+Plug 'haya14busa/incsearch-easymotion.vim'
+Plug 'easymotion/vim-easymotion'
+" Note: leader is \ by default
+map <Leader>l <Plug>(easymotion-lineforward)
+map <Leader>j <Plug>(easymotion-j)
+map <Leader>k <Plug>(easymotion-k)
+map <Leader>h <Plug>(easymotion-linebackward)
+
+let g:incsearch#auto_nohlsearch = 1
+map / <Plug>(incsearch-stay)
+map ? <Plug>(incsearch-backwards)
+map n  <Plug>(incsearch-nohl-n)
+map N  <Plug>(incsearch-nohl-N)
+map *  <Plug>(incsearch-nohl-*)
+map #  <Plug>(incsearch-nohl-#)
+map g* <Plug>(incsearch-nohl-g*)
+map g# <Plug>(incsearch-nohl-g#)
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " javascript highlighting and indenting
