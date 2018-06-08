@@ -1026,11 +1026,10 @@ nnoremap Q <nop>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Map filetypes to get proper highlighting
 augroup filetypedetect
-    au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
-    au BufNewFile,BufRead /etc/supervisor/* setf supervisor
-    au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
-    au BufNewFile,BufRead /etc/nginx/* setf nginx
-    au BufNewFile,BufRead /etc/logstash/* setf logstash
+    au BufNewFile,BufRead */apache/* setf apache
+    au BufNewFile,BufRead */supervisor/* setf supervisor
+    au BufNewFile,BufRead */nginx/* setf nginx
+    au BufNewFile,BufRead */logstash/* setf logstash
     au BufNewFile,BufRead *.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
