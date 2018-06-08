@@ -16,7 +16,7 @@ def get_width(default=80):
         except OSError:
             columns = os.environ.get('COLUMNS', default)
 
-    columns = int(columns) - 80
+    columns = int(columns) - 77
     # Since we have 6 columns with 1 space on each side, we can increment the
     # size for every 12 extra columns
     return max(0, columns / 12)
@@ -49,7 +49,7 @@ pattern = (
     '{normal}{background}{padding:^{width}}{i:^3d} '  # pad the background
     '{r:02X}/{g:02X}/{b:02X}'  # show the hex rgb code
     '{padding:^{width}}'  # pad the background on the other side
-    '{reset} '  # reset again
+    '{reset}'  # reset again
 )
 
 base_context = dict(reset=reset, padding='', width=get_width())
@@ -70,3 +70,5 @@ for i, (r, g, b) in enumerate(colored_palette + grayscale_palette, 16):
     # Print newlines when needed
     if i % 6 == 3:
         print()
+    else:
+        print(' ', end='')
