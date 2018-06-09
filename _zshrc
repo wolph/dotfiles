@@ -537,6 +537,9 @@ zstyle ':completion:*:history-words'   menu yes
 zstyle ':completion:*:*:cd:*:directory-stack' menu yes select              
 zstyle ':completion:*' menu select=5
 
+# No shared history between tabs
+unsetopt sharehistory
+
 test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
 
 if [ 1 -eq "$DEBUG" ]; then
