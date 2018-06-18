@@ -146,6 +146,7 @@ let g:used_javascript_libs = 'jquery'
 
 Plug 'ap/vim-css-color'
 Plug 'junegunn/vim-peekaboo'
+Plug 'powerman/vim-plugin-AnsiEsc'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split one-liners or join multi-line statements
@@ -199,6 +200,23 @@ let g:mirror#diff_layout = 'vsplit'
 " map #  <Plug>(incsearch-nohl-#)
 " map g* <Plug>(incsearch-nohl-g*)
 " map g# <Plug>(incsearch-nohl-g#)
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" arduino support
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'stevearc/vim-arduino'
+let g:arduino_run_headless = 1
+let g:arduino_args = '--verbose-upload'
+" let g:arduino_board = 'arduino:avr:uno'
+" let g:arduino_programmer = 'arduino:usbasp'
+" let g:arduino_serial_baud = 115200
+let g:arduino_auto_baud = 1
+let g:arduino_serial_tmux = 'split-window -d'
+nnoremap <buffer> <leader>am :ArduinoVerify<CR>
+nnoremap <buffer> <leader>au :ArduinoUpload<CR>
+nnoremap <buffer> <leader>ad :ArduinoUploadAndSerial<CR>
+nnoremap <buffer> <leader>ab :ArduinoChooseBoard<CR>
+nnoremap <buffer> <leader>ap :ArduinoChooseProgrammer<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " javascript highlighting and indenting
