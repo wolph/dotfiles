@@ -139,7 +139,7 @@ fi
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
 zstyle ':completion:*' max-errors 2
-# zstyle :compinstall filename '~/.zshrc'
+zstyle :compinstall filename '~/.zshrc'
 
 # Allow local X access, seems to be needed for OSX to work with X properly...
 #if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
@@ -443,6 +443,16 @@ hosts=(
   localhost
 )
 
+autoload bashcompinit
+bashcompinit
+autoload -Uz compinit
+compinit
+
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
+zstyle ':completion:*' max-errors 2
+# zstyle :compinstall filename '~/.zshrc'
+
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:complete:mpv:*' tag-order '!urls'
 zstyle ':completion:*:complete:mplayer:*' tag-order '!urls'
@@ -478,10 +488,28 @@ zstyle ':completion::complete:*:tar:directories' file-patterns '*~.*(-/)'
 zstyle ':completion:*:complete:-command-::commands' ignored-patterns '*\~'
 
 # Don't complete files that vim shouldn't handle
-zstyle ':completion:*:*:vi:*:*files' ignored-patterns '*?.pyc' '*?.pyo' \
-        '*?.pdf' '*?.o'
-zstyle ':completion:*:*:vim:*:*files' ignored-patterns '*?.pyc' '*?.pyo' \
-        '*?.pdf' '*?.o'
+zstyle ':completion:*:*:(vi|vim|nvim|vimdiff):*:*' ignored-patterns '*?.pyc' \
+    '*?.pyo' '*?.pdf' '*?.o'
+# zstyle ':completion:*:*:(vi|vim|nvim|vimdiff):*:directories' ignored-patterns \
+#     '(*/)*.egg-info'
+
+# Ignore these everywhere except for rm
+zstyle ':completion:*:*:*' ignored-patterns '(|*/)__pycache__' \
+    '(|*/)*.egg-info' '(*/)#lost+found'
+zstyle ':completion:*:rm:*' ignored-patterns
+
+# Ignore completion functions
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+# Ignore what's already in the line
+# With commands like `rm/kill/diff' it's annoying if one gets offered the same
+# filename again even if it is already on the command line. To avoid that:
+zstyle ':completion:*:(rm|kill|diff):*' ignore-line yes
+
+# Ignore parent directory
+# Useful for cd, mv and cp. Ex, cd will never select the parent directory (ie
+# cd ../<TAB>):
+zstyle ':completion:*:(cd|mv|cp):*' ignore-parents parent pwd
 
 # Separate matches into groups
 zstyle ':completion:*:matches' group 'yes'
@@ -509,6 +537,9 @@ zstyle ':completion:*:history-words'   menu yes
 zstyle ':completion:*:*:cd:*:directory-stack' menu yes select              
 zstyle ':completion:*' menu select=5
 
+# No shared history between tabs
+unsetopt sharehistory
+
 if [ 1 -eq "$DEBUG" ]; then
     # turn off tracing
     unsetopt xtrace
@@ -521,7 +552,7 @@ bashcompinit
 autoload -Uz compinit
 compinit
 
-if [ -d "~/.zsh/plugins" ]; then
+if [ -d ~/.zsh/plugins/ ]; then
     for f in ~/.zsh/plugins/*; do
         . "$f"
     done
@@ -576,4 +607,3 @@ fi
 
 test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
 test -f "${ROOT_DIR}.zshrc.local" && source "${ROOT_DIR}.zshrc.local"
-

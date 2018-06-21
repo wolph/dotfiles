@@ -81,8 +81,6 @@ call plug#begin(expand('~/.vim/bundle'))
 Plug 'scrooloose/nerdtree'
 " A Git wrapper so awesome, it should be illegal
 Plug 'tpope/vim-fugitive'
-" Easier way to move around in Vim
-Plug 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
@@ -120,6 +118,13 @@ Plug 'AndrewRadev/linediff.vim'
 Plug 'elzr/vim-json'
 let g:vim_json_syntax_conceal = 0
 
+Plug 'junegunn/vim-easy-align'
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
+
+Plug 'tomtom/tcomment_vim'
+vmap / gc<cr>
+
 Plug 'mattboehm/vim-unstack'
 
 if has("nvim")
@@ -134,6 +139,85 @@ Plug 'Quramy/vison'
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
 
+Plug 'mattn/emmet-vim'
+
+Plug 'othree/javascript-libraries-syntax.vim'
+let g:used_javascript_libs = 'jquery'
+
+Plug 'ap/vim-css-color'
+Plug 'junegunn/vim-peekaboo'
+Plug 'powerman/vim-plugin-AnsiEsc'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Split one-liners or join multi-line statements
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'AndrewRadev/splitjoin.vim'
+nmap <Leader>j :SplitjoinJoin<cr>
+nmap <Leader>s :SplitjoinSplit<cr>
+nmap gj :SplitjoinSplit<cr>
+nmap gs :SplitjoinJoin<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Toggle between values such as true/false
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'AndrewRadev/switch.vim'
+let g:switch_mapping = '"'
+" let g:switch_custom_definitions =
+"     \ [
+"     \   ['true', 'false']
+"     \ ]
+autocmd FileType python let b:switch_custom_definitions =
+            \ [
+            \ {'"': '''',},
+            \ ]
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Mirror tasks on multiple machines
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'zenbro/mirror.vim'
+
+let g:mirror#ssh_auto_cd = 1
+let g:mirror#diff_layout = 'vsplit'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Easier way to move around in Vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plug 'haya14busa/incsearch.vim'
+" Plug 'haya14busa/incsearch-easymotion.vim'
+" Plug 'easymotion/vim-easymotion'
+" " Note: leader is \ by default
+" map <Leader>l <Plug>(easymotion-lineforward)
+" map <Leader>j <Plug>(easymotion-j)
+" map <Leader>k <Plug>(easymotion-k)
+" map <Leader>h <Plug>(easymotion-linebackward)
+" 
+" let g:incsearch#auto_nohlsearch = 1
+" nmap /  <Plug>(incsearch-stay)
+" nmap ?  <Plug>(incsearch-backwards)
+" map n  <Plug>(incsearch-nohl-n)
+" map N  <Plug>(incsearch-nohl-N)
+" map *  <Plug>(incsearch-nohl-*)
+" map #  <Plug>(incsearch-nohl-#)
+" map g* <Plug>(incsearch-nohl-g*)
+" map g# <Plug>(incsearch-nohl-g#)
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" arduino support
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'stevearc/vim-arduino'
+let g:arduino_run_headless = 1
+let g:arduino_args = '--verbose-upload'
+" let g:arduino_board = 'arduino:avr:uno'
+" let g:arduino_programmer = 'arduino:usbasp'
+" let g:arduino_serial_baud = 115200
+let g:arduino_auto_baud = 1
+let g:arduino_serial_tmux = 'split-window -d'
+nnoremap <buffer> <leader>am :ArduinoVerify<CR>
+nnoremap <buffer> <leader>au :ArduinoUpload<CR>
+nnoremap <buffer> <leader>ad :ArduinoUploadAndSerial<CR>
+nnoremap <buffer> <leader>ab :ArduinoChooseBoard<CR>
+nnoremap <buffer> <leader>ap :ArduinoChooseProgrammer<CR>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " javascript highlighting and indenting
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -143,6 +227,16 @@ let g:javascript_plugin_ngdoc = 1
 let g:javascript_plugin_flow = 1
 
 Plug 'jelera/vim-javascript-syntax'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Vim indent guides
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'nathanaelkane/vim-indent-guides'
+let g:indent_guides_enable_on_vim_startup = 1
+" let g:indent_guides_guide_size = 1
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=235
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=234
+
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fuzzy finder (fzf)
@@ -396,10 +490,9 @@ command! -nargs=1 Silent
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 if has("clipboard")
   set clipboard=unnamed " copy to the system clipboardA
-  set mouse=n
+  set mouse= 
 
   if has("unnamedplus") " X11 support
     set clipboard+=unnamedplus
@@ -951,11 +1044,10 @@ nnoremap Q <nop>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Map filetypes to get proper highlighting
 augroup filetypedetect
-    au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
-    au BufNewFile,BufRead /etc/supervisor/* setf supervisor
-    au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
-    au BufNewFile,BufRead /etc/nginx/* setf nginx
-    au BufNewFile,BufRead /etc/logstash/* setf logstash
+    au BufNewFile,BufRead */apache/* setf apache
+    au BufNewFile,BufRead */supervisor/* setf supervisor
+    au BufNewFile,BufRead */nginx/* setf nginx
+    au BufNewFile,BufRead */logstash/* setf logstash
     au BufNewFile,BufRead *.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
@@ -1085,7 +1177,7 @@ endfunction
 " auto-reload vimrc on save
 if has ('autocmd') " Remain compatible with earlier versions
  augroup vimrc     " Source vim configuration upon save
-    autocmd! BufWritePost $MYVIMRC source % | echom "Reloaded " . $MYVIMRC | redraw
-    autocmd! BufWritePost $MYGVIMRC if has('gui_running') | so % | echom "Reloaded " . $MYGVIMRC | endif | redraw
+    autocmd! BufWritePost ~/.vimrc source % | redraw
+    autocmd! BufWritePost ~/.gvimrc if has('gui_running') | source % | endif | redraw
   augroup END
 endif " has autocmd
