@@ -104,7 +104,7 @@ else
 
         # Attach to the new session
         echo "Attaching tmux -2 attach-session -t $session_id"
-        exec tmux -2 attach-session -t $session_id
+        tmux -2 attach-session -t $session_id
 
         # When we detach from it, kill the session
         #tmux kill-session -t $session_id
