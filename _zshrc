@@ -509,8 +509,6 @@ zstyle ':completion:*:history-words'   menu yes
 zstyle ':completion:*:*:cd:*:directory-stack' menu yes select              
 zstyle ':completion:*' menu select=5
 
-test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
-
 if [ 1 -eq "$DEBUG" ]; then
     # turn off tracing
     unsetopt xtrace
@@ -575,4 +573,7 @@ if [ -f ~/.fzf.zsh ]; then
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
 fi
+
+test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
+test -f "${ROOT_DIR}.zshrc.local" && source "${ROOT_DIR}.zshrc.local"
 
