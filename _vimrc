@@ -148,6 +148,15 @@ Plug 'ap/vim-css-color'
 Plug 'junegunn/vim-peekaboo'
 Plug 'powerman/vim-plugin-AnsiEsc'
 
+if has("nvim")
+    Plug 'kassio/neoterm'
+    tnoremap <C-w><C-w> <C-\><C-n><C-w><C-w>
+    tnoremap <C-w>h <C-\><C-n><C-w>h
+    tnoremap <C-w>j <C-\><C-n><C-w>j
+    tnoremap <C-w>k <C-\><C-n><C-w>k
+    tnoremap <C-w>l <C-\><C-n><C-w>l
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split one-liners or join multi-line statements
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
