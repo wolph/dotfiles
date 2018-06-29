@@ -203,10 +203,13 @@ alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 # Little trick to change the name of the shell
 # . ${ROOT_DIR}bin/iterm2_helpers
 
-function title(){
-    echo -ne "\033]0;$1\007"
-    printf "\033k$1\033\\"
-}
+# moved to bin/title
+# function title(){
+#     if [ "$1" != "default" ]; then
+#         echo -ne "\033]0;$1\007"
+#         printf "\033k$1\033\\"
+#     fi
+# }
 
 function mosh(){
     if [ -n "$1" ]; then
