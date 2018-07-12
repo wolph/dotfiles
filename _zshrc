@@ -18,6 +18,10 @@ if [ "$TERM" = "xterm" ]; then
     export TERM=xterm-256color
 fi
 
+if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TMUX" ]; then
+    ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
+fi
+
 #DEBUG=1
 if [ 1 -eq "$DEBUG" ]; then
     # set the trace prompt to include seconds, nanoseconds, script name and
@@ -36,8 +40,7 @@ function command_exists(){
 }
 
 ticfile="$TERM.ti"
-command_exists tic
-if [[ $? -eq 0 && -f "$ticfile" ]]; then
+if command_exists tic && [ -f "$ticfile" ]; then
     tic "$ticfile"
 fi
 
@@ -73,6 +76,7 @@ setopt extendedglob
 zmodload -a colors
 zmodload -a autocomplete
 zmodload -a complist
+# autoload -U colors && colors
 
 export LANG=en_US.UTF-8
 export TZ=Europe/Amsterdam
@@ -117,6 +121,7 @@ export RPS1='%~'
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
 export PIP_DISABLE_PIP_VERSION_CHECK=1
+export PIPENV_VENV_IN_PROJECT=true
 
 # Set the java home
 test -x /usr/libexec/java_home && export JAVA_HOME=$(/usr/libexec/java_home)
@@ -134,7 +139,7 @@ fi
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
 zstyle ':completion:*' max-errors 2
-# zstyle :compinstall filename '~/.zshrc'
+zstyle :compinstall filename '~/.zshrc'
 
 # Allow local X access, seems to be needed for OSX to work with X properly...
 #if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
@@ -150,6 +155,10 @@ zstyle ':completion:*' max-errors 2
 command -v keychain >/dev/null 2>&1 && eval $(keychain --ignore-missing -Q -q --eval ~/.ssh/id_dsa ~/.ssh/id_rsa )
 
 # Some convenient aliases
+# Enable spellcheck/autocorrect?
+# setopt correct
+# export SPROMPT="Correct $fg[red]%R$reset_color to $fg[green]%r?$reset_color (Yes, No, Abort, Edit) "
+
 alias mv='nocorrect mv'       # no spelling correction on mv
 alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
@@ -165,15 +174,19 @@ alias l='ls -A'
 alias ll='l -l'
 alias qmv='qmv -f do'
 alias push='git pull; git push'
+export GIT_MERGE_AUTOEDIT=no
+
 # Some people might not like this but I find it convenient. It makes find
 # search in symlinks by default
 # alias find='find -L'
 alias grep='grep --color=auto'
 command_exists hub && alias git=hub
+
 # Link vim to the OS X clipboard
-if [ -x /usr/local/bin/nvim ]; then
+if command_exists nvim; then
     alias vim="safe-reattach-to-user-namespace nvim"
     alias vimdiff="safe-reattach-to-user-namespace nvim -d"
+    alias view="safe-reattach-to-user-namespace nvim -R"
 else
     alias vim="safe-reattach-to-user-namespace vim"
     alias vimdiff="safe-reattach-to-user-namespace vimdiff"
@@ -190,10 +203,13 @@ alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 # Little trick to change the name of the shell
 # . ${ROOT_DIR}bin/iterm2_helpers
 
-function title(){
-    echo -ne "\033]0;$1\007"
-    printf "\033k$1\033\\"
-}
+# moved to bin/title
+# function title(){
+#     if [ "$1" != "default" ]; then
+#         echo -ne "\033]0;$1\007"
+#         printf "\033k$1\033\\"
+#     fi
+# }
 
 function mosh(){
     if [ -n "$1" ]; then
@@ -276,13 +292,30 @@ _workon_if_possible(){
 }
 
 _virtualenv_tmux_name(){
-    if [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ] && [ -z "$session_name" ]; then
+    if [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ]; then
+        session_name=${VIRTUAL_ENV%%/.venv}
+        session_name=${session_name##.*/}
+        echo "session name: $session_name"
         export PS1="($session_name)$ORIGINAL_PS1"
+        echo -ne "\e]0;$session_name\a"
     fi
 }
 
 # Auto active virtualenv for the current directory
 activate(){
+    if [ -e ".venv/bin/activate" ]; then
+        . .venv/bin/activate
+        _virtualenv_tmux_name
+
+        # the pipenv shell normally enables these as well
+        export PYTHONDONTWRITEBYTECODE=1
+        export PIPENV_ACTIVE=1
+
+        if [ -f "${VIRTUAL_ENV}/.project" ]; then
+            cd $(cat "${VIRTUAL_ENV}/.project")
+        fi
+        return
+    fi
     if [ -e "activate" ]; then
         . ${ROOT_DIR}activate
         _virtualenv_tmux_name
@@ -413,6 +446,16 @@ hosts=(
   localhost
 )
 
+autoload bashcompinit
+bashcompinit
+autoload -Uz compinit
+compinit
+
+zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
+zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
+zstyle ':completion:*' max-errors 2
+# zstyle :compinstall filename '~/.zshrc'
+
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:complete:mpv:*' tag-order '!urls'
 zstyle ':completion:*:complete:mplayer:*' tag-order '!urls'
@@ -448,10 +491,28 @@ zstyle ':completion::complete:*:tar:directories' file-patterns '*~.*(-/)'
 zstyle ':completion:*:complete:-command-::commands' ignored-patterns '*\~'
 
 # Don't complete files that vim shouldn't handle
-zstyle ':completion:*:*:vi:*:*files' ignored-patterns '*?.pyc' '*?.pyo' \
-        '*?.pdf' '*?.o'
-zstyle ':completion:*:*:vim:*:*files' ignored-patterns '*?.pyc' '*?.pyo' \
-        '*?.pdf' '*?.o'
+zstyle ':completion:*:*:(vi|vim|nvim|vimdiff):*:*' ignored-patterns '*?.pyc' \
+    '*?.pyo' '*?.pdf' '*?.o'
+# zstyle ':completion:*:*:(vi|vim|nvim|vimdiff):*:directories' ignored-patterns \
+#     '(*/)*.egg-info'
+
+# Ignore these everywhere except for rm
+zstyle ':completion:*:*:*' ignored-patterns '(|*/)__pycache__' \
+    '(|*/)*.egg-info' '(*/)#lost+found'
+zstyle ':completion:*:rm:*' ignored-patterns
+
+# Ignore completion functions
+zstyle ':completion:*:functions' ignored-patterns '_*'
+
+# Ignore what's already in the line
+# With commands like `rm/kill/diff' it's annoying if one gets offered the same
+# filename again even if it is already on the command line. To avoid that:
+zstyle ':completion:*:(rm|kill|diff):*' ignore-line yes
+
+# Ignore parent directory
+# Useful for cd, mv and cp. Ex, cd will never select the parent directory (ie
+# cd ../<TAB>):
+zstyle ':completion:*:(cd|mv|cp):*' ignore-parents parent pwd
 
 # Separate matches into groups
 zstyle ':completion:*:matches' group 'yes'
@@ -479,7 +540,8 @@ zstyle ':completion:*:history-words'   menu yes
 zstyle ':completion:*:*:cd:*:directory-stack' menu yes select              
 zstyle ':completion:*' menu select=5
 
-test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
+# No shared history between tabs
+unsetopt sharehistory
 
 if [ 1 -eq "$DEBUG" ]; then
     # turn off tracing
@@ -493,7 +555,7 @@ bashcompinit
 autoload -Uz compinit
 compinit
 
-if [ -d "~/.zsh/plugins" ]; then
+if [ -d ~/.zsh/plugins/ ]; then
     for f in ~/.zsh/plugins/*; do
         . "$f"
     done
@@ -538,11 +600,13 @@ if [ -f ~/.fzf.zsh ]; then
     zle     -N      fzf-history-widget-accept
     bindkey '^R'    fzf-history-widget-accept
 
-    if [ $(command_exists pt ) ]; then
+    if command_exists pt; then
         export FZF_DEFAULT_COMMAND='pt --global-gitignore -g ""'
-    elif [ $(command_exists ag ) ]; then
-        export FZF_DEFAULT_COMMAND='ag -g ""'
+    elif command_exists ag; then
+        export FZF_DEFAULT_COMMAND='ag --follow -g "" . site-packages '
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
 fi
 
+test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
+test -f "${ROOT_DIR}.zshrc.local" && source "${ROOT_DIR}.zshrc.local"

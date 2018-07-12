@@ -11,6 +11,7 @@ filetype off
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Install Plug if it's not installed
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" TODO: replace with dein? https://github.com/Shougo/dein.vim
 let iCanHazPlug=1
 let plugPath=expand('~/.vim/autoload/plug.vim')
 if !filereadable(plugPath)
@@ -80,8 +81,6 @@ call plug#begin(expand('~/.vim/bundle'))
 Plug 'scrooloose/nerdtree'
 " A Git wrapper so awesome, it should be illegal
 Plug 'tpope/vim-fugitive'
-" Easier way to move around in Vim
-Plug 'Lokaltog/vim-easymotion'
 " Snipmate and requirements for TextMate snippets
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
@@ -91,10 +90,6 @@ Plug 'chr4/nginx.vim'
 Plug 'alfredodeza/coveragepy.vim'
 Plug 'alfredodeza/pytest.vim'
 Plug 'vim-scripts/pig.vim'
-if python_version >= 205
-    " Uses with_statement so python 2.5 or higher
-    Plug 'jmcantrell/vim-virtualenv'
-endif
 Plug 'rizzatti/dash.vim'
 Plug 'vim-scripts/vim-coffee-script'
 Plug 'tshirtman/vim-cython'
@@ -102,7 +97,7 @@ Plug 'robbles/logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
-Plug 'pangloss/vim-javascript'
+" Plug 'polpo/vim-html-js-indent'
 Plug 'rstacruz/sparkup'
 
 Plug 'markcornick/vim-vagrant'
@@ -113,12 +108,24 @@ Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
 
 Plug 'tfnico/vim-gradle'
+Plug 'MarcWeber/vim-addon-local-vimrc'
 
 Plug 'zainin/vim-mikrotik'
 Plug 'Chiel92/vim-autoformat'
 Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'AndrewRadev/linediff.vim'
+Plug 'elzr/vim-json'
+let g:vim_json_syntax_conceal = 0
+
+Plug 'junegunn/vim-easy-align'
+xmap ga <Plug>(EasyAlign)
+nmap ga <Plug>(EasyAlign)
+
+Plug 'tomtom/tcomment_vim'
+vmap / gc<cr>
+
+Plug 'mattboehm/vim-unstack'
 
 if has("nvim")
     Plug 'sbdchd/neoformat'
@@ -132,10 +139,118 @@ Plug 'Quramy/vison'
 map <leader>i :Isort<cr>
 command! -range=% Isort :<line1>,<line2>! isort -
 
-if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
+Plug 'mattn/emmet-vim'
+
+Plug 'othree/javascript-libraries-syntax.vim'
+let g:used_javascript_libs = 'jquery'
+
+Plug 'ap/vim-css-color'
+Plug 'junegunn/vim-peekaboo'
+Plug 'powerman/vim-plugin-AnsiEsc'
+
+if has("nvim")
+    Plug 'kassio/neoterm'
+    tnoremap <C-w><C-w> <C-\><C-n><C-w><C-w>
+    tnoremap <C-w>h <C-\><C-n><C-w>h
+    tnoremap <C-w>j <C-\><C-n><C-w>j
+    tnoremap <C-w>k <C-\><C-n><C-w>k
+    tnoremap <C-w>l <C-\><C-n><C-w>l
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Split one-liners or join multi-line statements
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'AndrewRadev/splitjoin.vim'
+nmap <Leader>j :SplitjoinJoin<cr>
+nmap <Leader>s :SplitjoinSplit<cr>
+nmap gj :SplitjoinSplit<cr>
+nmap gs :SplitjoinJoin<cr>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Toggle between values such as true/false
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'AndrewRadev/switch.vim'
+let g:switch_mapping = '"'
+" let g:switch_custom_definitions =
+"     \ [
+"     \   ['true', 'false']
+"     \ ]
+autocmd FileType python let b:switch_custom_definitions =
+            \ [
+            \ {'"': '''',},
+            \ ]
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Mirror tasks on multiple machines
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'zenbro/mirror.vim'
+
+let g:mirror#ssh_auto_cd = 1
+let g:mirror#diff_layout = 'vsplit'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Easier way to move around in Vim
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Plug 'haya14busa/incsearch.vim'
+" Plug 'haya14busa/incsearch-easymotion.vim'
+" Plug 'easymotion/vim-easymotion'
+" " Note: leader is \ by default
+" map <Leader>l <Plug>(easymotion-lineforward)
+" map <Leader>j <Plug>(easymotion-j)
+" map <Leader>k <Plug>(easymotion-k)
+" map <Leader>h <Plug>(easymotion-linebackward)
+" 
+" let g:incsearch#auto_nohlsearch = 1
+" nmap /  <Plug>(incsearch-stay)
+" nmap ?  <Plug>(incsearch-backwards)
+" map n  <Plug>(incsearch-nohl-n)
+" map N  <Plug>(incsearch-nohl-N)
+" map *  <Plug>(incsearch-nohl-*)
+" map #  <Plug>(incsearch-nohl-#)
+" map g* <Plug>(incsearch-nohl-g*)
+" map g# <Plug>(incsearch-nohl-g#)
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" arduino support
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'stevearc/vim-arduino'
+let g:arduino_run_headless = 1
+let g:arduino_args = '--verbose-upload'
+" let g:arduino_board = 'arduino:avr:uno'
+" let g:arduino_programmer = 'arduino:usbasp'
+" let g:arduino_serial_baud = 115200
+let g:arduino_auto_baud = 1
+let g:arduino_serial_tmux = 'split-window -d'
+nnoremap <buffer> <leader>am :ArduinoVerify<CR>
+nnoremap <buffer> <leader>au :ArduinoUpload<CR>
+nnoremap <buffer> <leader>ad :ArduinoUploadAndSerial<CR>
+nnoremap <buffer> <leader>ab :ArduinoChooseBoard<CR>
+nnoremap <buffer> <leader>ap :ArduinoChooseProgrammer<CR>
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" javascript highlighting and indenting
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'pangloss/vim-javascript'
+let g:javascript_plugin_jsdoc = 1
+let g:javascript_plugin_ngdoc = 1
+let g:javascript_plugin_flow = 1
+
+Plug 'jelera/vim-javascript-syntax'
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Vim indent guides
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+Plug 'nathanaelkane/vim-indent-guides'
+let g:indent_guides_enable_on_vim_startup = 1
+" let g:indent_guides_guide_size = 1
+autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=235
+autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=234
+
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fuzzy finder (fzf)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     if isdirectory('/usr/local/opt/fzf')
         Plug '/usr/local/opt/fzf'
     else
@@ -147,6 +262,7 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     " This is the default extra key bindings
     let g:fzf_action = {
         \ 'enter': 'rightbelow split',
+        \ 'ctrl-e': 'edit',
         \ 'ctrl-t': 'tab split',
         \ 'ctrl-x': 'rightbelow split',
         \ 'ctrl-v': 'rightbelow vsplit' }
@@ -162,9 +278,9 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     " - down / up / left / right
     let g:fzf_layout = { 'down': '~70%' }
 
-    " In Neovim, you can set up fzf window using a Vim command
-    let g:fzf_layout = { 'window': 'enew' }
-    let g:fzf_layout = { 'window': '-tabnew' }
+    " " In Neovim, you can set up fzf window using a Vim command
+    " let g:fzf_layout = { 'window': 'enew' }
+    " let g:fzf_layout = { 'window': '-tabnew' }
 
     " Customize fzf colors to match your color scheme
     let g:fzf_colors =
@@ -206,7 +322,7 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     let g:fzf_commands_expect = 'alt-enter,ctrl-x'
 
     nmap <c-t> :FZF<cr>
-    imap <c-x><c-o> <plug>(fzf-complete-line)
+    " imap <c-x><c-o> <plug>(fzf-complete-line)
     map <leader>b :Buffers<cr>
     map <leader>f :Files<cr>
     map <leader>g :GFiles<cr>
@@ -243,37 +359,82 @@ endif
 if has("nvim")
     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
     Plug 'zchee/deoplete-jedi'
+    let g:jedi#completions_enabled = 0
 
-	let g:deoplete#enable_at_startup = 1
-	let g:deoplete#auto_complete_start_length = 1
-	if !exists('g:deoplete#omni#input_patterns')
-  		let g:deoplete#omni#input_patterns = {}
-	endif
-	" let g:deoplete#disable_auto_complete = 1
-	autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+	" let g:deoplete#auto_complete_start_length = 1
+	" if !exists('g:deoplete#omni#input_patterns')
+  	" 	let g:deoplete#omni#input_patterns = {}
+	" endif
+	" " let g:deoplete#disable_auto_complete = 1
+	" autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
 
-	" omnifuncs
-	augroup omnifuncs
-  		autocmd!
-  		autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-  		autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-  		autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-  		autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-  		autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-	augroup end
-	" tern
-	if exists('g:plugs["tern_for_vim"]')
-  		let g:tern_show_argument_hints = 'on_hold'
-  		let g:tern_show_signature_in_pum = 1
-  		autocmd FileType javascript setlocal omnifunc=tern#Complete
-	endif
+	" " omnifuncs
+	" augroup omnifuncs
+  	" 	autocmd!
+  	" 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+  	" 	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+  	" 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+  	" 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+  	" 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+	" augroup end
+	" " tern
+	" if exists('g:plugs["tern_for_vim"]')
+  	" 	let g:tern_show_argument_hints = 'on_hold'
+  	" 	let g:tern_show_signature_in_pum = 1
+  	" 	autocmd FileType javascript setlocal omnifunc=tern#Complete
+	" endif
 
-	" deoplete tab-complete
-	inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-	" tern
-	autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+	" " deoplete tab-complete
+	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+	" " tern
+	" autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+    let g:deoplete#enable_at_startup = 1
+" else
+"   Plug 'Shougo/deoplete.nvim'
+"   Plug 'roxma/nvim-yarp'
+"   Plug 'roxma/vim-hug-neovim-rpc'
 endif
 
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Neovim completion manager
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" if has("nvim")
+"     Plug 'roxma/nvim-completion-manager'
+"     Plug 'roxma/python-support.nvim'
+" 
+"     " don't give |ins-completion-menu| messages.  For example,
+"     " '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
+"     set shortmess+=c
+" 
+"     " When the <Enter> key is pressed while the popup menu is visible, it only
+"     " hides the menu. Use this mapping to hide the menu and also start a new
+"     " line.
+"     inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+" 
+"     " Here is an example for expanding snippet in the popup menu with <Enter>
+"     " key. Suppose you use the <C-U> key for expanding snippet.
+"     imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+"     imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+" 
+"     " Use <TAB> to select the popup menu:
+"     inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+"     inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+" 
+"     Plug 'roxma/ncm-clang'
+"     Plug 'roxma/ncm-flow'
+"     Plug 'roxma/ncm-elm-oracle'
+"     Plug 'roxma/ncm-rct-complete'
+"     Plug 'roxma/ncm-phpactor'
+"     Plug 'roxma/ncm-github'
+"     Plug 'calebeby/ncm-css'
+"     Plug 'katsika/ncm-lbdb'
+"     Plug 'fgrsnau/ncm-otherbuf'
+"     Plug 'gaalcaras/ncm-R'
+"     Plug 'othree/csscomplete.vim'
+"     Plug 'Shougo/neco-vim'
+"     Plug 'Shougo/neco-syntax'
+"     Plug 'Shougo/neoinclude.vim'
+" endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
@@ -283,10 +444,10 @@ let g:ansible_options = {'ignore_blank_lines': 0}
 let g:ansible_options = {'documentation_mapping': '<C-K>'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Gundo, the holy grail in undos
+" Gundo/Mundo, the holy grail in undos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'dsummersl/gundo.vim'
-nnoremap U :silent GundoToggle<CR>
+Plug 'simnalamburt/vim-mundo'
+nnoremap U :silent MundoToggle<CR>
 let g:gundo_verbose_graph=0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -338,10 +499,9 @@ command! -nargs=1 Silent
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
 if has("clipboard")
   set clipboard=unnamed " copy to the system clipboardA
-  set mouse=n
+  set mouse= 
 
   if has("unnamedplus") " X11 support
     set clipboard+=unnamedplus
@@ -392,14 +552,14 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 " Syntastic, uber awesome syntax and errors highlighter
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 
-" Replaced with ALE for now
+" ALE is writing too much, so lets try neomake again
 " if has("nvim")
+"     Plug 'neomake/neomake'
+" 
 "     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
 "     " E501 is line length of 80 characters
 "     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
 "     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
-" 
-"     Plug 'neomake/neomake'
 " endif
 
 
@@ -408,8 +568,15 @@ let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 if has("nvim")
     Plug 'w0rp/ale'
 
+    " constantly writing means constant asking whether I want to save...
+    " annoying AF
+    let g:ale_lint_on_text_changed = 'never'
+
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
+    " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
+    " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
+    " pip3 install -U mypy
     let g:ale_linters = {
     \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
     \}
@@ -430,6 +597,38 @@ if has("nvim")
     " " shouldn't do Python for us
     " let g:syntastic_python_checkers = []
 endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Virtualenv support
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" in your plugin list (assuming you use vim-plug):
+if python_version >= 205
+    " Uses with_statement so python 2.5 or higher
+    " Plug 'jmcantrell/vim-virtualenv'
+    "
+    " WARNING: jedi currently has a bug that the dominant system python
+    " decides the Python path so symlink venv/lib/python3.x to
+    " venv/lib/python3.4 (or whatever your system python is)
+
+    python << EOF
+import os
+import sys
+import glob
+
+venv = os.getenv('VIRTUAL_ENV')
+if venv:
+    paths = glob.glob(os.path.join(venv, 'lib', 'python*', 'site-packages'))
+
+    for path in paths:
+        sys.path.insert(0, path)
+
+    vim.command('let g:deoplete#sources#jedi#extra_path="%s"' % paths[0])
+EOF
+
+endif
+
+" in your plugin constants configuration section
+" let g:virtualenv_auto_activate = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode
@@ -556,10 +755,9 @@ Plug 'vim-scripts/xorium.vim'
 call plug#end()
 
 if iCanHazPlug == 0
-    PlugUpdate
-    if has('nvim')
-        UpdateRemotePlugins
-    endif
+    PlugInstall
+
+    " call neomake#configure#automake('nw')
 endif
 
 
@@ -593,11 +791,12 @@ set exrc
 set secure
 " Lower the timeout for mappings, they are annoyingly slow otherwise
 set timeout timeoutlen=5000 ttimeoutlen=50
-" Write all files on `make`
-set autowrite
-set autowriteall
+" Write all files on `make` disabled because it causes automatic writes when
+" backgrounding neovim
+" set autowrite
+" set autowriteall
 
-au FocusLost * silent! wa
+" au FocusLost * silent! wa
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Files/Backups
@@ -668,7 +867,7 @@ set whichwrap+=<,>,h,l
 set mouse=h
 
 " shortens messages to avoid 'press a key' prompt 
-set shortmess=atI 
+set shortmess=atIF 
 " tell us when anything is changed via :...
 set report=0 
 " don't make noise
@@ -787,6 +986,8 @@ set foldopen-=search
 " don't open folds when you undo stuff
 set foldopen-=undo 
 
+nmap < :foldclose<cr>
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " CTags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -852,11 +1053,11 @@ nnoremap Q <nop>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Map filetypes to get proper highlighting
 augroup filetypedetect
-    au BufNewFile,BufRead /usr/local/etc/apache22/* setf apache
-    au BufNewFile,BufRead /etc/supervisor/* setf supervisor
-    au BufNewFile,BufRead /usr/local/etc/nginx/* setf nginx
-    au BufNewFile,BufRead /etc/logstash/* setf logstash
-    au BufNewFile,BufRead */templates/*.html setf jinja
+    au BufNewFile,BufRead */apache/* setf apache
+    au BufNewFile,BufRead */supervisor/* setf supervisor
+    au BufNewFile,BufRead */nginx/* setf nginx
+    au BufNewFile,BufRead */logstash/* setf logstash
+    au BufNewFile,BufRead *.html setf jinja
     au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
 augroup END
@@ -983,7 +1184,9 @@ function! s:CloseHiddenBuffers()
 endfunction
 
 " auto-reload vimrc on save
-augroup myvimrc
-    au!
-    au BufWritePost .vimrc,_vimrc,vimrc,.gvimrc,_gvimrc,gvimrc so $MYVIMRC | if has('gui_running') | so $MYGVIMRC | endif
-augroup END
+if has ('autocmd') " Remain compatible with earlier versions
+ augroup vimrc     " Source vim configuration upon save
+    autocmd! BufWritePost ~/.vimrc source % | redraw
+    autocmd! BufWritePost ~/.gvimrc if has('gui_running') | source % | endif | redraw
+  augroup END
+endif " has autocmd
