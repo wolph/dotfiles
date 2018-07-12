@@ -34,17 +34,20 @@ _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 # Anaconda breaks virtualenvwrapper
 # _append_to_path ~/anaconda3/bin
 
+export PYENV_ROOT="$HOME/.pyenv"
+
 _insert_to_path
 _insert_to_path /usr/local/sbin
 _insert_to_path ~/bin
 _insert_to_path $HOME/.rvm/bin
 _insert_to_path $HOME/go/bin
+_insert_to_path /usr/local/opt/python@2/bin
 _insert_to_path /usr/local/bin
 _insert_to_path /usr/lib/ccache/
 _insert_to_path "$PYENV_ROOT/bin"
+_insert_to_path /usr/local/opt/coreutils/libexec/gnubin
 _insert_to_path /usr/local/opt/ccache/libexec
 
-export PYENV_ROOT="$HOME/.pyenv"
 export PATH
 
 export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2

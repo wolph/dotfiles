@@ -32,6 +32,7 @@ newrelic.ini
 htmlcov
 .cache
 docs/_build/
+__pycache__
 
 .ropeproject
 .idea
@@ -40,5 +41,6 @@ docs/_build/
 /tags
 /.tags
 /.vs/
+/.venv/
 
 zwcfg*.xml*
