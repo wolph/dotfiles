@@ -163,7 +163,7 @@ alias mv='nocorrect mv'       # no spelling correction on mv
 alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
 alias less='/usr/bin/less -R'
-if [[ "$OSTYPE" =~ '^darwin' ]]; then
+if [[ "$OSTYPE" =~ '^(darwin|freebsd)' ]]; then
     export LS_OPTIONS=''
     alias vlc='open -a vlc'
 else
@@ -203,10 +203,13 @@ alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 # Little trick to change the name of the shell
 # . ${ROOT_DIR}bin/iterm2_helpers
 
-function title(){
-    echo -ne "\033]0;$1\007"
-    printf "\033k$1\033\\"
-}
+# moved to bin/title
+# function title(){
+#     if [ "$1" != "default" ]; then
+#         echo -ne "\033]0;$1\007"
+#         printf "\033k$1\033\\"
+#     fi
+# }
 
 function mosh(){
     if [ -n "$1" ]; then
@@ -573,8 +576,6 @@ zstyle ':completion:*' menu select=5
 # No shared history between tabs
 unsetopt sharehistory
 
-test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
-
 if [ 1 -eq "$DEBUG" ]; then
     # turn off tracing
     unsetopt xtrace
@@ -634,3 +635,6 @@ if [ -f ~/.fzf.zsh ]; then
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
 fi
+
+test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
+test -f "${ROOT_DIR}.zshrc.local" && source "${ROOT_DIR}.zshrc.local"

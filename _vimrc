@@ -154,6 +154,15 @@ if has("nvim") && has("macunix")
     set nofsync
 endif
 
+if has("nvim")
+    Plug 'kassio/neoterm'
+    tnoremap <C-w><C-w> <C-\><C-n><C-w><C-w>
+    tnoremap <C-w>h <C-\><C-n><C-w>h
+    tnoremap <C-w>j <C-\><C-n><C-w>j
+    tnoremap <C-w>k <C-\><C-n><C-w>k
+    tnoremap <C-w>l <C-\><C-n><C-w>l
+endif
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Split one-liners or join multi-line statements
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -188,24 +197,24 @@ let g:mirror#diff_layout = 'vsplit'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Easier way to move around in Vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'haya14busa/incsearch.vim'
-Plug 'haya14busa/incsearch-easymotion.vim'
-Plug 'easymotion/vim-easymotion'
-" Note: leader is \ by default
-map <Leader>l <Plug>(easymotion-lineforward)
-map <Leader>j <Plug>(easymotion-j)
-map <Leader>k <Plug>(easymotion-k)
-map <Leader>h <Plug>(easymotion-linebackward)
-
-let g:incsearch#auto_nohlsearch = 1
-nmap /  <Plug>(incsearch-stay)
-nmap ?  <Plug>(incsearch-backwards)
-map n  <Plug>(incsearch-nohl-n)
-map N  <Plug>(incsearch-nohl-N)
-map *  <Plug>(incsearch-nohl-*)
-map #  <Plug>(incsearch-nohl-#)
-map g* <Plug>(incsearch-nohl-g*)
-map g# <Plug>(incsearch-nohl-g#)
+" Plug 'haya14busa/incsearch.vim'
+" Plug 'haya14busa/incsearch-easymotion.vim'
+" Plug 'easymotion/vim-easymotion'
+" " Note: leader is \ by default
+" map <Leader>l <Plug>(easymotion-lineforward)
+" map <Leader>j <Plug>(easymotion-j)
+" map <Leader>k <Plug>(easymotion-k)
+" map <Leader>h <Plug>(easymotion-linebackward)
+" 
+" let g:incsearch#auto_nohlsearch = 1
+" nmap /  <Plug>(incsearch-stay)
+" nmap ?  <Plug>(incsearch-backwards)
+" map n  <Plug>(incsearch-nohl-n)
+" map N  <Plug>(incsearch-nohl-N)
+" map *  <Plug>(incsearch-nohl-*)
+" map #  <Plug>(incsearch-nohl-#)
+" map g* <Plug>(incsearch-nohl-g*)
+" map g# <Plug>(incsearch-nohl-g#)
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " arduino support
