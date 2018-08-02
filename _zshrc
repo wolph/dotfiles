@@ -451,25 +451,46 @@ bashcompinit
 autoload -Uz compinit
 compinit
 
+
+# Group matches and describe.
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*:matches' group 'yes'
+zstyle ':completion:*:options' description 'yes'
+zstyle ':completion:*:options' auto-description '%d'
+zstyle ':completion:*:corrections' format ' %F{green}-- %d (errors: %e) --%f'
+zstyle ':completion:*:descriptions' format ' %F{yellow}-- %d --%f'
+zstyle ':completion:*:messages' format ' %F{purple} -- %d --%f'
+zstyle ':completion:*:warnings' format ' %F{red}-- no matches found --%f'
+zstyle ':completion:*:default' list-prompt '%S%M matches%s'
+zstyle ':completion:*' format ' %F{yellow}-- %d --%f'
+zstyle ':completion:*' group-name ''
+zstyle ':completion:*' verbose yes
+
+# Expansion options
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
-zstyle ':completion:*' max-errors 2
-# zstyle :compinstall filename '~/.zshrc'
+zstyle ':completion::prefix-1:*' completer _complete
+zstyle ':completion:incremental:*' completer _complete _correct
+zstyle ':completion:predict:*' completer _complete
+zstyle ':completion:*:match:*' original only
+zstyle ':completion:*:approximate:*' max-errors 1 numeric
+
+# Increase the number of errors based on the length of the typed word.
+zstyle -e ':completion:*:approximate:*' max-errors 'reply=($((($#PREFIX+$#SUFFIX)/3))numeric)'
+
+# Don't complete unavailable commands.
+zstyle ':completion:*:functions' ignored-patterns '(_*|pre(cmd|exec))'
+
+# Array completion element sorting.
+zstyle ':completion:*:*:-subscript-:*' tag-order indexes parameters
 
 zstyle ':completion:*' group-name ''
 zstyle ':completion:*:complete:mpv:*' tag-order '!urls'
 zstyle ':completion:*:complete:mplayer:*' tag-order '!urls'
 zstyle ':completion:*:complete:vlc:*' tag-order '!urls'
 
-
 zstyle ':completion:*:ssh:*' hosts $hosts
 zstyle ':completion:*:slogin:*' hosts $hosts
-
-# Expansion options
-zstyle ':completion:*' completer _complete _prefix
-zstyle ':completion::prefix-1:*' completer _complete
-zstyle ':completion:incremental:*' completer _complete _correct
-zstyle ':completion:predict:*' completer _complete
 
 # Completion caching
 zstyle ':completion::complete:*' use-cache 1
@@ -477,7 +498,19 @@ zstyle ':completion::complete:*' cache-path ~/.zsh/cache/$HOST
 
 # Expand partial paths
 zstyle ':completion:*' expand 'yes'
-zstyle ':completion:*' squeeze-slashes 'yes'
+
+# Directories
+zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+zstyle ':completion:*:*:cd:*' tag-order local-directories directory-stack path-directories
+zstyle ':completion:*:*:cd:*:directory-stack' menu yes select
+zstyle ':completion:*:-tilde-:*' group-order 'named-directories' 'path-directories' 'users' 'expand'
+zstyle ':completion:*' squeeze-slashes true
+
+# History
+zstyle ':completion:*:history-words' stop yes
+zstyle ':completion:*:history-words' remove-all-dups yes
+zstyle ':completion:*:history-words' list false
+zstyle ':completion:*:history-words' menu yes
 
 # Include non-hidden directories in globbed file completions
 # for certain commands
@@ -549,11 +582,6 @@ if [ 1 -eq "$DEBUG" ]; then
     # restore stderr to the value saved in FD 3
     exec 2>&3 3>&-
 fi
-
-autoload bashcompinit
-bashcompinit
-autoload -Uz compinit
-compinit
 
 if [ -d ~/.zsh/plugins/ ]; then
     for f in ~/.zsh/plugins/*; do
