@@ -148,6 +148,12 @@ Plug 'ap/vim-css-color'
 Plug 'junegunn/vim-peekaboo'
 Plug 'powerman/vim-plugin-AnsiEsc'
 
+if has("nvim") && has("macunix")
+    " due to bug in neovim, disable fsync for now...
+    " https://github.com/neovim/neovim/issues/6725
+    set nofsync
+endif
+
 if has("nvim")
     Plug 'kassio/neoterm'
     tnoremap <C-w><C-w> <C-\><C-n><C-w><C-w>
