@@ -151,8 +151,13 @@ zstyle :compinstall filename '~/.zshrc'
 #     sudo ${ROOT_DIR}bin/start_supervisord
 # fi
 
+
+SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
+# Add ssh keys
+command_exists ssh-add && ssh-add -A -K $SSH_KEYS
+
 # Enable keychain
-command -v keychain >/dev/null 2>&1 && eval $(keychain --ignore-missing -Q -q --eval ~/.ssh/id_dsa ~/.ssh/id_rsa )
+command_exists keychain && eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
 
 # Some convenient aliases
 # Enable spellcheck/autocorrect?
