@@ -154,7 +154,11 @@ zstyle :compinstall filename '~/.zshrc'
 
 SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
 # Add ssh keys
-command_exists ssh-add && ssh-add -A -K $SSH_KEYS
+if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
+	command_exists ssh-add && ssh-add -A -K $SSH_KEYS
+else
+	command_exists ssh-add && ssh-add $SSH_KEYS
+fi
 
 # Enable keychain
 command_exists keychain && eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
@@ -171,6 +175,7 @@ alias less='/usr/bin/less -R'
 if [[ "$OSTYPE" =~ '^(darwin|freebsd)' ]]; then
     export LS_OPTIONS=''
     alias vlc='open -a vlc'
+
 else
     export LS_OPTIONS='--color=auto'
 fi
