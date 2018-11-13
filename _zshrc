@@ -153,15 +153,21 @@ zstyle :compinstall filename '~/.zshrc'
 
 
 SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
-# Add ssh keys
-if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
-	command_exists ssh-add && ssh-add -A -K $SSH_KEYS
-else
-	command_exists ssh-add && ssh-add $SSH_KEYS
-fi
 
-# Enable keychain
-command_exists keychain && eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
+# Enable keychain or ssh-add
+if command_exists keychain; then
+    eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
+elif command_exists ssh-add; then
+    if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
+	    alias ssh-add='ssh-add -A -K'
+	fi
+
+    for key in $SSH_KEYS; do
+        if [ -f "$key" ]; then
+            ssh-add $key
+        fi
+    done
+fi
 
 # Some convenient aliases
 # Enable spellcheck/autocorrect?
