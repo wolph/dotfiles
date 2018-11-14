@@ -169,7 +169,7 @@ alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
 alias less='/usr/bin/less -R'
 if [[ "$OSTYPE" =~ '^(darwin|freebsd)' ]]; then
-    export LS_OPTIONS=''
+    export LS_OPTIONS='--color'
     alias vlc='open -a vlc'
 else
     export LS_OPTIONS='--color=auto'
