@@ -460,7 +460,6 @@ let g:ansible_options = {'documentation_mapping': '<C-K>'}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plug 'simnalamburt/vim-mundo'
 nnoremap U :silent MundoToggle<CR>
-let g:gundo_verbose_graph=0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Snippets
