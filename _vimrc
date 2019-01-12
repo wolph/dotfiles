@@ -71,10 +71,9 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check python version if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let python_version=0
 if has("python")
     python import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
-else
-    let python_version=0
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
