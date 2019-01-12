@@ -1,0 +1,22 @@
+#compdef tmx rtmx tmate
+
+local active_sessions all_sessions
+
+_active_sessions() {
+    if [ -n "$(tmux ls 2>/dev/null)" ]; then
+        active_sessions=($(tmux ls | awk -F ':' '{print $1}' | tr '\n' ' '))
+    fi
+}
+
+_all_sessions() {
+    [ -d ~/workspace ] && all_sessions=($(ls -1 ~/workspace | sed -e 's/\.sparseimage.*//' | grep -v '\.' | grep -iE '[a-z0-9]*'))
+}
+
+_active_sessions
+_wanted active_sessions expl 'Active sessions' compadd -a active_sessions
+
+_all_sessions
+_wanted all_sessions expl 'All sessions' compadd -a all_sessions
+
+_wanted all_sessions expl 'Hosts' compadd -a hosts
+
