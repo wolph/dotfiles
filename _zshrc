@@ -652,6 +652,9 @@ if [ -f ~/.fzf.zsh ]; then
         export FZF_DEFAULT_COMMAND='ag --follow -g "" . site-packages '
     fi
     export FZF_DEFAULT_OPTS='--no-mouse'
+elif [ -f /usr/local/share/examples/fzf/shell/completion.zsh ]; then
+    echo "source /usr/local/share/examples/fzf/shell/completion.zsh" > ~/.fzf.zsh
+    echo "source /usr/local/share/examples/fzf/shell/key-bindings.zsh" >> ~/.fzf.zsh
 fi
 
 test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
