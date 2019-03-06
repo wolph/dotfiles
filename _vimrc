@@ -152,6 +152,8 @@ Plug 'ap/vim-css-color'
 Plug 'junegunn/vim-peekaboo'
 Plug 'powerman/vim-plugin-AnsiEsc'
 
+Plug 'leafgarland/typescript-vim'
+
 if has("nvim") && has("macunix")
     " due to bug in neovim, disable fsync for now...
     " https://github.com/neovim/neovim/issues/6725
