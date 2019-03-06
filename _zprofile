@@ -34,6 +34,8 @@ _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 # Anaconda breaks virtualenvwrapper
 # _append_to_path ~/anaconda3/bin
 
+_append_to_path /Applications/Postgres.app/Contents/Versions/latest/bin
+
 export PYENV_ROOT="$HOME/.pyenv"
 
 _insert_to_path
