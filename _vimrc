@@ -56,6 +56,7 @@ if has("nvim")
     else
         echom "WARNING: no valid python2 install found"
     endif
+    " echom "Using python 2 prog: " . g:python_host_prog
 
     if filereadable(expand('~/envs/neovim3/bin/python'))
         let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
@@ -66,6 +67,7 @@ if has("nvim")
     else
         echom "WARNING: no valid python3 install found"
     endif
+    " echom "Using python 3 prog: " . g:python3_host_prog
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
