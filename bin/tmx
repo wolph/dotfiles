@@ -50,7 +50,7 @@ base_session="$1"
 
 test -n "$ITERM_PROFILE" && echo -ne "\e]1;$base_session\a"
 # Set terminal name
-title "$1"
+~/bin/title "$1"
 
 # This actually works without the trim() on all systems except OSX
 tmux_nb=$(trim `echo "$sessions" | grep "^$base_session:" | wc -l`)
