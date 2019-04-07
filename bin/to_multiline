@@ -27,7 +27,7 @@ for original_line in sys.stdin:
             i -= 1
             token = tokens[i]
 
-            for start_brace, end_brace in BRACES.iteritems():
+            for start_brace, end_brace in BRACES.items():
                 if token.count(start_brace) != token.count(end_brace):
                     tokens[i - 1] += token
                     break
@@ -39,9 +39,9 @@ for original_line in sys.stdin:
 
         lines.append(indenting + ')')
 
-        print '\n'.join(lines)
+        print('\n'.join(lines))
 
-    except Exception, e:
-        print original_line,
+    except Exception as e:
+        print(original_line, end=' ')
 
 

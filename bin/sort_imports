@@ -2,7 +2,7 @@
 import re
 import sys
 
-IMPORT_RE = re.compile('^(from (?P<module>[^\s]+) )?import (?P<imports>.*)$')
+IMPORT_RE = re.compile(r'^(from (?P<module>[^\s]+) )?import (?P<imports>.*)$')
 
 imports = []
 
@@ -26,7 +26,7 @@ for import_ in imports:
     modules[module] |= set(map(str.strip, imports))
 
 cleaned_modules = {}
-for module, imports in modules.iteritems():
+for module, imports in modules.items():
     for import_ in imports:
         try:
             name, alias = import_.split(' as ')
@@ -50,7 +50,7 @@ for module, imports in modules.iteritems():
         else:
             cleaned_modules[new_module].add(new_name)
 
-cleaned_modules = sorted(cleaned_modules.iteritems())
+cleaned_modules = sorted(cleaned_modules.items())
 
 for module, imports in cleaned_modules:
     if module:
@@ -58,7 +58,7 @@ for module, imports in cleaned_modules:
         chars = len(out)
     else:
         for import_ in sorted(imports):
-            print 'import %s' % import_
+            print('import %s' % import_)
         continue
 
     for import_ in sorted(imports):
@@ -66,7 +66,7 @@ for module, imports in cleaned_modules:
             tmp = ' %s' % word
             if chars + len(tmp) >= 78:
                 out += ' \\'
-                print out
+                print(out)
                 out = '    %s' % word
                 chars = len(out)
             else:
@@ -74,7 +74,7 @@ for module, imports in cleaned_modules:
                 chars += len(tmp)
         out += ','
         chars += 1
-    print out.rstrip('//').rstrip().rstrip(',')
+    print(out.rstrip('//').rstrip().rstrip(','))
     out = ''
     chars = 0
 
