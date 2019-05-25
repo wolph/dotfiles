@@ -257,7 +257,7 @@ function autossh(){
         title "$1"
     fi
     monitor_port=$((RANDOM % (65000 - 20000) + 20000))
-    exec /usr/local/bin/autossh -o ControlMaster=no -o ControlPath=/dev/null -M $monitor_port $*
+    exec /usr/local/bin/autossh -o ControlMaster=no -M $monitor_port $*
     title ""
 }
 
