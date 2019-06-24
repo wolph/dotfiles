@@ -56,6 +56,7 @@ if has("nvim")
     else
         echom "WARNING: no valid python2 install found"
     endif
+    " echom "Using python 2 prog: " . g:python_host_prog
 
     if filereadable(expand('~/envs/neovim3/bin/python'))
         let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
@@ -66,15 +67,15 @@ if has("nvim")
     else
         echom "WARNING: no valid python3 install found"
     endif
+    " echom "Using python 3 prog: " . g:python3_host_prog
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check python version if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let python_version=0
 if has("python")
     python import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
-else
-    let python_version=0
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -152,6 +153,8 @@ let g:used_javascript_libs = 'jquery'
 Plug 'ap/vim-css-color'
 Plug 'junegunn/vim-peekaboo'
 Plug 'powerman/vim-plugin-AnsiEsc'
+
+Plug 'leafgarland/typescript-vim'
 
 if has("nvim") && has("macunix")
     " due to bug in neovim, disable fsync for now...
