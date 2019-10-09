@@ -221,7 +221,6 @@ function ssh(){
     if [[ "$@" =~ "BatchMode" ]]; then
         /usr/bin/ssh $*
     else
-	printf "\033k$1\033\\"
         if [ -n "$1" ]; then
             title "$*"
         fi
