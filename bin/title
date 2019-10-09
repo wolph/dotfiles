@@ -1,0 +1,5 @@
+#!/usr/bin/env zsh
+if [ "$1" != "default" ]; then
+    echo -ne "\033]0;$1\007"
+    printf "\033k$1\033\\"
+fi
