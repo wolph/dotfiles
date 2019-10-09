@@ -1,0 +1,80 @@
+#!/usr/bin/env python
+import re
+import sys
+
+IMPORT_RE = re.compile(r'^(from (?P<module>[^\s]+) )?import (?P<imports>.*)$')
+
+imports = []
+
+for line in sys.stdin:
+    line = line.strip().rstrip('\\')
+    if line.startswith('import ') or line.startswith('from '):
+        imports.append(line)
+    else:
+        imports[-1] += line
+
+imports.sort(key=lambda x: (x.split()[1], x))
+
+modules = {}
+for import_ in imports:
+    match = IMPORT_RE.match(import_)
+    module = match.group('module')
+    if module not in modules:
+        modules[module] = set()
+
+    imports = match.group('imports').split(',')
+    modules[module] |= set(map(str.strip, imports))
+
+cleaned_modules = {}
+for module, imports in modules.items():
+    for import_ in imports:
+        try:
+            name, alias = import_.split(' as ')
+            try:
+                new_module, new_name = name.rsplit('.', 1)
+                if module:
+                    new_module = module + '.' + new_module
+            except ValueError:
+                new_module = module
+                new_name = name
+
+            if new_name != alias:
+                new_name = '%s as %s' % (new_name, alias)
+
+        except ValueError:
+            new_module = module
+            new_name = import_
+
+        if new_module not in cleaned_modules:
+            cleaned_modules[new_module] = set([new_name])
+        else:
+            cleaned_modules[new_module].add(new_name)
+
+cleaned_modules = sorted(cleaned_modules.items())
+
+for module, imports in cleaned_modules:
+    if module:
+        out = 'from %s import' % module
+        chars = len(out)
+    else:
+        for import_ in sorted(imports):
+            print('import %s' % import_)
+        continue
+
+    for import_ in sorted(imports):
+        for word in import_.split():
+            tmp = ' %s' % word
+            if chars + len(tmp) >= 78:
+                out += ' \\'
+                print(out)
+                out = '    %s' % word
+                chars = len(out)
+            else:
+                out += tmp
+                chars += len(tmp)
+        out += ','
+        chars += 1
+    print(out.rstrip('//').rstrip().rstrip(','))
+    out = ''
+    chars = 0
+

@@ -36,7 +36,12 @@ if has("win32")
     source .vim\autoload\plug.vim
 endif
 
-let g:plug_threads=64
+" The Raspberry PI has very little memory
+if system("uname -m") == "armv7l\n"
+    let g:plug_threads=4
+else
+    let g:plug_threads=64
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Make sure neovim doesn't use the virtualenv
@@ -51,6 +56,7 @@ if has("nvim")
     else
         echom "WARNING: no valid python2 install found"
     endif
+    " echom "Using python 2 prog: " . g:python_host_prog
 
     if filereadable(expand('~/envs/neovim3/bin/python'))
         let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
@@ -61,15 +67,15 @@ if has("nvim")
     else
         echom "WARNING: no valid python3 install found"
     endif
+    " echom "Using python 3 prog: " . g:python3_host_prog
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Check python version if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+let python_version=0
 if has("python")
     python import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
-else
-    let python_version=0
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -153,6 +159,14 @@ let g:used_javascript_libs = 'jquery'
 Plug 'ap/vim-css-color'
 Plug 'junegunn/vim-peekaboo'
 Plug 'powerman/vim-plugin-AnsiEsc'
+
+Plug 'leafgarland/typescript-vim'
+
+if has("nvim") && has("macunix")
+    " due to bug in neovim, disable fsync for now...
+    " https://github.com/neovim/neovim/issues/6725
+    set nofsync
+endif
 
 if has("nvim")
     Plug 'kassio/neoterm'
@@ -346,10 +360,10 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enhanced diffs
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("nvim") || exists("*systemlist")
-    Plug 'chrisbra/vim-diff-enhanced'
-    let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
-endif
+" if has("nvim") || exists("*systemlist")
+"     Plug 'chrisbra/vim-diff-enhanced'
+"     let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
+" endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " YouCompleteMe
@@ -362,7 +376,7 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete autocompleter 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("nvim")
+if has("nvim") && exists("v:t_list")
     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
     Plug 'zchee/deoplete-jedi'
     let g:jedi#completions_enabled = 0
@@ -405,42 +419,43 @@ endif
 " Neovim completion manager
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " if has("nvim")
-"     Plug 'roxma/nvim-completion-manager'
-"     Plug 'roxma/python-support.nvim'
-" 
-"     " don't give |ins-completion-menu| messages.  For example,
-"     " '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
-"     set shortmess+=c
-" 
-"     " When the <Enter> key is pressed while the popup menu is visible, it only
-"     " hides the menu. Use this mapping to hide the menu and also start a new
-"     " line.
-"     inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-" 
-"     " Here is an example for expanding snippet in the popup menu with <Enter>
-"     " key. Suppose you use the <C-U> key for expanding snippet.
-"     imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-"     imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
-" 
-"     " Use <TAB> to select the popup menu:
-"     inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-"     inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-" 
-"     Plug 'roxma/ncm-clang'
-"     Plug 'roxma/ncm-flow'
-"     Plug 'roxma/ncm-elm-oracle'
-"     Plug 'roxma/ncm-rct-complete'
-"     Plug 'roxma/ncm-phpactor'
-"     Plug 'roxma/ncm-github'
-"     Plug 'calebeby/ncm-css'
-"     Plug 'katsika/ncm-lbdb'
-"     Plug 'fgrsnau/ncm-otherbuf'
-"     Plug 'gaalcaras/ncm-R'
-"     Plug 'othree/csscomplete.vim'
-"     Plug 'Shougo/neco-vim'
-"     Plug 'Shougo/neco-syntax'
-"     Plug 'Shougo/neoinclude.vim'
-" endif
+if has("nvim") && !exists("v:t_list")
+    Plug 'roxma/nvim-completion-manager'
+    Plug 'roxma/python-support.nvim'
+
+    " don't give |ins-completion-menu| messages.  For example,
+    " '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
+    set shortmess+=c
+
+    " When the <Enter> key is pressed while the popup menu is visible, it only
+    " hides the menu. Use this mapping to hide the menu and also start a new
+    " line.
+    inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
+
+    " Here is an example for expanding snippet in the popup menu with <Enter>
+    " key. Suppose you use the <C-U> key for expanding snippet.
+    imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
+    imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
+
+    " Use <TAB> to select the popup menu:
+    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
+    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
+
+    Plug 'roxma/ncm-clang'
+    Plug 'roxma/ncm-flow'
+    Plug 'roxma/ncm-elm-oracle'
+    Plug 'roxma/ncm-rct-complete'
+    Plug 'roxma/ncm-phpactor'
+    Plug 'roxma/ncm-github'
+    Plug 'calebeby/ncm-css'
+    Plug 'katsika/ncm-lbdb'
+    Plug 'fgrsnau/ncm-otherbuf'
+    Plug 'gaalcaras/ncm-R'
+    Plug 'othree/csscomplete.vim'
+    Plug 'Shougo/neco-vim'
+    Plug 'Shougo/neco-syntax'
+    Plug 'Shougo/neoinclude.vim'
+endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
@@ -454,7 +469,6 @@ let g:ansible_options = {'documentation_mapping': '<C-K>'}
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plug 'simnalamburt/vim-mundo'
 nnoremap U :silent MundoToggle<CR>
-let g:gundo_verbose_graph=0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Snippets
@@ -1069,6 +1083,7 @@ augroup filetypedetect
 augroup END
 
 autocmd Filetype python setlocal suffixesadd=.py
+autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Colors 
