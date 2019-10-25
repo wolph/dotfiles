@@ -1,0 +1,22 @@
+#!/usr/bin/env zsh
+
+title $@
+export AUTOSSH_PORT=$(awk 'BEGIN { srand(); do r = rand()*32000; while ( r < 20000 ); printf("%d\n",r)  }' < /dev/null)
+
+if [ $# -eq 0 ]; then
+    echo "Usage: $0 [hostname] session-name"
+elif [ $# -eq 1 ]; then
+    if [[ "$@" =~ '\.' ]]; then
+        hostname="$1"
+        session='default'
+    else
+        session="$1"
+        hostname="192.168.0.26"
+    fi
+else
+    hostname="$1"
+    shift
+    session="$@"
+fi
+
+/usr/local/bin/autossh -o ControlMaster=no "$hostname" -t "~/bin/tmx $session"
