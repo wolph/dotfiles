@@ -87,13 +87,13 @@
 	process = git-lfs filter-process
 [http]
 	postBuffer = 524288000
-
-[url "http://github.com/"]
-  insteadOf = "gh:"
-  insteadOf = "gh://"
-
-[url "git@github.com:WoLpH"]
-    pushInsteadOf = git@github.com:wolph
+# 
+# [url "http://github.com/"]
+#   insteadOf = "gh:"
+#   insteadOf = "gh://"
+# 
+# [url "git@github.com:WoLpH"]
+#     pushInsteadOf = git@github.com:wolph
 
 # [url "git@github.com:"]
 #     pushInsteadOf = "https://github.com/"
@@ -144,3 +144,5 @@
 	interactive = false
 [git-up "push"]
 	auto = true
+[commit]
+	gpgsign = true
