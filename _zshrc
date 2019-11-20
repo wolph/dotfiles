@@ -162,13 +162,13 @@ SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
 if command_exists keychain; then
     eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
 elif command_exists ssh-add; then
-    if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
-	    alias ssh-add='ssh-add -A -K'
-	fi
-
     for key in $SSH_KEYS; do
         if [ -f "$key" ]; then
-            ssh-add $key
+            if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
+	            ssh-add -q -A -K $key
+	        else
+                ssh-add -q $key
+	        fi
         fi
     done
 fi
@@ -683,5 +683,6 @@ if [ 1 -eq "$DEBUG" ]; then
     zprof
 fi
 
-
+# only works with aggressive resize disabled
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
