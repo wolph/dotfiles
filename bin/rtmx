@@ -3,6 +3,8 @@
 title $@
 export AUTOSSH_PORT=$(awk 'BEGIN { srand(); do r = rand()*32000; while ( r < 20000 ); printf("%d\n",r)  }' < /dev/null)
 
+# TODO: perhaps switch to Eternal Terminal? https://eternalterminal.dev/
+
 if [ $# -eq 0 ]; then
     echo "Usage: $0 [hostname] session-name"
 elif [ $# -eq 1 ]; then
