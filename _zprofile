@@ -50,6 +50,7 @@ _insert_to_path $HOME/.config/yarn/global/node_modules/.bin
 _insert_to_path $HOME/.yarn/bin
 _insert_to_path /usr/local/bin
 _insert_to_path /usr/lib/ccache/
+_insert_to_path /usr/local/opt/ccache/libexec
 _insert_to_path "$PYENV_ROOT/bin"
 _insert_to_path /usr/local/opt/coreutils/libexec/gnubin
 _insert_to_path /usr/local/opt/ccache/libexec
