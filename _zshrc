@@ -22,19 +22,6 @@ if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TM
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
 fi
 
-#DEBUG=1
-if [ 1 -eq "$DEBUG" ]; then
-    # set the trace prompt to include seconds, nanoseconds, script name and
-    # line number
-    PS4='+$(gdate "+%s:%N") %N:%i> '
-    # save file stderr to file descriptor 3 and redirect stderr (including
-    # trace output) to a file with the script's PID as an extension
-    exec 3>&2 2>/tmp/startlog.$$
-    # set options to turn on tracing and expansion of commands contained in
-    # the prompt
-    setopt xtrace prompt_subst
-fi
-
 function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
@@ -48,6 +35,23 @@ fi
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
     alias gdate=date
+fi
+
+DEBUG=0
+if [ 1 -eq "$DEBUG" ]; then
+    zmodload zsh/zprof
+    # set the trace prompt to include seconds, nanoseconds, script name and
+    # line number
+    zmodload zsh/datetime
+    PS4='+$EPOCHREALTIME %N:%i> '
+    # save file stderr to file descriptor 3 and redirect stderr (including
+    # trace output) to a file with the script's PID as an extension
+    logfile=/tmp/startlog.$$
+    echo "Logging to $logfile"
+    exec 3>&2 2>$logfile
+    # set options to turn on tracing and expansion of commands contained in
+    # the prompt
+    setopt xtrace prompt_subst
 fi
 
 # Tool to check the timing of the config file, handy for debugging
@@ -158,13 +162,13 @@ SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
 if command_exists keychain; then
     eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
 elif command_exists ssh-add; then
-    if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
-	    alias ssh-add='ssh-add -A -K'
-	fi
-
     for key in $SSH_KEYS; do
         if [ -f "$key" ]; then
-            ssh-add $key
+            if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
+	            ssh-add -q -A -K $key
+	        else
+                ssh-add -q $key
+	        fi
         fi
     done
 fi
@@ -182,7 +186,8 @@ alias less='/usr/bin/less -R'
 if [[ "$OSTYPE" =~ '^freebsd' ]]; then
     export LS_OPTIONS='-G'
 elif [[ "$OSTYPE" =~ '^darwin' ]]; then
-    export LS_OPTIONS='--color'
+    export LS_OPTIONS='-G'
+    # export LS_OPTIONS='--color'
     alias vlc='open -a vlc'
 else
     export LS_OPTIONS='--color=auto'
@@ -198,7 +203,7 @@ export GIT_MERGE_AUTOEDIT=no
 # Some people might not like this but I find it convenient. It makes find
 # search in symlinks by default
 # alias find='find -L'
-alias grep='grep --color=auto'
+alias grep='grep --color=auto --directories=skip'
 command_exists hub && alias git=hub
 
 # Link vim to the OS X clipboard
@@ -464,10 +469,26 @@ hosts=(
   localhost
 )
 
+_zpcompinit_custom() {
+  setopt extendedglob local_options
+  autoload -Uz compinit
+  local zcd=${ZDOTDIR:-$HOME}/.zcompdump
+  local zcdc="$zcd.zwc"
+  # Compile the completion dump to increase startup speed, if dump is newer or doesn't exist,
+  # in the background as this is doesn't affect the current session
+  # if [[ -f "$zcd"(#qN.m+1) ]]; then
+  #       compinit -i -d "$zcd"
+  #       { rm -f "$zcdc" && zcompile "$zcd" } &!
+  # else
+  #       compinit -C -d "$zcd"
+  #       { [[ ! -f "$zcdc" || "$zcd" -nt "$zcdc" ]] && rm -f "$zcdc" && zcompile "$zcd" } &!
+  # fi
+  compinit
+}
+
 autoload bashcompinit
 bashcompinit
-autoload -Uz compinit
-compinit
+_zpcompinit_custom
 
 
 # Group matches and describe.
@@ -594,12 +615,7 @@ zstyle ':completion:*' menu select=5
 # No shared history between tabs
 unsetopt sharehistory
 
-if [ 1 -eq "$DEBUG" ]; then
-    # turn off tracing
-    unsetopt xtrace
-    # restore stderr to the value saved in FD 3
-    exec 2>&3 3>&-
-fi
+[ -e /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 if [ -d ~/.zsh/plugins/ ]; then
     for f in ~/.zsh/plugins/*; do
@@ -607,9 +623,6 @@ if [ -d ~/.zsh/plugins/ ]; then
     done
 fi
 
-
-# added by travis gem
-[ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
 
 if [ -f ~/.fzf.zsh ]; then
     source ~/.fzf.zsh
@@ -659,3 +672,17 @@ fi
 
 test -f "${ROOT_DIR}.zshrc_local" && source "${ROOT_DIR}.zshrc_local"
 test -f "${ROOT_DIR}.zshrc.local" && source "${ROOT_DIR}.zshrc.local"
+
+export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
+
+if [ 1 -eq "$DEBUG" ]; then
+    # turn off tracing
+    unsetopt xtrace
+    # restore stderr to the value saved in FD 3
+    exec 2>&3 3>&-
+    zprof
+fi
+
+# only works with aggressive resize disabled
+export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"

@@ -1,0 +1,6 @@
+#!/usr/bin/env python2
+
+import sys
+import urllib
+
+sys.stdout.write(urllib.unquote(sys.stdin.read()))
