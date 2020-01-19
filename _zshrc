@@ -91,8 +91,6 @@ fpath=(/usr/local/share/zsh/site-functions/ $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 
-if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
-
 # # Antigen bundles
 # . ${ROOT_DIR}.antigen.zsh
 # antigen bundle WoLpH/zsh-completions src
@@ -186,8 +184,7 @@ alias less='/usr/bin/less -R'
 if [[ "$OSTYPE" =~ '^freebsd' ]]; then
     export LS_OPTIONS='-G'
 elif [[ "$OSTYPE" =~ '^darwin' ]]; then
-    export LS_OPTIONS='-G'
-    # export LS_OPTIONS='--color'
+    export LS_OPTIONS='--color'
     alias vlc='open -a vlc'
 else
     export LS_OPTIONS='--color=auto'
@@ -306,7 +303,7 @@ alias s='sudo -i zsh'
 
 _workon_if_possible(){
     if [ -e "$WORKON_HOME/$1" ] || [ -e "$WORKON_HOME/$1.sparseimage*" ]; then
-        echo "Working on $1"
+        echo "Working on ~/envs/$1"
         workon "$1"
         _virtualenv_tmux_name
         return true
@@ -327,6 +324,7 @@ _virtualenv_tmux_name(){
 # Auto active virtualenv for the current directory
 activate(){
     if [ -e ".venv/bin/activate" ]; then
+        echo "Activating pipenv in $PWD/.venv"
         . .venv/bin/activate
         _virtualenv_tmux_name
 
@@ -334,23 +332,20 @@ activate(){
         export PYTHONDONTWRITEBYTECODE=1
         export PIPENV_ACTIVE=1
 
-        if [ -f "${VIRTUAL_ENV}/.project" ]; then
-            cd $(cat "${VIRTUAL_ENV}/.project")
-        fi
-        return
-    fi
-    if [ -e "activate" ]; then
-        . ${ROOT_DIR}activate
+    elif [ -e "activate" ]; then
+        echo "Activating using $PWD/activate"
+        . ./activate
         _virtualenv_tmux_name
-
-        if [ -f "${VIRTUAL_ENV}/.project" ]; then
-            cd $(cat "${VIRTUAL_ENV}/.project")
-        fi
-        return
+    else
+        # activate if our current dir or our parent dir is the name of a
+        # virtualenv
+        _workon_if_possible $(basename "$PWD")
+        _workon_if_possible $(basename $(dirname "$(pwd)"))
     fi
-    # if our current dir is the name of a virtualenv, activate
-    _workon_if_possible $(basename "$PWD") && return
-    _workon_if_possible $(basename $(dirname "$(pwd)")) && return
+
+    if [ -f "${VIRTUAL_ENV}/.project" ]; then
+        cd $(cat "${VIRTUAL_ENV}/.project")
+    fi
 }
 
 # Virtualenvwrapper stuff
@@ -358,7 +353,30 @@ export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 #export DISPLAY=:0
 
-. ${ROOT_DIR}bin/mount_workon
+if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
+if which pyenv-virtualenv-init > /dev/null; then
+    eval "$(pyenv virtualenv-init -)";
+    pyenv virtualenvwrapper
+    # if ! command_exists original_workon; then
+    #     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
+    # fi
+
+    # # No need for mount_workon anymore, perhaps in the future
+    # # . ${ROOT_DIR}bin/mount_workon
+    # workon(){
+    #     project_dir="${PROJECT_HOME}$1"
+    #     env_dir="${WORKON_HOME}$1"
+    #     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
+    #         mkproject "$1"
+    #         cd "$project_dir"
+    #     elif [ -d "$env_dir" ]; then
+    #         original_workon "$1"
+    #     else
+    #         echo "No virtualenv $1, simply doing a cd to $project_dir"
+    #         test -d "$project_dir" && cd "$project_dir"
+    #     fi
+    # }
+fi
 
 # activate virtualenv automatically
 if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
@@ -686,3 +704,4 @@ fi
 # only works with aggressive resize disabled
 export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=
 test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
