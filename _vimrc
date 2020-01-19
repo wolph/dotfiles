@@ -49,6 +49,8 @@ endif
 if has("nvim")
     if filereadable(expand('~/envs/neovim2/bin/python'))
         let g:python_host_prog = expand('~/envs/neovim2/bin/python')
+    elseif filereadable(expand('~/.pyenv/shims/python2'))
+        let g:python_host_prog = expand('~/.pyenv/shims/python2')
     elseif filereadable('/usr/local/bin/python2')
         let g:python_host_prog = '/usr/local/bin/python2'
     elseif filereadable('/usr/bin/python2')
@@ -60,6 +62,8 @@ if has("nvim")
 
     if filereadable(expand('~/envs/neovim3/bin/python'))
         let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
+    elseif filereadable(expand('~/.pyenv/shims/python3'))
+        let g:python3_host_prog = expand('~/.pyenv/shims/python3')
     elseif filereadable('/usr/local/bin/python3')
         let g:python3_host_prog = '/usr/local/bin/python3'
     elseif filereadable('/usr/bin/python3')
