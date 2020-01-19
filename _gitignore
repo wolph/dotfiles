@@ -42,5 +42,6 @@ __pycache__
 /.tags
 /.vs/
 /.venv/
+/gpgit/
 
 zwcfg*.xml*
