@@ -57,8 +57,9 @@ _insert_to_path /usr/local/opt/ccache/libexec
 
 export PATH
 
-export LDFLAGS="-L/usr/local/opt/node@10/lib"
-export CPPFLAGS="-I/usr/local/opt/node@10/include"
+# This breaks IDF!
+# export LDFLAGS="-L/usr/local/opt/node@10/lib"
+# export CPPFLAGS="-I/usr/local/opt/node@10/include"
 
 export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2
 export ANDROID_NDK=/usr/local/Cellar/android-ndk/r9d
