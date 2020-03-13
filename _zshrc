@@ -314,7 +314,43 @@ alias s='sudo -i zsh'
 #     sudo su -m $@ -c 'exec zsh'
 # }
 
+# Virtualenvwrapper stuff
+export WORKON_HOME="${HOME}/envs/"
+export PROJECT_HOME="${HOME}/workspace/"
+#export DISPLAY=:0
+
+if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
+if which pyenv-virtualenv-init > /dev/null; then
+    eval "$(pyenv virtualenv-init -)";
+    pyenv virtualenvwrapper
+else
+    . $(which virtualenvwrapper.sh)
+    # if ! command_exists original_workon; then
+    #     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
+    # fi
+
+    # # No need for mount_workon anymore, perhaps in the future
+    # # . ${ROOT_DIR}bin/mount_workon
+    # workon(){
+    #     project_dir="${PROJECT_HOME}$1"
+    #     env_dir="${WORKON_HOME}$1"
+    #     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
+    #         mkproject "$1"
+    #         cd "$project_dir"
+    #     elif [ -d "$env_dir" ]; then
+    #         original_workon "$1"
+    #     else
+    #         echo "No virtualenv $1, simply doing a cd to $project_dir"
+    #         test -d "$project_dir" && cd "$project_dir"
+    #     fi
+    # }
+fi
+
 _workon_if_possible(){
+    if [ "$1" = '/' ] || [ "$1" = 'root' ]; then
+        return false;
+    fi
+
     if [ -e "$WORKON_HOME/$1" ] || [ -e "$WORKON_HOME/$1.sparseimage*" ]; then
         echo "Working on ~/envs/$1"
         workon "$1"
@@ -360,36 +396,6 @@ activate(){
         cd $(cat "${VIRTUAL_ENV}/.project")
     fi
 }
-
-# Virtualenvwrapper stuff
-export WORKON_HOME="${HOME}/envs/"
-export PROJECT_HOME="${HOME}/workspace/"
-#export DISPLAY=:0
-
-if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
-if which pyenv-virtualenv-init > /dev/null; then
-    eval "$(pyenv virtualenv-init -)";
-    pyenv virtualenvwrapper
-    # if ! command_exists original_workon; then
-    #     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
-    # fi
-
-    # # No need for mount_workon anymore, perhaps in the future
-    # # . ${ROOT_DIR}bin/mount_workon
-    # workon(){
-    #     project_dir="${PROJECT_HOME}$1"
-    #     env_dir="${WORKON_HOME}$1"
-    #     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
-    #         mkproject "$1"
-    #         cd "$project_dir"
-    #     elif [ -d "$env_dir" ]; then
-    #         original_workon "$1"
-    #     else
-    #         echo "No virtualenv $1, simply doing a cd to $project_dir"
-    #         test -d "$project_dir" && cd "$project_dir"
-    #     fi
-    # }
-fi
 
 # activate virtualenv automatically
 if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
