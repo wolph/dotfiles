@@ -111,6 +111,19 @@ export PATH="$PATH:~/bin:${ROOT_DIR}bin"
 export PS1="$(print '%{\e[38;5;208m%}%n%{\e[0m%}')$(print '%{\e[38;5;33m%}@%{\e[0m%}')$(print '%{\e[38;5;10m%}%m%{\e[0m%}')# "
 export ORIGINAL_PS1="$PS1"
 export RPS1='%~'
+export ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+
+# Declare the variable
+typeset -A ZSH_HIGHLIGHT_STYLES
+
+# # To differentiate aliases from other command types
+# ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
+# 
+# # To have paths colored instead of underlined
+# ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
+
+# To disable highlighting of globbing expressions
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 
 # Show the vim mode
 # function zle-line-init zle-keymap-select {
@@ -700,8 +713,4 @@ if [ 1 -eq "$DEBUG" ]; then
     exec 2>&3 3>&-
     zprof
 fi
-
-# only works with aggressive resize disabled
-export ITERM_ENABLE_SHELL_INTEGRATION_WITH_TMUX=
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
-
+export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
