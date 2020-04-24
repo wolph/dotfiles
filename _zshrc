@@ -319,32 +319,54 @@ export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 #export DISPLAY=:0
 
-if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
-if which pyenv-virtualenv-init > /dev/null; then
-    eval "$(pyenv virtualenv-init -)";
-    pyenv virtualenvwrapper
-else
-    . $(which virtualenvwrapper.sh)
-    # if ! command_exists original_workon; then
-    #     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
-    # fi
+if which pyenv &> /dev/null; then
+# eval "$(pyenv init -)"; fi
+	export PATH="/Users/rick/.pyenv/shims:${PATH}"
+	export PYENV_SHELL=zsh
+	source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
+	# command pyenv rehash 2>/dev/null
+	pyenv() {
+  	local command
+  	command="${1:-}"
+  	if [ "$#" -gt 0 ]; then
+    	shift
+  	fi
 
-    # # No need for mount_workon anymore, perhaps in the future
-    # # . ${ROOT_DIR}bin/mount_workon
-    # workon(){
-    #     project_dir="${PROJECT_HOME}$1"
-    #     env_dir="${WORKON_HOME}$1"
-    #     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
-    #         mkproject "$1"
-    #         cd "$project_dir"
-    #     elif [ -d "$env_dir" ]; then
-    #         original_workon "$1"
-    #     else
-    #         echo "No virtualenv $1, simply doing a cd to $project_dir"
-    #         test -d "$project_dir" && cd "$project_dir"
-    #     fi
-    # }
+  	case "$command" in
+  	activate|deactivate|rehash|shell|virtualenvwrapper|virtualenvwrapper_lazy)
+    	eval "$(pyenv "sh-$command" "$@")";;
+  	*)
+    	command pyenv "$command" "$@";;
+  	esac
+	}
+
+	pyenv virtualenvwrapper_lazy
+elif which virtualenvwrapper.sh > /dev/null; then
+    . $(which virtualenvwrapper.sh)
 fi
+
+# else
+#     . $(which virtualenvwrapper.sh)
+#     # if ! command_exists original_workon; then
+#     #     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
+#     # fi
+# 
+#     # # No need for mount_workon anymore, perhaps in the future
+#     # # . ${ROOT_DIR}bin/mount_workon
+#     # workon(){
+#     #     project_dir="${PROJECT_HOME}$1"
+#     #     env_dir="${WORKON_HOME}$1"
+#     #     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
+#     #         mkproject "$1"
+#     #         cd "$project_dir"
+#     #     elif [ -d "$env_dir" ]; then
+#     #         original_workon "$1"
+#     #     else
+#     #         echo "No virtualenv $1, simply doing a cd to $project_dir"
+#     #         test -d "$project_dir" && cd "$project_dir"
+#     #     fi
+#     # }
+# fi
 
 _workon_if_possible(){
     if [ "$1" = '/' ] || [ "$1" = 'root' ]; then
@@ -655,7 +677,7 @@ unsetopt sharehistory
 [ -e /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 if [ -d ~/.zsh/plugins/ ]; then
-    for f in ~/.zsh/plugins/*; do
+    for f in ~/.zsh/plugins/*sh; do
         . "$f"
     done
 fi
@@ -720,3 +742,5 @@ if [ 1 -eq "$DEBUG" ]; then
     zprof
 fi
 export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+export PATH="/usr/local/opt/helm@2/bin:$PATH"
+export PATH="/usr/local/opt/helm@2/bin:$PATH"
