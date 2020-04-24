@@ -33,6 +33,8 @@ _append_to_path /usr/bin
 
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 _append_to_path /Applications/Xcode.app/Contents/Developer/usr/bin
+_append_to_path ~/.krew/bin
+_append_to_path /usr/local/opt/qt/bin
 # Anaconda breaks virtualenvwrapper
 # _append_to_path ~/anaconda3/bin
 
@@ -50,6 +52,7 @@ _insert_to_path /usr/local/opt/node@10/bin
 _insert_to_path /usr/local/opt/python@2/bin
 _insert_to_path $HOME/.config/yarn/global/node_modules/.bin
 _insert_to_path $HOME/.yarn/bin
+_insert_to_path ./node_modules/.bin
 _insert_to_path /usr/local/bin
 _insert_to_path /usr/lib/ccache/
 _insert_to_path /usr/local/opt/ccache/libexec
