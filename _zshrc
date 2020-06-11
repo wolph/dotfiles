@@ -14,9 +14,9 @@ else;
     export ROOT_DIR=~rick/
 fi
 
-if [ "$TERM" = "xterm" ]; then
-    export TERM=xterm-256color
-fi
+# if [ "$TERM" = "xterm" ]; then
+#     export TERM=xterm-256color
+# fi
 
 if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TMUX" ]; then
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
@@ -326,18 +326,18 @@ if which pyenv &> /dev/null; then
 	[ -x /usr/local/Cellar/pyenv/ ] && source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
 	# command pyenv rehash 2>/dev/null
 	pyenv() {
-  	local command
-  	command="${1:-}"
-  	if [ "$#" -gt 0 ]; then
-    	shift
-  	fi
+  	    local command
+  	    command="${1:-}"
+  	    if [ "$#" -gt 0 ]; then
+    	    shift
+  	    fi
 
-  	case "$command" in
-  	activate|deactivate|rehash|shell|virtualenvwrapper|virtualenvwrapper_lazy)
-    	eval "$(pyenv "sh-$command" "$@")";;
-  	*)
-    	command pyenv "$command" "$@";;
-  	esac
+  	    case "$command" in
+  	    activate|deactivate|rehash|shell|virtualenvwrapper|virtualenvwrapper_lazy)
+    	    which sh-$command &> /dev/null && eval "$(pyenv "sh-$command" "$@")";;
+  	    *)
+    	    command pyenv "$command" "$@";;
+  	    esac
 	}
 
 	pyenv virtualenvwrapper_lazy
