@@ -323,7 +323,7 @@ if which pyenv &> /dev/null; then
 # eval "$(pyenv init -)"; fi
 	export PATH="/Users/rick/.pyenv/shims:${PATH}"
 	export PYENV_SHELL=zsh
-	source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
+	[ -x /usr/local/Cellar/pyenv/ ] && source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
 	# command pyenv rehash 2>/dev/null
 	pyenv() {
   	local command
