@@ -1,0 +1,4 @@
+#!/usr/bin/env zsh
+
+echo -ne "\e]0;\007"
+echo -ne "\e[23t"

@@ -30,8 +30,11 @@ _append_to_path /bin
 _append_to_path /usr/sbin
 _append_to_path /usr/bin
 [ -d "/usr/local/Cellar/ruby/" ] && _append_to_path /usr/local/Cellar/ruby/*/bin
+
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 _append_to_path /Applications/Xcode.app/Contents/Developer/usr/bin
+_append_to_path ~/.krew/bin
+_append_to_path /usr/local/opt/qt/bin
 # Anaconda breaks virtualenvwrapper
 # _append_to_path ~/anaconda3/bin
 
@@ -44,12 +47,15 @@ _insert_to_path /usr/local/sbin
 _insert_to_path ~/bin
 _insert_to_path $HOME/.rvm/bin
 _insert_to_path $HOME/go/bin
+_insert_to_path /usr/local/opt/ruby/bin
 _insert_to_path /usr/local/opt/node@10/bin
 _insert_to_path /usr/local/opt/python@2/bin
 _insert_to_path $HOME/.config/yarn/global/node_modules/.bin
 _insert_to_path $HOME/.yarn/bin
+_insert_to_path ./node_modules/.bin
 _insert_to_path /usr/local/bin
 _insert_to_path /usr/lib/ccache/
+_insert_to_path /usr/local/opt/ccache/libexec
 _insert_to_path "$PYENV_ROOT/bin"
 _insert_to_path /usr/local/opt/coreutils/libexec/gnubin
 _insert_to_path /usr/local/opt/ccache/libexec
@@ -57,8 +63,9 @@ _insert_to_path ~/.pyenv/bin
 
 export PATH
 
-export LDFLAGS="-L/usr/local/opt/node@10/lib"
-export CPPFLAGS="-I/usr/local/opt/node@10/include"
+# This breaks IDF!
+# export LDFLAGS="-L/usr/local/opt/node@10/lib"
+# export CPPFLAGS="-I/usr/local/opt/node@10/include"
 
 export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2
 export ANDROID_NDK=/usr/local/Cellar/android-ndk/r9d

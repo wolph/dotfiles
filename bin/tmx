@@ -1,5 +1,13 @@
 #!/usr/bin/env zsh
 
+if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
+if which pyenv-virtualenv-init > /dev/null; then
+    eval "$(pyenv virtualenv-init -)";
+    pyenv virtualenvwrapper_lazy
+elif which virtualenvwrapper.sh > /dev/null; then
+    . $(which virtualenvwrapper.sh)
+fi
+
 #
 # Tmux launcher
 #
@@ -75,11 +83,11 @@ if [[ "$tmux_nb" == "0" ]]; then
     if [ -d "$project_path" ] || [ -f "$project_image" ]; then
         . ~/bin/mount_workon
         workon "$1"
-        cd "$PROJECT_HOME$1"
+        cd "$project_path"
     fi
 
     if [ -d "$project_path" ]; then
-        export HISTFILE="$PROJECT_HOME$1/.zshhistory"
+        export HISTFILE="$project_path/.zshhistory"
         if [ ! -f "$HISTFILE" ]; then
             cp ~/.zshhistory "$HISTFILE"
         fi
