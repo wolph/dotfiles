@@ -19,14 +19,6 @@
 	global-gc = !git-global-gc
 	# pull = pull --rebase
 
-    repo = !gh repo \"$@\"
-    user = !gh user \"$@\"
-    alias = !gh alias \"$@\"
-    gists = !gh gists \"$@\"
-    hello = !gh hello \"$@\"
-    issue = !gh issue \"$@\"
-    notification = !gh notification \"$@\"
-    pull-request = !gh pull-request \"$@\"
 	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
 
 [color]
@@ -87,13 +79,13 @@
 	process = git-lfs filter-process
 [http]
 	postBuffer = 524288000
-
-[url "http://github.com/"]
-  insteadOf = "gh:"
-  insteadOf = "gh://"
-
-[url "git@github.com:WoLpH"]
-    pushInsteadOf = git@github.com:wolph
+# 
+# [url "http://github.com/"]
+#   insteadOf = "gh:"
+#   insteadOf = "gh://"
+# 
+# [url "git@github.com:WoLpH"]
+#     pushInsteadOf = git@github.com:wolph
 
 # [url "git@github.com:"]
 #     pushInsteadOf = "https://github.com/"

@@ -22,19 +22,6 @@ if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TM
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
 fi
 
-#DEBUG=1
-if [ 1 -eq "$DEBUG" ]; then
-    # set the trace prompt to include seconds, nanoseconds, script name and
-    # line number
-    PS4='+$(gdate "+%s:%N") %N:%i> '
-    # save file stderr to file descriptor 3 and redirect stderr (including
-    # trace output) to a file with the script's PID as an extension
-    exec 3>&2 2>/tmp/startlog.$$
-    # set options to turn on tracing and expansion of commands contained in
-    # the prompt
-    setopt xtrace prompt_subst
-fi
-
 function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
@@ -48,6 +35,23 @@ fi
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
     alias gdate=date
+fi
+
+DEBUG=0
+if [ 1 -eq "$DEBUG" ]; then
+    zmodload zsh/zprof
+    # set the trace prompt to include seconds, nanoseconds, script name and
+    # line number
+    zmodload zsh/datetime
+    PS4='+$EPOCHREALTIME %N:%i> '
+    # save file stderr to file descriptor 3 and redirect stderr (including
+    # trace output) to a file with the script's PID as an extension
+    logfile=/tmp/startlog.$$
+    echo "Logging to $logfile"
+    exec 3>&2 2>$logfile
+    # set options to turn on tracing and expansion of commands contained in
+    # the prompt
+    setopt xtrace prompt_subst
 fi
 
 # Tool to check the timing of the config file, handy for debugging
@@ -87,8 +91,6 @@ fpath=(/usr/local/share/zsh/site-functions/ $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 
-if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
-
 # # Antigen bundles
 # . ${ROOT_DIR}.antigen.zsh
 # antigen bundle WoLpH/zsh-completions src
@@ -109,6 +111,19 @@ export PATH="$PATH:~/bin:${ROOT_DIR}bin"
 export PS1="$(print '%{\e[38;5;208m%}%n%{\e[0m%}')$(print '%{\e[38;5;33m%}@%{\e[0m%}')$(print '%{\e[38;5;10m%}%m%{\e[0m%}')# "
 export ORIGINAL_PS1="$PS1"
 export RPS1='%~'
+export ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
+
+# Declare the variable
+typeset -A ZSH_HIGHLIGHT_STYLES
+
+# # To differentiate aliases from other command types
+# ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
+# 
+# # To have paths colored instead of underlined
+# ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
+
+# To disable highlighting of globbing expressions
+ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 
 # Show the vim mode
 # function zle-line-init zle-keymap-select {
@@ -158,13 +173,13 @@ SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
 if command_exists keychain; then
     eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
 elif command_exists ssh-add; then
-    if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
-	    alias ssh-add='ssh-add -A -K'
-	fi
-
     for key in $SSH_KEYS; do
         if [ -f "$key" ]; then
-            ssh-add $key
+            if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
+	            ssh-add -q -A -K $key
+	        else
+                ssh-add -q $key
+	        fi
         fi
     done
 fi
@@ -299,9 +314,67 @@ alias s='sudo -i zsh'
 #     sudo su -m $@ -c 'exec zsh'
 # }
 
+# Virtualenvwrapper stuff
+export WORKON_HOME="${HOME}/envs/"
+export PROJECT_HOME="${HOME}/workspace/"
+#export DISPLAY=:0
+
+if which pyenv &> /dev/null; then
+# eval "$(pyenv init -)"; fi
+	export PATH="/Users/rick/.pyenv/shims:${PATH}"
+	export PYENV_SHELL=zsh
+	source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
+	# command pyenv rehash 2>/dev/null
+	pyenv() {
+  	local command
+  	command="${1:-}"
+  	if [ "$#" -gt 0 ]; then
+    	shift
+  	fi
+
+  	case "$command" in
+  	activate|deactivate|rehash|shell|virtualenvwrapper|virtualenvwrapper_lazy)
+    	eval "$(pyenv "sh-$command" "$@")";;
+  	*)
+    	command pyenv "$command" "$@";;
+  	esac
+	}
+
+	pyenv virtualenvwrapper_lazy
+elif which virtualenvwrapper.sh > /dev/null; then
+    . $(which virtualenvwrapper.sh)
+fi
+
+# else
+#     . $(which virtualenvwrapper.sh)
+#     # if ! command_exists original_workon; then
+#     #     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
+#     # fi
+# 
+#     # # No need for mount_workon anymore, perhaps in the future
+#     # # . ${ROOT_DIR}bin/mount_workon
+#     # workon(){
+#     #     project_dir="${PROJECT_HOME}$1"
+#     #     env_dir="${WORKON_HOME}$1"
+#     #     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
+#     #         mkproject "$1"
+#     #         cd "$project_dir"
+#     #     elif [ -d "$env_dir" ]; then
+#     #         original_workon "$1"
+#     #     else
+#     #         echo "No virtualenv $1, simply doing a cd to $project_dir"
+#     #         test -d "$project_dir" && cd "$project_dir"
+#     #     fi
+#     # }
+# fi
+
 _workon_if_possible(){
+    if [ "$1" = '/' ] || [ "$1" = 'root' ]; then
+        return false;
+    fi
+
     if [ -e "$WORKON_HOME/$1" ] || [ -e "$WORKON_HOME/$1.sparseimage*" ]; then
-        echo "Working on $1"
+        echo "Working on ~/envs/$1"
         workon "$1"
         _virtualenv_tmux_name
         return true
@@ -322,6 +395,7 @@ _virtualenv_tmux_name(){
 # Auto active virtualenv for the current directory
 activate(){
     if [ -e ".venv/bin/activate" ]; then
+        echo "Activating pipenv in $PWD/.venv"
         . .venv/bin/activate
         _virtualenv_tmux_name
 
@@ -329,31 +403,21 @@ activate(){
         export PYTHONDONTWRITEBYTECODE=1
         export PIPENV_ACTIVE=1
 
-        if [ -f "${VIRTUAL_ENV}/.project" ]; then
-            cd $(cat "${VIRTUAL_ENV}/.project")
-        fi
-        return
-    fi
-    if [ -e "activate" ]; then
-        . ${ROOT_DIR}activate
+    elif [ -e "activate" ]; then
+        echo "Activating using $PWD/activate"
+        . ./activate
         _virtualenv_tmux_name
-
-        if [ -f "${VIRTUAL_ENV}/.project" ]; then
-            cd $(cat "${VIRTUAL_ENV}/.project")
-        fi
-        return
+    else
+        # activate if our current dir or our parent dir is the name of a
+        # virtualenv
+        _workon_if_possible $(basename "$PWD")
+        _workon_if_possible $(basename $(dirname "$(pwd)"))
     fi
-    # if our current dir is the name of a virtualenv, activate
-    _workon_if_possible $(basename "$PWD") && return
-    _workon_if_possible $(basename $(dirname "$(pwd)")) && return
+
+    if [ -f "${VIRTUAL_ENV}/.project" ]; then
+        cd $(cat "${VIRTUAL_ENV}/.project")
+    fi
 }
-
-# Virtualenvwrapper stuff
-export WORKON_HOME="${HOME}/envs/"
-export PROJECT_HOME="${HOME}/workspace/"
-#export DISPLAY=:0
-
-. ${ROOT_DIR}bin/mount_workon
 
 # activate virtualenv automatically
 if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
@@ -464,10 +528,26 @@ hosts=(
   localhost
 )
 
+_zpcompinit_custom() {
+  setopt extendedglob local_options
+  autoload -Uz compinit
+  local zcd=${ZDOTDIR:-$HOME}/.zcompdump
+  local zcdc="$zcd.zwc"
+  # Compile the completion dump to increase startup speed, if dump is newer or doesn't exist,
+  # in the background as this is doesn't affect the current session
+  # if [[ -f "$zcd"(#qN.m+1) ]]; then
+  #       compinit -i -d "$zcd"
+  #       { rm -f "$zcdc" && zcompile "$zcd" } &!
+  # else
+  #       compinit -C -d "$zcd"
+  #       { [[ ! -f "$zcdc" || "$zcd" -nt "$zcdc" ]] && rm -f "$zcdc" && zcompile "$zcd" } &!
+  # fi
+  compinit
+}
+
 autoload bashcompinit
 bashcompinit
-autoload -Uz compinit
-compinit
+_zpcompinit_custom
 
 
 # Group matches and describe.
@@ -594,22 +674,14 @@ zstyle ':completion:*' menu select=5
 # No shared history between tabs
 unsetopt sharehistory
 
-if [ 1 -eq "$DEBUG" ]; then
-    # turn off tracing
-    unsetopt xtrace
-    # restore stderr to the value saved in FD 3
-    exec 2>&3 3>&-
-fi
+[ -e /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] && source /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh
 
 if [ -d ~/.zsh/plugins/ ]; then
-    for f in ~/.zsh/plugins/*; do
+    for f in ~/.zsh/plugins/*sh; do
         . "$f"
     done
 fi
 
-
-# added by travis gem
-[ -f /Users/rick/.travis/travis.sh ] && source /Users/rick/.travis/travis.sh
 
 if [ -f ~/.fzf.zsh ]; then
     source ~/.fzf.zsh
@@ -704,3 +776,13 @@ elif type compctl &>/dev/null; then
   compctl -K _pm2_completion + -f + pm2
 fi
 ###-end-pm2-completion-###
+if [ 1 -eq "$DEBUG" ]; then
+    # turn off tracing
+    unsetopt xtrace
+    # restore stderr to the value saved in FD 3
+    exec 2>&3 3>&-
+    zprof
+fi
+export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
+export PATH="/usr/local/opt/helm@2/bin:$PATH"
+export PATH="/usr/local/opt/helm@2/bin:$PATH"
