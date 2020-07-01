@@ -14,9 +14,9 @@ else;
     export ROOT_DIR=~rick/
 fi
 
-if [ "$TERM" = "xterm" ]; then
-    export TERM=xterm-256color
-fi
+# if [ "$TERM" = "xterm" ]; then
+#     export TERM=xterm-256color
+# fi
 
 if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TMUX" ]; then
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
