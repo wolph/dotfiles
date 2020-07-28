@@ -918,8 +918,8 @@ set matchtime=2
 set nohlsearch 
 " BUT do highlight as you type you search phrase
 set noincsearch 
-" Keep 5 lines (top/bottom) for scope
-set so=5 
+" Keep 15 lines (top/bottom) for scope (when searching)
+set so=15 
 " don't blink
 set visualbell 
 " always show the status line
