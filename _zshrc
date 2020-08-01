@@ -319,6 +319,8 @@ export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 #export DISPLAY=:0
 
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+
 # if which pyenv &> /dev/null; then
 #     eval "$(pyenv init -)";
 # 	export PATH="/Users/rick/.pyenv/shims:${PATH}"
