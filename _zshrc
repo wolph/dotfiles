@@ -319,7 +319,11 @@ export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 #export DISPLAY=:0
 
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+if [ -x /usr/local/bin/python3 ]; then
+    export VIRTUALENVWRAPPER_PYTHON=/usr/local/bin/python3
+else
+    export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+fi
 
 # if which pyenv &> /dev/null; then
 #     eval "$(pyenv init -)";
