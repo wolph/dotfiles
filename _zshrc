@@ -169,7 +169,7 @@ zstyle :compinstall filename '~/.zshrc'
 
 SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
 
-if command_exists ssh-agent; then
+if command_exists ssh-agent && [ -z "$SSH_AUTH_SOCK" ]; then
     eval $(ssh-agent) > /dev/null
 fi
 
