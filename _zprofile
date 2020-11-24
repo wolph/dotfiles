@@ -33,12 +33,13 @@ _append_to_path /usr/bin
 
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 _append_to_path /Applications/Xcode.app/Contents/Developer/usr/bin
-_append_to_path ~/.krew/bin
+# _append_to_path ~/.krew/bin
 _append_to_path /usr/local/opt/qt/bin
 # Anaconda breaks virtualenvwrapper
 # _append_to_path ~/anaconda3/bin
 
 _append_to_path /Applications/Postgres.app/Contents/Versions/latest/bin
+_append_to_path ~/.cargo/bin
 
 export PYENV_ROOT="$HOME/.pyenv"
 
