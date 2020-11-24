@@ -60,6 +60,7 @@ _insert_to_path /usr/local/opt/ccache/libexec
 _insert_to_path "$PYENV_ROOT/bin"
 _insert_to_path /usr/local/opt/coreutils/libexec/gnubin
 _insert_to_path /usr/local/opt/ccache/libexec
+_insert_to_path ~/.pyenv/bin
 
 export PATH
 
@@ -69,3 +70,7 @@ export PATH
 
 export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2
 export ANDROID_NDK=/usr/local/Cellar/android-ndk/r9d
+
+eval "$(pyenv init -)"
+eval "$(pyenv virtualenv-init -)"
+

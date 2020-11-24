@@ -14,9 +14,9 @@ else;
     export ROOT_DIR=~rick/
 fi
 
-if [ "$TERM" = "xterm" ]; then
-    export TERM=xterm-256color
-fi
+# if [ "$TERM" = "xterm" ]; then
+#     export TERM=xterm-256color
+# fi
 
 if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TMUX" ]; then
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
@@ -343,29 +343,35 @@ export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 #export DISPLAY=:0
 
-if which pyenv &> /dev/null; then
-# eval "$(pyenv init -)"; fi
-	export PATH="/Users/rick/.pyenv/shims:${PATH}"
-	export PYENV_SHELL=zsh
-	source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
-	# command pyenv rehash 2>/dev/null
-	pyenv() {
-  	local command
-  	command="${1:-}"
-  	if [ "$#" -gt 0 ]; then
-    	shift
-  	fi
+export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 
-  	case "$command" in
-  	activate|deactivate|rehash|shell|virtualenvwrapper|virtualenvwrapper_lazy)
-    	eval "$(pyenv "sh-$command" "$@")";;
-  	*)
-    	command pyenv "$command" "$@";;
-  	esac
-	}
+# if which pyenv &> /dev/null; then
+#     eval "$(pyenv init -)";
+# 	export PATH="/Users/rick/.pyenv/shims:${PATH}"
+# 	export PYENV_SHELL=zsh
+# 	[ -x /usr/local/Cellar/pyenv/ ] && source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
+# 	# command pyenv rehash 2>/dev/null
+# 	pyenv() {
+#   	local command
+#   	command="${1:-}"
+#   	if [ "$#" -gt 0 ]; then
+#     	shift
+#   	fi
+# 
+#   	case "$command" in
+#   	activate|deactivate|rehash|shell|virtualenvwrapper|virtualenvwrapper_lazy)
+#     	eval "$(pyenv "sh-$command" "$@")";;
+#   	*)
+#     	command pyenv "$command" "$@";;
+#   	esac
+# 	}
+# 
+# 	pyenv virtualenvwrapper_lazy
+# elif which virtualenvwrapper.sh &> /dev/null; then
+#     . $(which virtualenvwrapper.sh)
+# fi
 
-	pyenv virtualenvwrapper_lazy
-elif which virtualenvwrapper.sh > /dev/null; then
+if which virtualenvwrapper.sh &> /dev/null; then
     . $(which virtualenvwrapper.sh)
 fi
 
@@ -756,6 +762,48 @@ test -f "${ROOT_DIR}.zshrc.local" && source "${ROOT_DIR}.zshrc.local"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
+test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+
+###-begin-pm2-completion-###
+### credits to npm for the completion file model
+#
+# Installation: pm2 completion >> ~/.bashrc  (or ~/.zshrc)
+#
+
+COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
+COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
+export COMP_WORDBREAKS
+
+if type complete &>/dev/null; then
+  _pm2_completion () {
+    local si="$IFS"
+    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
+                           COMP_LINE="$COMP_LINE" \
+                           COMP_POINT="$COMP_POINT" \
+                           pm2 completion -- "${COMP_WORDS[@]}" \
+                           2>/dev/null)) || return $?
+    IFS="$si"
+  }
+  complete -o default -F _pm2_completion pm2
+elif type compctl &>/dev/null; then
+  _pm2_completion () {
+    local cword line point words si
+    read -Ac words
+    read -cn cword
+    let cword-=1
+    read -l line
+    read -ln point
+    si="$IFS"
+    IFS=$'\n' reply=($(COMP_CWORD="$cword" \
+                       COMP_LINE="$line" \
+                       COMP_POINT="$point" \
+                       pm2 completion -- "${words[@]}" \
+                       2>/dev/null)) || return $?
+    IFS="$si"
+  }
+  compctl -K _pm2_completion + -f + pm2
+fi
+###-end-pm2-completion-###
 if [ 1 -eq "$DEBUG" ]; then
     # turn off tracing
     unsetopt xtrace
