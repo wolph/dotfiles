@@ -169,6 +169,10 @@ zstyle :compinstall filename '~/.zshrc'
 
 SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
 
+if command_exists ssh-agent; then
+    eval $(ssh-agent) > /dev/null
+fi
+
 # Enable keychain or ssh-add
 if command_exists keychain; then
     eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
@@ -221,10 +225,13 @@ if command_exists nvim; then
     alias vim="safe-reattach-to-user-namespace nvim"
     alias vimdiff="safe-reattach-to-user-namespace nvim -d"
     alias view="safe-reattach-to-user-namespace nvim -R"
+    export EDITOR=nvim
 else
     alias vim="safe-reattach-to-user-namespace vim"
     alias vimdiff="safe-reattach-to-user-namespace vimdiff"
+    export EDITOR=vim
 fi
+
 alias vi='vim'
 alias parallel='parallel --no-notice'
 alias feh='/usr/local/bin/feh --auto-zoom --draw-filename --fullscreen --recursive'
@@ -233,6 +240,23 @@ alias tb='nc termbin.com 9999'
 alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
 alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 #alias mplayer='open -a MplayerX.App --args '
+
+# kubernetes aliases
+alias k=kubectl
+alias ka='kubectl apply'
+alias kaf='kubectl apply -f'
+alias kg='kubectl get'
+alias kgp='kubectl get pod'
+alias kgj='kubectl get job'
+alias kdesc='kubectl describe'
+alias kd='kubectl delete'
+alias kdf='kubectl delete -f '
+alias kc='kubectl create'
+alias kcf='kubectl create -f '
+
+function kshell(){
+    kubectl exec --stdin --tty --namespace=$1 $2 -- ${3:-/bin/bash}
+}
 
 # Little trick to change the name of the shell
 # . ${ROOT_DIR}bin/iterm2_helpers
@@ -396,7 +420,7 @@ _virtualenv_tmux_name(){
 activate(){
     if [ -e ".venv/bin/activate" ]; then
         echo "Activating pipenv in $PWD/.venv"
-        . .venv/bin/activate
+# . .venv/bin/activate  # commented out by conda initialize
         _virtualenv_tmux_name
 
         # the pipenv shell normally enables these as well
@@ -479,8 +503,6 @@ export LS_COLORS='rs=0:di=01;34:ln=01;36:mh=00:pi=40;33:so=01;35:do=01;35:bd=40;
 zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
 export CLICOLOR=true
 export LSCOLORS=Exfxcxdxbxegedabagacad
-
-export EDITOR=vim
 
 zstyle ':completion:*' list-colors 'reply=( "=(#b)(*$VAR)(?)*=00=$color[green]=$color[bg-green]" )'
 zstyle ':completion:*:*:tmx:*:active-sessions' list-colors '=*=228;0'
@@ -744,3 +766,4 @@ fi
 export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
 export PATH="/usr/local/opt/helm@2/bin:$PATH"
 export PATH="/usr/local/opt/helm@2/bin:$PATH"
+
