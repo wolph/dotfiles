@@ -169,7 +169,7 @@ zstyle :compinstall filename '~/.zshrc'
 
 SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa ~/.ssh/likestagram)
 
-if command_exists ssh-agent; then
+if command_exists ssh-agent && [ -z "$SSH_AUTH_SOCK" ]; then
     eval $(ssh-agent) > /dev/null
 fi
 
@@ -373,6 +373,9 @@ export VIRTUALENVWRAPPER_PYTHON=python3
 
 # if which virtualenvwrapper.sh &> /dev/null; then
 #     . $(which virtualenvwrapper.sh)
+# elif [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
+#     # Support default ubuntu locations
+#     . /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 # fi
 
 # else
