@@ -343,7 +343,7 @@ export WORKON_HOME="${HOME}/envs/"
 export PROJECT_HOME="${HOME}/workspace/"
 #export DISPLAY=:0
 
-export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
+export VIRTUALENVWRAPPER_PYTHON=python3
 
 # if which pyenv &> /dev/null; then
 #     eval "$(pyenv init -)";
@@ -371,9 +371,9 @@ export VIRTUALENVWRAPPER_PYTHON=/usr/bin/python3
 #     . $(which virtualenvwrapper.sh)
 # fi
 
-if which virtualenvwrapper.sh &> /dev/null; then
-    . $(which virtualenvwrapper.sh)
-fi
+# if which virtualenvwrapper.sh &> /dev/null; then
+#     . $(which virtualenvwrapper.sh)
+# fi
 
 # else
 #     . $(which virtualenvwrapper.sh)
