@@ -67,14 +67,21 @@ test -n "$ITERM_PROFILE" && echo -ne "\e]1;$base_session\a"
 # Set terminal name
 title "$1"
 
+# Virtualenvwrapper stores the projects in the $PROJECT_HOME directory so
+# see if there's a project to activate :)
+project_path="$PROJECT_HOME$1"
+project_image="$project_path.sparseimage"
+
+if [ -d "$project_path" ]; then
+    export HISTFILE="$project_path/.zshhistory"
+    if [ ! -f "$HISTFILE" ]; then
+        cp ~/.zshhistory "$HISTFILE"
+    fi
+fi
+
 # This actually works without the trim() on all systems except OSX
 tmux_nb=$(trim `echo "$sessions" | grep "^$base_session:" | wc -l`)
 if [[ "$tmux_nb" == "0" ]]; then
-
-    # Virtualenvwrapper stores the projects in the $PROJECT_HOME directory so
-    # see if there's a project to activate :)
-    project_path="$PROJECT_HOME$1"
-    project_image="$project_path.sparseimage"
 
     if [ -f "$project_image.bz2" ]; then
         pbzip2 -dvv "$project_image.bz2"
@@ -86,19 +93,12 @@ if [[ "$tmux_nb" == "0" ]]; then
         cd "$project_path"
     fi
 
-    if [ -d "$project_path" ]; then
-        export HISTFILE="$project_path/.zshhistory"
-        if [ ! -f "$HISTFILE" ]; then
-            cp ~/.zshhistory "$HISTFILE"
-        fi
-    fi
-
     echo "Launching tmux base session $base_session ..."
     rc="$project_path/.tmuxrc"
     if [ -f $rc ]; then
         . $rc
     else
-        tmux -2 new-session -s $base_session
+        tmux -2 new-session -s $base_session -c "$project_path"
     fi
 else
     # Make sure we are not already in a tmux session

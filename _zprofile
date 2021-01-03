@@ -35,12 +35,13 @@ _append_to_path /usr/bin
 
 _append_to_path /Library/Frameworks/Python.framework/Versions/2.7/bin
 _append_to_path /Applications/Xcode.app/Contents/Developer/usr/bin
-_append_to_path ~/.krew/bin
+# _append_to_path ~/.krew/bin
 _append_to_path /usr/local/opt/qt/bin
 # Anaconda breaks virtualenvwrapper
 # _append_to_path ~/anaconda3/bin
 
 _append_to_path /Applications/Postgres.app/Contents/Versions/latest/bin
+_append_to_path ~/.cargo/bin
 
 export PYENV_ROOT="$HOME/.pyenv"
 
@@ -75,6 +76,7 @@ export ANDROID_NDK=/usr/local/Cellar/android-ndk/r9d
 function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
+
 if command_exists pyenv; then
     eval "$(pyenv init -)"
     eval "$(pyenv virtualenv-init -)"
