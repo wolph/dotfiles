@@ -353,6 +353,8 @@ fi
 
 if which virtualenvwrapper.sh &> /dev/null; then
     . $(which virtualenvwrapper.sh)
+elif [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
+    . /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 fi
 
 # else

@@ -136,3 +136,5 @@
 	interactive = false
 [git-up "push"]
 	auto = true
+[pull]
+	rebase = false
