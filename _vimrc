@@ -520,6 +520,12 @@ command! -nargs=1 Silent
 " " Remove trailing whitespace in Python before saving
 " autocmd BufWritePre *.py :%s/\s\+$//e
 
+Plug 'psf/black', {'branch': 'stable'}
+" automatic black execution on write... enable at your own risk
+" autocmd BufWritePre *.py silent! execute ':Black' | redraw!
+let g:black_skip_string_normalization = 1
+let g:black_linelength = 78
+
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -560,6 +566,7 @@ let g:riv_file_link_style = 2
 
 augroup filetypedetect
     au BufNewFile,BufRead *.rst set suffixesadd+=.rst
+    au BufNewFile,BufRead *.rst set ft=doctest
 augroup END
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Supertab so we can <Tab> for autocompletion
@@ -595,6 +602,7 @@ if has("nvim")
     " constantly writing means constant asking whether I want to save...
     " annoying AF
     let g:ale_lint_on_text_changed = 'never'
+    let g:ale_python_black_options = "--skip-string-normalization"
 
     " pylint is too whiny for my taste... disable it until I find a proper
     " config
@@ -605,6 +613,8 @@ if has("nvim")
     \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
     \}
     " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
+
+    let b:ale_python_flake8_options = '--ignore=D300'
 
     let g:ale_fixers = {
     \    'python': [
@@ -759,7 +769,7 @@ let g:jedi#use_splits_not_buffers = 1
 " Shortcuts
 let g:jedi#goto_assignments_command = "<leader>g"
 let g:jedi#goto_definitions_command = "<leader>d"
-let g:jedi#documentation_command = "K"
+" let g:jedi#documentation_command = "K"
 let g:jedi#usages_command = "<leader>n"
 let g:jedi#completions_command = "<C-Space>"
 let g:jedi#rename_command = "<leader>r"
@@ -987,6 +997,9 @@ set completeopt=menu,longest,preview
 " Make sure # doesn't start at the beginning of the line
 set cinkeys-=0#
 set indentkeys-=0#
+
+" when incrementing numbers, don't use octal mode
+set nrformats-=octal
 
 " Don't scroll when splitting windows
 nnoremap <C-W>s Hmx`` \|:split<CR>`xzt``
