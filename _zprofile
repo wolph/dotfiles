@@ -68,8 +68,8 @@ export PATH
 # export LDFLAGS="-L/usr/local/opt/node@10/lib"
 # export CPPFLAGS="-I/usr/local/opt/node@10/include"
 
-export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2
-export ANDROID_NDK=/usr/local/Cellar/android-ndk/r9d
+# export ANDROID_SDK=/usr/local/Cellar/android-sdk/22.6.2
+# export ANDROID_NDK=/usr/local/Cellar/android-ndk/r9d
 
 function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
