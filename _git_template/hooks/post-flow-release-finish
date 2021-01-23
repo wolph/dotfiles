@@ -15,8 +15,9 @@
 VERSION=$1
 ORIGIN=$2
 BRANCH=$3
+MESSAGE=$(git log -1)
 
 # Implement your script here.
-gpgit $VERSION
+gpgit $VERSION -m "$MESSAGE"
 
 exit 0

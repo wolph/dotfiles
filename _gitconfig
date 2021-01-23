@@ -73,8 +73,8 @@
 	clean = git media clean %f
 	smudge = git media smudge %f
 [filter "lfs"]
-	clean = git lfs clean %f
-	smudge = git lfs smudge %f
+	clean = git-lfs clean -- %f
+	smudge = git-lfs smudge -- %f
 	required = true
 	process = git-lfs filter-process
 [http]
@@ -136,3 +136,5 @@
 	interactive = false
 [git-up "push"]
 	auto = true
+[pull]
+	rebase = false
