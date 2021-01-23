@@ -371,12 +371,11 @@ export VIRTUALENVWRAPPER_PYTHON=python3
 #     . $(which virtualenvwrapper.sh)
 # fi
 
-# if which virtualenvwrapper.sh &> /dev/null; then
-#     . $(which virtualenvwrapper.sh)
-# elif [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
-#     # Support default ubuntu locations
-#     . /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-# fi
+if which virtualenvwrapper.sh &> /dev/null; then
+    . $(which virtualenvwrapper.sh)
+elif [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
+    . /usr/share/virtualenvwrapper/virtualenvwrapper.sh
+fi
 
 # else
 #     . $(which virtualenvwrapper.sh)
