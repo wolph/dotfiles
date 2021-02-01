@@ -1106,7 +1106,10 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 " Colors 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable 256 color support when available
-if ((&term == 'xterm-256color') || (&term == 'screen-256color' || &term == 'nvim'))
+if (&term == 'nvim')
+    set termguicolors
+    silent! colo desert
+elseif (&term == 'xterm-256color') || (&term == 'screen-256color')
     set t_Co=256
     set t_Sb=[4%dm
     set t_Sf=[3%dm
