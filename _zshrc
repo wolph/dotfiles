@@ -371,8 +371,10 @@ export VIRTUALENVWRAPPER_PYTHON=python3
 #     . $(which virtualenvwrapper.sh)
 # fi
 
-if which virtualenvwrapper.sh &> /dev/null; then
-    . $(which virtualenvwrapper.sh)
+if [ -x "/usr/local/bin/virtualenvwrapper.sh" ]; then
+    . /usr/local/bin/virtualenvwrapper.sh
+elif which virtualenvwrapper.sh &> /dev/null; then
+    # . $(which virtualenvwrapper.sh)
 elif [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
     . /usr/share/virtualenvwrapper/virtualenvwrapper.sh
 fi
@@ -400,7 +402,6 @@ fi
 #     # }
 # fi
 #
-[ -x "/usr/local/bin/virtualenvwrapper.sh" ] && . /usr/local/bin/virtualenvwrapper.sh
 
 _workon_if_possible(){
     if [ "$1" = '/' ] || [ "$1" = 'root' ]; then
