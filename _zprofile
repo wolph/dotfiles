@@ -79,6 +79,7 @@ function command_exists(){
 
 if command_exists pyenv; then
     eval "$(pyenv init -)"
-    eval "$(pyenv virtualenv-init -)"
+    # Slow as fuck...
+    # eval "$(pyenv virtualenv-init -)"
 fi
 
