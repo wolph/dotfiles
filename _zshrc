@@ -18,7 +18,7 @@ fi
 #     export TERM=xterm-256color
 # fi
 
-if [ "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TMUX" ]; then
+if [ -n "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TMUX" ]; then
     ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
 fi
 
@@ -82,7 +82,9 @@ zmodload -a autocomplete
 zmodload -a complist
 # autoload -U colors && colors
 
-export LANG=en_US.UTF-8
+[ -z "$LANG" ] && export LANG=C.UTF-8
+[ -z "$LANGUAGE" ] && export LANGUAGE=C.UTF-8
+[ -z "$LC_ALL" ] && export LC_ALL=C.UTF-8
 export TZ=Europe/Amsterdam
 
 # Adding my own completion functions
@@ -174,18 +176,20 @@ if command_exists ssh-agent && [ -z "$SSH_AUTH_SOCK" ]; then
 fi
 
 # Enable keychain or ssh-add
-if command_exists keychain; then
-    eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
-elif command_exists ssh-add; then
-    for key in $SSH_KEYS; do
-        if [ -f "$key" ]; then
-            if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
-	            ssh-add -q -A -K $key
-	        else
-                ssh-add -q $key
-	        fi
-        fi
-    done
+if [ -z "$SSH_AUTH_SOCK" ]; then
+    if command_exists keychain; then
+        eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
+    elif command_exists ssh-add; then
+        for key in $SSH_KEYS; do
+            if [ -f "$key" ]; then
+                if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
+	                ssh-add -q -A -K $key
+	            else
+                    ssh-add -q $key
+	            fi
+            fi
+        done
+    fi
 fi
 
 # Some convenient aliases

@@ -137,4 +137,4 @@
 [git-up "push"]
 	auto = true
 [pull]
-	rebase = false
+	rebase = true
