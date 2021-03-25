@@ -1,27 +1,47 @@
-#!/usr/bin/env zsh -ve
+#!/usr/bin/env zsh -e
 
 # Why "materialized" commands instead of simple aliases you ask? Because xargs
 # doesn't understand aliases ;)
 
 declare -A kube_aliases
+declare -A operations
+declare -A objects
+
+operations[g]=get
+operations[e]=edit
+operations[a]=apply
+operations[c]=create
+operations[d]=delete
+
+objects[p]=pod
+objects[j]=job
+objects[f]='-f '
+
+for op operation in ${(kv)operations}; do
+    echo "$op=$operation"
+    for obj object in ${(kv)objects}; do
+        echo "\t$obj=$object"
+        alias_="k${op}${obj}"
+        cmd="kubectl ${operation} ${object}"
+        kube_aliases[$alias_]=$cmd
+    done
+
+    alias_="k${op}"
+    cmd="kubectl ${operation}"
+    kube_aliases[$alias_]=$cmd
+done
+
+echo
 
 kube_aliases[k]=kubectl
-kube_aliases[ka]='kubectl apply'
-kube_aliases[kaf]='kubectl apply -f'
-kube_aliases[kg]='kubectl get'
-kube_aliases[kgp]='kubectl get pod'
-kube_aliases[kgj]='kubectl get job'
 kube_aliases[kdesc]='kubectl describe'
-kube_aliases[kd]='kubectl delete'
-kube_aliases[kdf]='kubectl delete -f '
-kube_aliases[kc]='kubectl create'
-kube_aliases[kcf]='kubectl create -f '
 
 mkdir -p kubernetes-aliases
 
-for alias cmd in ${(kv)kube_aliases}; do
-    file=kubernetes-aliases/$alias
+for alias_ cmd in ${(kv)kube_aliases}; do
+    echo "$alias_=$cmd"
+    file=kubernetes-aliases/$alias_
     echo '#!/usr/bin/env zsh' > $file
-    echo "exec $cmd" > $file
+    echo "exec $cmd "'$@' > $file
     chmod +x $file
 done

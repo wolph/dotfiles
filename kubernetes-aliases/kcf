@@ -1,1 +1,1 @@
-exec kubectl create -f 
+exec kubectl create -f  $@

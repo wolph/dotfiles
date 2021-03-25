@@ -1,1 +1,1 @@
-exec kubectl apply -f
+exec kubectl apply -f  $@

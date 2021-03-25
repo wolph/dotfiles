@@ -1,1 +1,1 @@
-exec kubectl get
+exec kubectl get $@

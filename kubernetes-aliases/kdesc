@@ -1,1 +1,1 @@
-exec kubectl describe
+exec kubectl describe $@
