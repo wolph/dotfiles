@@ -63,6 +63,16 @@ ln -sf "$HOME/.mpv" "$HOME/.config/mpv"
 ln -sf "$HOME/.vim" "$HOME/.config/nvim"
 ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 
+# kubernetes aliases
+if type kubectl > /dev/null; then
+    ./generate-kubernetes-aliases.sh
+    for file in kubernetes-aliases/*; do
+        destination="$HOME/bin/$(basename $file)"
+        source=$PWD/$file
+        link "$source" "$destination"
+    done
+fi
+
 curl -L https://iterm2.com/shell_integration/zsh \
     -o ~/.iterm2_shell_integration.zsh
 

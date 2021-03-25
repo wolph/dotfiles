@@ -249,23 +249,6 @@ alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
 alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 #alias mplayer='open -a MplayerX.App --args '
 
-# kubernetes aliases
-alias k=kubectl
-alias ka='kubectl apply'
-alias kaf='kubectl apply -f'
-alias kg='kubectl get'
-alias kgp='kubectl get pod'
-alias kgj='kubectl get job'
-alias kdesc='kubectl describe'
-alias kd='kubectl delete'
-alias kdf='kubectl delete -f '
-alias kc='kubectl create'
-alias kcf='kubectl create -f '
-
-function kshell(){
-    kubectl exec --stdin --tty --namespace=$1 $2 -- ${3:-/bin/bash}
-}
-
 # Little trick to change the name of the shell
 # . ${ROOT_DIR}bin/iterm2_helpers
 

@@ -1,0 +1,2 @@
+#!/usr/bin/env zsh
+kubectl exec --stdin --tty --namespace=$1 $2 -- ${3:-/bin/bash}
