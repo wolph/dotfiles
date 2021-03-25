@@ -1,1 +1,1 @@
-exec kubectl delete -f 
+exec kubectl delete -f  $@
