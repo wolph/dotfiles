@@ -1106,7 +1106,7 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 " Colors 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable 256 color support when available
-if (&term == 'nvim')
+if (&term == 'nvim' && $TERM != 'xterm')
     set termguicolors
     silent! colo desert
 elseif (&term == 'xterm-256color') || (&term == 'screen-256color')
@@ -1231,3 +1231,4 @@ if has ('autocmd') " Remain compatible with earlier versions
     autocmd! BufWritePost ~/.gvimrc if has('gui_running') | source % | endif | redraw
   augroup END
 endif " has autocmd
+
