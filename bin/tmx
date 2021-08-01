@@ -1,6 +1,6 @@
 #!/usr/bin/env zsh
 
-if which pyenv &> /dev/null; then eval "$(pyenv init -)"; fi
+if which pyenv &> /dev/null; then eval "$(pyenv init --path zsh)"; fi
 if which pyenv-virtualenv-init > /dev/null; then
     eval "$(pyenv virtualenv-init -)";
     pyenv virtualenvwrapper_lazy
