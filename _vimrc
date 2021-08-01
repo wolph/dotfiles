@@ -481,16 +481,17 @@ nnoremap U :silent MundoToggle<CR>
 
 Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
-Plug 'garbas/vim-snipmate'
 
-" Lots of snippets
-Plug 'honza/vim-snippets'
-" snippets for BibTeX files
-Plug 'rbonvall/snipmate-snippets-bib'
-" snippets for Arduino files
-Plug 'sudar/vim-arduino-snippets'
-" snippets for Twitter Bootstrap markup, in HTML and Haml
-Plug 'bonsaiben/bootstrap-snippets'
+" Not really using snippets... I should really get into that
+" Plug 'garbas/vim-snipmate'
+" " Lots of snippets
+" Plug 'honza/vim-snippets'
+" " snippets for BibTeX files
+" Plug 'rbonvall/snipmate-snippets-bib'
+" " snippets for Arduino files
+" Plug 'sudar/vim-arduino-snippets'
+" " snippets for Twitter Bootstrap markup, in HTML and Haml
+" Plug 'bonsaiben/bootstrap-snippets'
 
 
 " Rainbow parenthesis
