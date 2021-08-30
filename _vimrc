@@ -55,8 +55,8 @@ if has("nvim")
         let g:python_host_prog = '/usr/local/bin/python2'
     elseif filereadable('/usr/bin/python2')
         let g:python_host_prog = '/usr/bin/python2'
-    else
-        echom "WARNING: no valid python2 install found"
+    " else
+    "     echom "WARNING: no valid python2 install found"
     endif
     " echom "Using python 2 prog: " . g:python_host_prog
 
@@ -68,8 +68,8 @@ if has("nvim")
         let g:python3_host_prog = '/usr/local/bin/python3'
     elseif filereadable('/usr/bin/python3')
         let g:python3_host_prog = '/usr/bin/python3'
-    else
-        echom "WARNING: no valid python3 install found"
+    " else
+    "     echom "WARNING: no valid python3 install found"
     endif
     " echom "Using python 3 prog: " . g:python3_host_prog
 endif
