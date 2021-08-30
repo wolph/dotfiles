@@ -136,6 +136,8 @@
 	interactive = false
 [git-up "push"]
 	auto = true
+[pull]
+	rebase = true
 [commit]
 	# gpgsign = true
 [pull]
