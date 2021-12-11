@@ -15,9 +15,9 @@
 VERSION=$1
 ORIGIN=$2
 BRANCH=$3
-MESSAGE=$(git log -1)
 
 # Implement your script here.
-gpgit $VERSION -m "$MESSAGE"
+git push --tags $VERSION
+gpgit -d $VERSION 2>&1 | tee git-flow.log
 
 exit 0

@@ -95,21 +95,21 @@ call plug#begin(expand('~/.vim/bundle'))
 " Tree like file browser
 " Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
 Plug 'scrooloose/nerdtree'
-" A Git wrapper so awesome, it should be illegal
+" Git wrapper
 Plug 'tpope/vim-fugitive'
 " Snipmate and requirements for TextMate snippets
-Plug 'tpope/vim-eunuch'
-Plug 'tpope/vim-repeat'
-Plug 'lepture/vim-jinja'
-Plug 'thiderman/vim-supervisor'
-Plug 'chr4/nginx.vim'
-Plug 'alfredodeza/coveragepy.vim'
-Plug 'alfredodeza/pytest.vim'
-Plug 'vim-scripts/pig.vim'
-Plug 'rizzatti/dash.vim'
-Plug 'vim-scripts/vim-coffee-script'
-Plug 'tshirtman/vim-cython'
-Plug 'robbles/logstash.vim'
+" Plug 'tpope/vim-eunuch'
+" Plug 'tpope/vim-repeat'
+" Plug 'lepture/vim-jinja'
+" Plug 'thiderman/vim-supervisor'
+" Plug 'chr4/nginx.vim'
+" Plug 'alfredodeza/coveragepy.vim'
+" Plug 'alfredodeza/pytest.vim'
+" Plug 'vim-scripts/pig.vim'
+" Plug 'rizzatti/dash.vim'
+" Plug 'vim-scripts/vim-coffee-script'
+" Plug 'tshirtman/vim-cython'
+" Plug 'robbles/logstash.vim'
 " Bundle 'clickable.vim'
 
 " Javascript/html indending
@@ -122,6 +122,7 @@ if has('mac')
 endif
 Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
+Plug 'udalov/kotlin-vim'
 
 Plug 'tfnico/vim-gradle'
 Plug 'MarcWeber/vim-addon-local-vimrc'
