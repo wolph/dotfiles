@@ -838,3 +838,5 @@ if [ 1 -eq "$DEBUG" ]; then
     exec 2>&3 3>&-
     zprof
 fi
+
+fpath+=~/.zfunc

@@ -66,7 +66,7 @@ function autocrop_start()
     -- insert the cropdetect filter
     ret=mp.command(
         string.format(
-            'vf add @%s:lavfi=graph="cropdetect=limit=24:round=2:reset=0"',
+            'vf add @%s:lavfi=graph="cropdetect=limit=250:round=2:reset=3"',
             cropdetect_label
         )
     )
