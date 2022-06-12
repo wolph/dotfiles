@@ -294,7 +294,7 @@ function autossh(){
 # Little function to go to a random directory, handy if you have a lot of
 # stuff to sort out and don't know where to start ;)
 torandomdir(){
-    files=(*)
+    files=(*(/))
     dir=("${files[RANDOM%${#files[@]}]}")
     cd "$dir"
 }
@@ -363,6 +363,8 @@ export VIRTUALENVWRAPPER_PYTHON=python3
 #     . $(which virtualenvwrapper.sh)
 # fi
 
+# if [ -x "/usr/local/bin/virtualenvwrapper_lazy.sh" ]; then
+#     . /usr/local/bin/virtualenvwrapper_lazy.sh
 if [ -x "/usr/local/bin/virtualenvwrapper.sh" ]; then
     . /usr/local/bin/virtualenvwrapper.sh
 elif which virtualenvwrapper.sh &> /dev/null; then
@@ -394,6 +396,35 @@ fi
 #     # }
 # fi
 #
+#
+activate_venv(){
+    if [ -n "$VIRTUAL_ENV" ]; then
+        return false
+    fi
+
+    activate_file="$WORKON_HOME/${1}/bin/activate"
+    if [ -e "$activate_file" ]; then
+        . "$activate_file"
+        return true
+    fi
+
+    activate_file="./env/bin/activate"
+    if [ -e "$activate_file" ]; then
+        . "$activate_file"
+        return true
+    fi
+
+    activate_file="./.env/bin/activate"
+    if [ -e "$activate_file" ]; then
+        . "$activate_file"
+        return true
+    fi
+
+    if [ -e "pyproject.yaml" ]; then
+        poetry shell
+        return true
+    fi
+}
 
 _workon_if_possible(){
     if [ "$1" = '/' ] || [ "$1" = 'root' ]; then
@@ -402,7 +433,7 @@ _workon_if_possible(){
 
     if [ -e "$WORKON_HOME/$1" ] || [ -e "$WORKON_HOME/$1.sparseimage*" ]; then
         echo "Working on ~/envs/$1"
-        workon "$1"
+        activate_venv "$1"
         _virtualenv_tmux_name
         return true
     fi
@@ -840,3 +871,19 @@ if [ 1 -eq "$DEBUG" ]; then
 fi
 
 fpath+=~/.zfunc
+
+# >>> conda initialize >>>
+# !! Contents within this block are managed by 'conda init' !!
+__conda_setup="$('/Users/rick/opt/anaconda3/bin/conda' 'shell.zsh' 'hook' 2> /dev/null)"
+if [ $? -eq 0 ]; then
+    eval "$__conda_setup"
+else
+    if [ -f "/Users/rick/opt/anaconda3/etc/profile.d/conda.sh" ]; then
+        . "/Users/rick/opt/anaconda3/etc/profile.d/conda.sh"
+    else
+        export PATH="/Users/rick/opt/anaconda3/bin:$PATH"
+    fi
+fi
+unset __conda_setup
+# <<< conda initialize <<<
+
