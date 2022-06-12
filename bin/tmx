@@ -1,11 +1,13 @@
 #!/usr/bin/env zsh
 
-if which pyenv &> /dev/null; then eval "$(pyenv init --path zsh)"; fi
+if which pyenv &> /dev/null; then
+    eval "$(pyenv init --path zsh)";
+fi
 if which pyenv-virtualenv-init > /dev/null; then
     eval "$(pyenv virtualenv-init -)";
-    pyenv virtualenvwrapper_lazy
-# elif which virtualenvwrapper.sh > /dev/null; then
-#     . $(which virtualenvwrapper.sh)
+fi
+if which virtualenvwrapper.sh > /dev/null; then
+    $(which virtualenvwrapper.sh)
 fi
 
 #
@@ -82,7 +84,6 @@ fi
 # This actually works without the trim() on all systems except OSX
 tmux_nb=$(trim `echo "$sessions" | grep "^$base_session:" | wc -l`)
 if [[ "$tmux_nb" == "0" ]]; then
-
     if [ -f "$project_image.bz2" ]; then
         pbzip2 -dvv "$project_image.bz2"
     fi
@@ -98,7 +99,9 @@ if [[ "$tmux_nb" == "0" ]]; then
     if [ -f $rc ]; then
         . $rc
     else
+        echo creating
         tmux -2 new-session -s $base_session -c "$project_path"
+        echo created session
     fi
 else
     # Make sure we are not already in a tmux session

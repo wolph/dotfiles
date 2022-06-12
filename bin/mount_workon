@@ -6,13 +6,15 @@ function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
 
-if command_exists poetry && -f pyproject.toml; then
+if command_exists poetry && [ -f pyproject.toml ]; then
     exec poetry shell
-elif command_exists pyenv-virtualenv-init; then
-    pyenv virtualenvwrapper
-    eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
-elif ! command_exists original_workon && command_exists virtualenvwrapper_lazy.sh; then
-    . $(which virtualenvwrapper_lazy.sh)
+# elif command_exists pyenv-virtualenv-init; then
+#     pyenv virtualenvwrapper
+#     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
+elif which virtualenvwrapper.sh > /dev/null; then
+    $(which virtualenvwrapper.sh)
+# elif ! command_exists original_workon && command_exists virtualenvwrapper.sh; then
+#     . $(which virtualenvwrapper.sh)
     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
 fi
 
@@ -52,11 +54,14 @@ function workon(){
     env_dir="${WORKON_HOME}$1"
     mount_file "$project_dir"
     mount_file "$env_dir"
+    echo "Working on $1"
     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
         mkproject "$1"
         cd "$project_dir"
     elif [ -d "$env_dir" ]; then
-        original_workon "$1"
+        . "${env_dir}/bin/activate"
+        echo "Activated ${env_dir}"
+        # original_workon "$1"
     else
         echo "No virtualenv $1, simply doing a cd to $project_dir"
         test -d "$project_dir" && cd "$project_dir"
