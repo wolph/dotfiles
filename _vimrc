@@ -96,7 +96,7 @@ call plug#begin(expand('~/.vim/bundle'))
 " Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
 Plug 'scrooloose/nerdtree'
 " Git wrapper
-Plug 'tpope/vim-fugitive'
+" Plug 'tpope/vim-fugitive'
 " Snipmate and requirements for TextMate snippets
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
@@ -480,8 +480,8 @@ nnoremap U :silent MundoToggle<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Track the engine.
 
-Plug 'MarcWeber/vim-addon-mw-utils'
-Plug 'tomtom/tlib_vim'
+" Plug 'MarcWeber/vim-addon-mw-utils'
+" Plug 'tomtom/tlib_vim'
 
 " Not really using snippets... I should really get into that
 " Plug 'garbas/vim-snipmate'
