@@ -20,6 +20,7 @@
 	# pull = pull --rebase
 
 	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
+	squash-all = "!f(){ git reset $(git commit-tree HEAD^{tree} -m \"${1:-Initial commit}\");};f"
 
 [color]
 	diff = auto
