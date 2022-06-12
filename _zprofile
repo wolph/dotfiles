@@ -63,7 +63,7 @@ _insert_to_path /usr/local/opt/ccache/libexec
 _insert_to_path "$PYENV_ROOT/bin"
 _insert_to_path /usr/local/opt/coreutils/libexec/gnubin
 _insert_to_path /usr/local/opt/ccache/libexec
-_insert_to_path ~/.pyenv/shims
+_insert_to_path ~/.pyenv/bin
 
 export PATH
 
