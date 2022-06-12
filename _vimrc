@@ -47,22 +47,22 @@ endif
 " Make sure neovim doesn't use the virtualenv
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("nvim")
-    if filereadable(expand('~/envs/neovim2/bin/python'))
-        let g:python_host_prog = expand('~/envs/neovim2/bin/python')
-    elseif filereadable(expand('~/.pyenv/shims/python2'))
-        let g:python_host_prog = expand('~/.pyenv/shims/python2')
-    elseif filereadable('/usr/local/bin/python2')
-        let g:python_host_prog = '/usr/local/bin/python2'
-    elseif filereadable('/usr/bin/python2')
-        let g:python_host_prog = '/usr/bin/python2'
-    " else
-    "     echom "WARNING: no valid python2 install found"
-    endif
-    " echom "Using python 2 prog: " . g:python_host_prog
+    " if filereadable(expand('~/envs/neovim2/bin/python'))
+    "     let g:python_host_prog = expand('~/envs/neovim2/bin/python')
+    " elseif filereadable(expand('~/.pyenv/shims/python2'))
+    "     let g:python_host_prog = expand('~/.pyenv/shims/python2')
+    " elseif filereadable('/usr/local/bin/python2')
+    "     let g:python_host_prog = '/usr/local/bin/python2'
+    " elseif filereadable('/usr/bin/python2')
+    "     let g:python_host_prog = '/usr/bin/python2'
+    " " else
+    " "     echom "WARNING: no valid python2 install found"
+    " endif
+    " " echom "Using python 2 prog: " . g:python_host_prog
 
-    if filereadable(expand('~/envs/neovim3/bin/python'))
-        let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
-    elseif filereadable(expand('~/.pyenv/shims/python3'))
+    " if filereadable(expand('~/envs/neovim3/bin/python'))
+    "     let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
+    if filereadable(expand('~/.pyenv/shims/python3'))
         let g:python3_host_prog = expand('~/.pyenv/shims/python3')
     elseif filereadable('/usr/local/bin/python3')
         let g:python3_host_prog = '/usr/local/bin/python3'
@@ -95,8 +95,8 @@ call plug#begin(expand('~/.vim/bundle'))
 " Tree like file browser
 " Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
 Plug 'scrooloose/nerdtree'
-" Git wrapper
-" Plug 'tpope/vim-fugitive'
+" A Git wrapper so awesome, it should be illegal
+Plug 'tpope/vim-fugitive'
 " Snipmate and requirements for TextMate snippets
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
@@ -122,7 +122,6 @@ if has('mac')
 endif
 Plug 'mikewest/vimroom'
 Plug 'guns/xterm-color-table.vim'
-Plug 'udalov/kotlin-vim'
 
 Plug 'tfnico/vim-gradle'
 Plug 'MarcWeber/vim-addon-local-vimrc'
@@ -480,8 +479,8 @@ nnoremap U :silent MundoToggle<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Track the engine.
 
-" Plug 'MarcWeber/vim-addon-mw-utils'
-" Plug 'tomtom/tlib_vim'
+Plug 'MarcWeber/vim-addon-mw-utils'
+Plug 'tomtom/tlib_vim'
 
 " Not really using snippets... I should really get into that
 " Plug 'garbas/vim-snipmate'
