@@ -49,6 +49,7 @@ export PYENV_ROOT="$HOME/.pyenv"
 _insert_to_path
 _insert_to_path /usr/local/sbin
 _insert_to_path ~/bin
+_insert_to_path ~/.local/bin
 _insert_to_path $HOME/.rvm/bin
 _insert_to_path $HOME/go/bin
 _insert_to_path /usr/local/opt/ruby/bin
@@ -61,9 +62,10 @@ _insert_to_path /usr/local/bin
 _insert_to_path /usr/lib/ccache/
 _insert_to_path /usr/local/opt/ccache/libexec
 _insert_to_path "$PYENV_ROOT/bin"
-_insert_to_path /usr/local/opt/coreutils/libexec/gnubin
 _insert_to_path /usr/local/opt/ccache/libexec
 _insert_to_path ~/.pyenv/bin
+
+_append_to_path /usr/local/opt/coreutils/libexec/gnubin
 
 export PATH
 
