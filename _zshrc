@@ -119,6 +119,9 @@ export ORIGINAL_PS1="$PS1"
 export RPS1='%~'
 export ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
+# esptool settings
+ESPTOOL_BAUD=921600
+
 # Declare the variable
 typeset -A ZSH_HIGHLIGHT_STYLES
 
@@ -221,6 +224,7 @@ alias ll='l -l'
 alias qmv='qmv -f do'
 alias push='git pull; git push'
 export GIT_MERGE_AUTOEDIT=no
+export HOMEBREW_CASK_OPTS=--no-quarantine
 
 # Some people might not like this but I find it convenient. It makes find
 # search in symlinks by default
