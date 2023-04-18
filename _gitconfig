@@ -143,3 +143,6 @@
 	# gpgsign = true
 [pull]
 	rebase = true
+[pack]
+	windowMemory = 100m
+	packSizeLimit = 100m
