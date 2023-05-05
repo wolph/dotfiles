@@ -1070,8 +1070,9 @@ let perl_extended_vars=1 " highlight advanced perl vars inside strings
 " Change paging overlap amount from 2 to 5 (+3)
 " if you swapped C-y and C-e, and set them to 2, it would 
 " remove any overlap between pages
-nnoremap <C-f> <C-f>3<C-y> "  Make overlap 3 extra on control-f
-nnoremap <C-b> <C-b>3<C-e> "  Make overlap 3 extra on control-b
+" Make overlap 3 extra on control-f and control-b
+nnoremap <C-f> <C-f>3<C-y>
+nnoremap <C-b> <C-b>3<C-e>
 " Add the current date in yyyy-mm-dd format
 nnoremap <F5> "=strftime("%F")<CR>P
 inoremap <F5> <C-R>=strftime("%F")<CR>
