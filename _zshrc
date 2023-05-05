@@ -371,6 +371,8 @@ export VIRTUALENVWRAPPER_PYTHON=python3
 #     . /usr/local/bin/virtualenvwrapper_lazy.sh
 if [ -x "/usr/local/bin/virtualenvwrapper.sh" ]; then
     . /usr/local/bin/virtualenvwrapper.sh
+elif [ -x "~/.pyenv/shims/virtualenvwrapper.sh" ]; then
+    . ~/.pyenv/shims/virtualenvwrapper.sh
 elif which virtualenvwrapper.sh &> /dev/null; then
     # . $(which virtualenvwrapper.sh)
 elif [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
