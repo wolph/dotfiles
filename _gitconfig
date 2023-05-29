@@ -146,3 +146,6 @@
 [pack]
 	windowMemory = 100m
 	packSizeLimit = 100m
+[diff "sqlite3"]
+    binary = true
+    textconv = "echo .dump | sqlite3"
