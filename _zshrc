@@ -450,7 +450,6 @@ _virtualenv_tmux_name(){
     if [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ]; then
         session_name=${VIRTUAL_ENV%%/.venv}
         session_name=${session_name##.*/}
-        echo "session name: $session_name"
         export PS1="($session_name)$ORIGINAL_PS1"
         echo -ne "\e]0;$session_name\a"
     fi
@@ -459,8 +458,8 @@ _virtualenv_tmux_name(){
 # Auto active virtualenv for the current directory
 activate(){
     if [ -e ".venv/bin/activate" ]; then
-        echo "Activating pipenv in $PWD/.venv"
-# . .venv/bin/activate  # commented out by conda initialize
+        echo "Activating env in $PWD/.venv"
+        . .venv/bin/activate
         _virtualenv_tmux_name
 
         # the pipenv shell normally enables these as well
