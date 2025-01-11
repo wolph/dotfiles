@@ -62,6 +62,7 @@ mkdir -p "$HOME/.vim/autoload"
 ln -sf "$HOME/.mpv" "$HOME/.config/mpv"
 ln -sf "$HOME/.vim" "$HOME/.config/nvim"
 ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
+ln -sf vim.lua "$HOME/.config/nvim/init.lua"
 
 # kubernetes aliases
 if type kubectl > /dev/null; then

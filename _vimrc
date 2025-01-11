@@ -116,7 +116,7 @@ Plug 'robbles/logstash.vim'
 " Plug 'polpo/vim-html-js-indent'
 Plug 'rstacruz/sparkup'
 
-Plug 'markcornick/vim-vagrant'
+" Plug 'markcornick/vim-vagrant'
 if has('mac')
     Plug 'vim-scripts/copy-as-rtf'
 endif
@@ -146,6 +146,8 @@ Plug 'mattboehm/vim-unstack'
 if has("nvim")
     Plug 'sbdchd/neoformat'
 endif
+
+Plug 'robertklep/vim-berry'
 
 " Json stuff
 Plug 'Shougo/unite.vim'
@@ -380,45 +382,47 @@ endif
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Deoplete autocompleter 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("nvim") && exists("v:t_list")
-    Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-    Plug 'zchee/deoplete-jedi'
-    let g:jedi#completions_enabled = 0
+" Replaced with ruff and pyright via init.lua
 
-	" let g:deoplete#auto_complete_start_length = 1
-	" if !exists('g:deoplete#omni#input_patterns')
-  	" 	let g:deoplete#omni#input_patterns = {}
-	" endif
-	" " let g:deoplete#disable_auto_complete = 1
-	" autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-
-	" " omnifuncs
-	" augroup omnifuncs
-  	" 	autocmd!
-  	" 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-  	" 	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-  	" 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-  	" 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-  	" 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-	" augroup end
-	" " tern
-	" if exists('g:plugs["tern_for_vim"]')
-  	" 	let g:tern_show_argument_hints = 'on_hold'
-  	" 	let g:tern_show_signature_in_pum = 1
-  	" 	autocmd FileType javascript setlocal omnifunc=tern#Complete
-	" endif
-
-	" " deoplete tab-complete
-	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-	" " tern
-	" autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
-    let g:deoplete#enable_at_startup = 1
-" else
-"   Plug 'Shougo/deoplete.nvim'
-"   Plug 'roxma/nvim-yarp'
-"   Plug 'roxma/vim-hug-neovim-rpc'
-endif
-
+" if has("nvim") && exists("v:t_list")
+"     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
+"     Plug 'zchee/deoplete-jedi'
+"     let g:jedi#completions_enabled = 0
+"
+" 	" let g:deoplete#auto_complete_start_length = 1
+" 	" if !exists('g:deoplete#omni#input_patterns')
+"   	" 	let g:deoplete#omni#input_patterns = {}
+" 	" endif
+" 	" " let g:deoplete#disable_auto_complete = 1
+" 	" autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
+"
+" 	" " omnifuncs
+" 	" augroup omnifuncs
+"   	" 	autocmd!
+"   	" 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
+"   	" 	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
+"   	" 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
+"   	" 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
+"   	" 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
+" 	" augroup end
+" 	" " tern
+" 	" if exists('g:plugs["tern_for_vim"]')
+"   	" 	let g:tern_show_argument_hints = 'on_hold'
+"   	" 	let g:tern_show_signature_in_pum = 1
+"   	" 	autocmd FileType javascript setlocal omnifunc=tern#Complete
+" 	" endif
+"
+" 	" " deoplete tab-complete
+" 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
+" 	" " tern
+" 	" autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
+"     let g:deoplete#enable_at_startup = 1
+" " else
+" "   Plug 'Shougo/deoplete.nvim'
+" "   Plug 'roxma/nvim-yarp'
+" "   Plug 'roxma/vim-hug-neovim-rpc'
+" endif
+"
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neovim completion manager
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -521,11 +525,13 @@ command! -nargs=1 Silent
 " " Remove trailing whitespace in Python before saving
 " autocmd BufWritePre *.py :%s/\s\+$//e
 
-Plug 'psf/black', {'branch': 'stable'}
+" Plug 'psf/black', {'branch': 'stable'}
 " automatic black execution on write... enable at your own risk
 " autocmd BufWritePre *.py silent! execute ':Black' | redraw!
 let g:black_skip_string_normalization = 1
 let g:black_linelength = 78
+
+" Replaced with the ruff language server in ~/.vim/init.lua
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
