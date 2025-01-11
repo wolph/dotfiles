@@ -6,7 +6,8 @@ function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
 
-if command_exists poetry && [ -f pyproject.toml ]; then
+echo testing poetry
+if command_exists poetry && $(grep -qs tool.poetry pyproject.yaml); then
     exec poetry shell
 # elif command_exists pyenv-virtualenv-init; then
 #     pyenv virtualenvwrapper

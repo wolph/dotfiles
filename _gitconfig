@@ -17,7 +17,6 @@
 	publish = !legit publish \"$@\"
 	graft = !legit graft \"$@\"
 	global-gc = !git-global-gc
-	# pull = pull --rebase
 
 	permission-reset = !git diff -p -R --no-color | grep -E \"^(diff|(old|new) mode)\" --color=never | git apply
 	squash-all = "!f(){ git reset $(git commit-tree HEAD^{tree} -m \"${1:-Initial commit}\");};f"
@@ -138,12 +137,8 @@
 	interactive = false
 [git-up "push"]
 	auto = true
-[pull]
-	rebase = true
 [commit]
 	# gpgsign = true
-[pull]
-	rebase = true
 [pack]
 	windowMemory = 100m
 	packSizeLimit = 100m

@@ -2,6 +2,8 @@
 .DS_Store
 Thumbs.db
 
+.env
+
 *.pyc
 *.pyo
 .*.swp
@@ -45,3 +47,6 @@ __pycache__
 /gpgit/
 
 zwcfg*.xml*
+/.venv
+*.prof
+*.pclprof
