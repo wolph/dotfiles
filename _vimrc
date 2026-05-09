@@ -44,14 +44,10 @@ else
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Make sure neovim doesn't use the virtualenv
+" Make sure neovim uses a stable Python host
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 if has("nvim")
-    " if filereadable(expand('~/envs/neovim2/bin/python'))
-    "     let g:python_host_prog = expand('~/envs/neovim2/bin/python')
-    " elseif filereadable(expand('~/.pyenv/shims/python2'))
-    "     let g:python_host_prog = expand('~/.pyenv/shims/python2')
-    " elseif filereadable('/usr/local/bin/python2')
+    " if filereadable('/usr/local/bin/python2')
     "     let g:python_host_prog = '/usr/local/bin/python2'
     " elseif filereadable('/usr/bin/python2')
     "     let g:python_host_prog = '/usr/bin/python2'
@@ -60,11 +56,7 @@ if has("nvim")
     " endif
     " " echom "Using python 2 prog: " . g:python_host_prog
 
-    " if filereadable(expand('~/envs/neovim3/bin/python'))
-    "     let g:python3_host_prog = expand('~/envs/neovim3/bin/python')
-    if filereadable(expand('~/.pyenv/shims/python3'))
-        let g:python3_host_prog = expand('~/.pyenv/shims/python3')
-    elseif filereadable('/usr/local/bin/python3')
+    if filereadable('/usr/local/bin/python3')
         let g:python3_host_prog = '/usr/local/bin/python3'
     elseif filereadable('/usr/bin/python3')
         let g:python3_host_prog = '/usr/bin/python3'
@@ -640,13 +632,9 @@ if has("nvim")
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Virtualenv support
+" Active Python environment support
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" in your plugin list (assuming you use vim-plug):
 if python_version >= 205
-    " Uses with_statement so python 2.5 or higher
-    " Plug 'jmcantrell/vim-virtualenv'
-    "
     " WARNING: jedi currently has a bug that the dominant system python
     " decides the Python path so symlink venv/lib/python3.x to
     " venv/lib/python3.4 (or whatever your system python is)
@@ -667,9 +655,6 @@ if venv:
 EOF
 
 endif
-
-" in your plugin constants configuration section
-" let g:virtualenv_auto_activate = 1
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Mode
@@ -741,11 +726,6 @@ endif
 " let g:pymode_lint_message = 1
 " " I prefer a blank line at the end of files
 " let g:pymode_lint_ignore = "W391"
-" 
-" 
-" " Support virtualenv
-" let g:pymode_virtualenv = 1
-" 
 " " Enable breakpoints plugin
 " let g:pymode_breakpoint = 1
 " let g:pymode_breakpoint_key = '<leader>b'
@@ -1239,4 +1219,3 @@ if has ('autocmd') " Remain compatible with earlier versions
     autocmd! BufWritePost ~/.gvimrc if has('gui_running') | source % | endif | redraw
   augroup END
 endif " has autocmd
-

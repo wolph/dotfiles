@@ -1,14 +1,6 @@
 #!/usr/bin/env zsh
 
-if which pyenv &> /dev/null; then
-    eval "$(pyenv init --path zsh)";
-fi
-if which pyenv-virtualenv-init > /dev/null; then
-    eval "$(pyenv virtualenv-init -)";
-fi
-if which virtualenvwrapper.sh > /dev/null; then
-    $(which virtualenvwrapper.sh)
-fi
+TMX_WORKSPACE_DIR="${TMX_WORKSPACE_DIR:-$HOME/workspace}"
 
 #
 # Tmux launcher
@@ -69,12 +61,12 @@ test -n "$ITERM_PROFILE" && echo -ne "\e]1;$base_session\a"
 # Set terminal name
 title "$1"
 
-# Virtualenvwrapper stores the projects in the $PROJECT_HOME directory so
-# see if there's a project to activate :)
-project_path="$PROJECT_HOME$1"
-project_image="$project_path.sparseimage"
+# Start project sessions in ~/workspace/<session> when that directory exists.
+project_path="${TMX_WORKSPACE_DIR%/}/$base_session"
+tmux_cwd="$PWD"
 
 if [ -d "$project_path" ]; then
+    tmux_cwd="$project_path"
     export HISTFILE="$project_path/.zshhistory"
     if [ ! -f "$HISTFILE" ]; then
         cp ~/.zshhistory "$HISTFILE"
@@ -84,23 +76,13 @@ fi
 # This actually works without the trim() on all systems except OSX
 tmux_nb=$(trim `echo "$sessions" | grep "^$base_session:" | wc -l`)
 if [[ "$tmux_nb" == "0" ]]; then
-    if [ -f "$project_image.bz2" ]; then
-        pbzip2 -dvv "$project_image.bz2"
-    fi
-
-    if [ -d "$project_path" ] || [ -f "$project_image" ]; then
-        . ~/bin/mount_workon
-        workon "$1"
-        cd "$project_path"
-    fi
-
     echo "Launching tmux base session $base_session ..."
-    rc="$project_path/.tmuxrc"
+    rc="$tmux_cwd/.tmuxrc"
     if [ -f $rc ]; then
-        . $rc
+        (cd "$tmux_cwd" && . $rc)
     else
         echo creating
-        tmux -2 new-session -s $base_session -c "$project_path"
+        tmux -2 new-session -s $base_session -c "$tmux_cwd"
         echo created session
     fi
 else
@@ -127,14 +109,6 @@ else
         # When we detach from it, kill the session
         #tmux kill-session -t $session_id
     fi
-fi 
-
-sessions=$(tmux ls 2> /dev/null && tmux ls)
-sessions=$(echo "$sessions" | grep "$1")
-if [[ -z "$sessions" ]]; then
-    . ~/bin/mount_workon
-    workoff "$1"
 fi
 
 test -n "$ITERM_PROFILE" && echo -ne "\e]0;\a"
-

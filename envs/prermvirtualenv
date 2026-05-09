@@ -1,3 +1,0 @@
-#!/usr/bin/env zsh
-# This hook is run before a virtualenv is deleted.
-
