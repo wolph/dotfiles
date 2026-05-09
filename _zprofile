@@ -38,8 +38,6 @@ _append_to_path /Applications/Xcode.app/Contents/Developer/usr/bin
 # _append_to_path ~/.krew/bin
 _append_to_path /usr/local/opt/qt/bin
 _append_to_path ~/.local/bin
-# Anaconda breaks virtualenvwrapper
-# _append_to_path ~/anaconda3/bin
 
 _append_to_path /Applications/Postgres.app/Contents/Versions/latest/bin
 _append_to_path ~/.cargo/bin
@@ -66,7 +64,19 @@ _insert_to_path /usr/local/opt/ccache/libexec
 _insert_to_path ~/.pyenv/bin
 _insert_to_path ~/.pyenv/shims
 
-_append_to_path /usr/local/opt/coreutils/libexec/gnubin
+# Homebrew (Apple Silicon)
+if [ -x /opt/homebrew/bin/brew ]; then
+    eval "$(/opt/homebrew/bin/brew shellenv)"
+    # Add GNU gnubin to the path to use the GNU version without the prefix
+    for gnu_bin in /opt/homebrew/opt/*/libexec/gnubin; do
+        if [ -d "$gnu_bin" ]; then
+            _insert_to_path "$gnu_bin"
+        fi
+    done
+    # binutils is keg-only and needs special treatment
+    _insert_to_path /opt/homebrew/opt/binutils/bin
+fi
+
 _append_to_path $HOME/.cargo/bin
 
 export PATH
@@ -87,4 +97,5 @@ function command_exists(){
 #     # Slow as fuck...
 #     # eval "$(pyenv virtualenv-init -)"
 # fi
-#
+
+test -f "$HOME/.zprofile.local" && source "$HOME/.zprofile.local"

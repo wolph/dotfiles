@@ -1,0 +1,150 @@
+#!/usr/bin/env bash
+
+set -u
+set -o pipefail
+
+LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+
+usage() {
+    echo "Usage: $(basename "$0") [brew] <subcommand> [args...]" >&2
+}
+
+collect_requested_package_tokens() {
+    local arg
+
+    for arg in "$@"; do
+        case "$arg" in
+            install|reinstall)
+                ;;
+            --*)
+                ;;
+            *)
+                printf '%s\n' "$arg"
+                ;;
+        esac
+    done
+}
+
+collect_app_paths_for_package() {
+    local token="$1"
+    local package_path
+    local app_bundle_path
+    local app_name
+    local app_path
+
+    while IFS= read -r package_path; do
+        [[ -n "$package_path" ]] || continue
+
+        if [[ "$package_path" == *.app ]]; then
+            app_bundle_path="$package_path"
+        elif [[ "$package_path" == *.app/* ]]; then
+            app_bundle_path="${package_path%%.app/*}.app"
+        else
+            continue
+        fi
+
+        printf '%s\n' "$app_bundle_path"
+
+        app_name=${app_bundle_path##*/}
+        for app_path in "/Applications/$app_name" "$HOME/Applications/$app_name"; do
+            if [[ -e "$app_path" ]]; then
+                printf '%s\n' "$app_path"
+            fi
+        done
+    done < <(
+        {
+            brew list --cask "$token" 2>/dev/null || true
+            brew list --formula "$token" 2>/dev/null || true
+        } | awk '!seen[$0]++'
+    )
+}
+
+refresh_app_bundle() {
+    local app_path="$1"
+
+    [[ -e "$app_path" ]] || return 0
+
+    touch -c "$app_path" >/dev/null 2>&1 || true
+    touch -c "$(dirname "$app_path")" >/dev/null 2>&1 || true
+    "$LSREGISTER" -f "$app_path" >/dev/null 2>&1 || true
+    /usr/bin/mdimport "$app_path" >/dev/null 2>&1 || true
+}
+
+trigger_alfred_app_cache_reload() {
+    open 'alfred://runtrigger/de.chris-grieser.homebrew/reload-app-cache/' >/dev/null 2>&1 || true
+}
+
+refresh_alfred_metadata() {
+    local -a package_tokens=("$@")
+    local refreshed_any=0
+    local app_path
+    local token
+
+    if [[ ${#package_tokens[@]} -eq 0 ]]; then
+        return 0
+    fi
+
+    echo
+    echo "Refreshing Spotlight and LaunchServices metadata for Alfred..."
+
+    while IFS= read -r app_path; do
+        [[ -n "$app_path" ]] || continue
+        refresh_app_bundle "$app_path"
+        refreshed_any=1
+        echo "  - $app_path"
+    done < <(
+        for token in "${package_tokens[@]}"; do
+            collect_app_paths_for_package "$token"
+        done | awk '!seen[$0]++'
+    )
+
+    if [[ $refreshed_any -eq 1 ]]; then
+        trigger_alfred_app_cache_reload
+        echo "Metadata refresh complete."
+    fi
+}
+
+main() {
+    local -a brew_args=("$@")
+    local -a package_tokens=()
+    local subcommand
+    local token
+    local status
+
+    if [[ ${#brew_args[@]} -eq 0 ]]; then
+        usage
+        exit 1
+    fi
+
+    if [[ "${brew_args[0]}" == "brew" ]]; then
+        brew_args=("${brew_args[@]:1}")
+    fi
+
+    if [[ ${#brew_args[@]} -eq 0 ]]; then
+        usage
+        exit 1
+    fi
+
+    subcommand="${brew_args[0]}"
+
+    while IFS= read -r token; do
+        [[ -n "$token" ]] || continue
+        package_tokens+=("$token")
+    done < <(collect_requested_package_tokens "${brew_args[@]}")
+
+    command brew "${brew_args[@]}"
+    status=$?
+    if [[ $status -ne 0 ]]; then
+        exit "$status"
+    fi
+
+    if [[ "$subcommand" != "install" && "$subcommand" != "reinstall" ]]; then
+        exit 0
+    fi
+
+    if [[ ${#package_tokens[@]} -gt 0 ]]; then
+        refresh_alfred_metadata "${package_tokens[@]}"
+    fi
+}
+
+main "$@"

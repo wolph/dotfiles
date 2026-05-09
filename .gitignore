@@ -1,2 +1,16 @@
 /_tmux/resurrect
 /_tmux/plugins
+
+# Local-only and generated artifacts
+AGENTS.md
+*.log
+*.local
+*_local
+_mpv/mpv-config/
+.remember/
+.claude/
+.agents/
+tmp/
+docs/plans/
+docs/specs/
+docs/superpowers/

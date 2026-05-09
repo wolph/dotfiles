@@ -1,6 +1,6 @@
 [user]
 	name = Rick van Hattem
-	email = Wolph@wol.ph
+	email = wolph@wol.ph
 [github]
 	user = WoLpH
 [alias]
@@ -68,7 +68,7 @@
 #    required
 
 [include]
-    path = .gitconfig.local
+    path = ~/.gitconfig.local
 [filter "media"]
 	required = true
 	clean = git media clean %f
