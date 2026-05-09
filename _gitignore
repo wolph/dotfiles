@@ -50,3 +50,12 @@ zwcfg*.xml*
 /.venv
 *.prof
 *.pclprof
+
+# AI agent artifacts
+.remember/
+.claude/
+.agents/
+tmp/
+docs/plans/
+docs/specs/
+docs/superpowers/
