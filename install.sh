@@ -50,13 +50,6 @@ for file in bin/*; do
     link "$source" "$destination"
 done
 
-mkdir -p "$HOME/envs"
-for file in envs/*; do
-    destination="$HOME/$file"
-    source=$PWD/$file
-    link "$source" "$destination"
-done
-
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.vim/autoload"
 ln -sf "$HOME/.mpv" "$HOME/.config/mpv"

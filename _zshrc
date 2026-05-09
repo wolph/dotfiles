@@ -28,9 +28,9 @@ fi
 #     sudo chmod ugo-x /usr/libexec/path_helper
 # fi
 
-if [ -x ~/bin/mount_workon ]; then
+if [ -x ~/bin/tmx ]; then
     export ROOT_DIR=~/
-elif [ -x ./bin/mount_workon ]; then
+elif [ -x ./bin/tmx ]; then
     export ROOT_DIR=./
 else
     export ROOT_DIR=~rick/
@@ -335,165 +335,8 @@ alias s='sudo -i zsh'
 #     sudo su -m $@ -c 'exec zsh'
 # }
 
-# Virtualenvwrapper stuff
-export WORKON_HOME="${HOME}/envs/"
-export PROJECT_HOME="${HOME}/workspace/"
-export POETRY_VIRTUALENVS_PATH="$WORKON_HOME"
-#export DISPLAY=:0
-
-export VIRTUALENVWRAPPER_PYTHON=python3
-
-export PYENV_ROOT="$HOME/.pyenv"
-command -v pyenv >/dev/null || export PATH="$PYENV_ROOT/bin:$PATH"
-
-# if which pyenv &> /dev/null; then
-#     eval "$(pyenv init -)";
-# 	export PATH="/Users/rick/.pyenv/shims:${PATH}"
-# 	export PYENV_SHELL=zsh
-# 	[ -x /usr/local/Cellar/pyenv/ ] && source /usr/local/Cellar/pyenv/*/libexec/../completions/pyenv.zsh
-# 	# command pyenv rehash 2>/dev/null
-# 	pyenv() {
-#   	local command
-#   	command="${1:-}"
-#   	if [ "$#" -gt 0 ]; then
-#     	shift
-#   	fi
-# 
-#   	case "$command" in
-#   	activate|deactivate|rehash|shell|virtualenvwrapper|virtualenvwrapper_lazy)
-#     	eval "$(pyenv "sh-$command" "$@")";;
-#   	*)
-#     	command pyenv "$command" "$@";;
-#   	esac
-# 	}
-# 
-# 	pyenv virtualenvwrapper_lazy
-# elif which virtualenvwrapper.sh &> /dev/null; then
-#     . $(which virtualenvwrapper.sh)
-# fi
-
-# if [ -x "/usr/local/bin/virtualenvwrapper_lazy.sh" ]; then
-#     . /usr/local/bin/virtualenvwrapper_lazy.sh
-if [ -x "/usr/local/bin/virtualenvwrapper.sh" ]; then
-    . /usr/local/bin/virtualenvwrapper.sh
-elif [ -x "~/.pyenv/shims/virtualenvwrapper.sh" ]; then
-    . ~/.pyenv/shims/virtualenvwrapper.sh
-elif which virtualenvwrapper.sh &> /dev/null; then
-    # . $(which virtualenvwrapper.sh)
-elif [ -f /usr/share/virtualenvwrapper/virtualenvwrapper.sh ]; then
-    . /usr/share/virtualenvwrapper/virtualenvwrapper.sh
-fi
-
-# else
-#     . $(which virtualenvwrapper.sh)
-#     # if ! command_exists original_workon; then
-#     #     eval "$(echo "original_workon() {"; declare -f workon | tail -n +2)"
-#     # fi
-# 
-#     # # No need for mount_workon anymore, perhaps in the future
-#     # # . ${ROOT_DIR}bin/mount_workon
-#     # workon(){
-#     #     project_dir="${PROJECT_HOME}$1"
-#     #     env_dir="${WORKON_HOME}$1"
-#     #     if [ ! -d "$project_dir" ] && [ ! -d "$env_dir" ]; then
-#     #         mkproject "$1"
-#     #         cd "$project_dir"
-#     #     elif [ -d "$env_dir" ]; then
-#     #         original_workon "$1"
-#     #     else
-#     #         echo "No virtualenv $1, simply doing a cd to $project_dir"
-#     #         test -d "$project_dir" && cd "$project_dir"
-#     #     fi
-#     # }
-# fi
-#
-#
-activate_venv(){
-    if [ -n "$VIRTUAL_ENV" ]; then
-        return false
-    fi
-
-    activate_file="$WORKON_HOME/${1}/bin/activate"
-    if [ -e "$activate_file" ]; then
-        . "$activate_file"
-        return true
-    fi
-
-    activate_file="./env/bin/activate"
-    if [ -e "$activate_file" ]; then
-        . "$activate_file"
-        return true
-    fi
-
-    activate_file="./.env/bin/activate"
-    if [ -e "$activate_file" ]; then
-        . "$activate_file"
-        return true
-    fi
-
-    if $(grep -qs tool.poetry pyproject.yaml); then
-        echo 'activating poetry'
-        poetry shell
-        return true
-    fi
-}
-
-_workon_if_possible(){
-    if [ "$1" = '/' ] || [ "$1" = 'root' ]; then
-        return false;
-    fi
-
-    if [ -e "$WORKON_HOME/$1" ] || [ -e "$WORKON_HOME/$1.sparseimage*" ]; then
-        echo "Working on ~/envs/$1"
-        activate_venv "$1"
-        _virtualenv_tmux_name
-        return true
-    fi
-    return false
-}
-
-_virtualenv_tmux_name(){
-    if [ -n "$TMUX" ] && [ -z "$VIRTUAL_ENV" ]; then
-        session_name=${VIRTUAL_ENV%%/.venv}
-        session_name=${session_name##.*/}
-        export PS1="($session_name)$ORIGINAL_PS1"
-        echo -ne "\e]0;$session_name\a"
-    fi
-}
-
-# Auto active virtualenv for the current directory
-activate(){
-    if [ -e ".venv/bin/activate" ]; then
-        echo "Activating env in $PWD/.venv"
-        . .venv/bin/activate
-        _virtualenv_tmux_name
-
-        # the pipenv shell normally enables these as well
-        export PYTHONDONTWRITEBYTECODE=1
-        export PIPENV_ACTIVE=1
-
-    elif [ -e "activate" ]; then
-        echo "Activating using $PWD/activate"
-        . ./activate
-        _virtualenv_tmux_name
-    else
-        # activate if our current dir or our parent dir is the name of a
-        # virtualenv
-        _workon_if_possible $(basename "$PWD")
-        _workon_if_possible $(basename $(dirname "$(pwd)"))
-    fi
-
-    if [ -f "${VIRTUAL_ENV}/.project" ]; then
-        cd $(cat "${VIRTUAL_ENV}/.project")
-    fi
-}
-
-# activate virtualenv automatically
-if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
-    activate
-fi
-
 # UV environment variables and path to be fully contained in ~/workspace
+export TMX_WORKSPACE_DIR="${TMX_WORKSPACE_DIR:-${HOME}/workspace}"
 export UV_INSTALL_DIR=~/workspace/.uv
 export UV_DATA_DIR="$UV_INSTALL_DIR"
 export UV_CACHE_DIR="$UV_INSTALL_DIR/cache"
@@ -501,6 +344,41 @@ export UV_TOOL_DIR="$UV_INSTALL_DIR/tools"
 export UV_BIN_DIR="$UV_INSTALL_DIR/bin"
 export UV_PYTHON_INSTALL_DIR="$UV_INSTALL_DIR/python"
 export PATH="$UV_BIN_DIR:$PATH"
+
+_uv_tmux_name(){
+    if [ -n "$TMUX" ] && [ -n "$VIRTUAL_ENV" ]; then
+        session_name=${VIRTUAL_ENV%/.venv}
+        session_name=${session_name##*/}
+        export PS1="($session_name)$ORIGINAL_PS1"
+        echo -ne "\e]0;$session_name\a"
+    fi
+}
+
+_activate_file(){
+    activate_file="$1"
+    if [ -f "$activate_file" ]; then
+        echo "Activating using $PWD/${activate_file#./}"
+        . "$activate_file"
+        export PYTHONDONTWRITEBYTECODE=1
+        _uv_tmux_name
+        return 0
+    fi
+    return 1
+}
+
+activate(){
+    if [ -n "$VIRTUAL_ENV" ]; then
+        return 0
+    fi
+
+    _activate_file ./activate && return 0
+    _activate_file ./.venv/bin/activate && return 0
+    return 1
+}
+
+if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
+    activate
+fi
 
 # # reset all bindkeys, this makes vi mode work _much_ faster
 # bindkey -rpM viins '\e'

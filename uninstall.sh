@@ -24,9 +24,3 @@ for file in bin/*; do
     source=$PWD/$file
     unlink "$source" "$destination"
 done
-
-for file in envs/*; do
-    destination="$HOME/$file"
-    source=$PWD/$file
-    unlink "$source" "$destination"
-done

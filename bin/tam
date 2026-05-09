@@ -41,38 +41,28 @@ base_session="$1"
 
 [ -n "$ITERM_PROFILE" ] && echo -ne "\e]1;$base_session\a"
 
+# Start project sessions in ~/workspace/<session> when that directory exists.
+TMX_WORKSPACE_DIR="${TMX_WORKSPACE_DIR:-$HOME/workspace}"
+project_path="${TMX_WORKSPACE_DIR%/}/$base_session"
+tmate_cwd="$PWD"
+if [ -d "$project_path" ]; then
+    tmate_cwd="$project_path"
+    export HISTFILE="$project_path/.zshhistory"
+    if [ ! -f "$HISTFILE" ]; then
+        cp ~/.zshhistory "$HISTFILE"
+    fi
+fi
+
 # This actually works without the trim() on all systems except OSX
 tmate_nb=$(trim `echo "$sessions" | grep "^$base_session:" | wc -l`)
 if [[ "$tmate_nb" == "0" ]]; then
 
-    # Virtualenvwrapper stores the projects in the $PROJECT_HOME directory so
-    # see if there's a project to activate :)
-    project_path="$PROJECT_HOME$1"
-    project_image="$project_path.sparseimage"
-
-    if [ -f "$project_image.bz2" ]; then
-        pbzip2 -dvv "$project_image.bz2"
-    fi
-
-    if [ -d "$project_path" ] || [ -f "$project_image" ]; then
-        . ~/bin/mount_workon
-        workon "$1"
-        cd "$PROJECT_HOME$1"
-    fi
-
-    if [ -d "$project_path" ]; then
-        export HISTFILE="$PROJECT_HOME$1/.zshhistory"
-        if [ ! -f "$HISTFILE" ]; then
-            cp ~/.zshhistory "$HISTFILE"
-        fi
-    fi
-
     echo "Launching tmate base session $base_session ..."
-    rc="$project_path/.tmuxrc"
+    rc="$tmate_cwd/.tmuxrc"
     if [ -f $rc ]; then
-        . $rc
+        (cd "$tmate_cwd" && . $rc)
     else
-        tmate -2 new-session -s $base_session
+        (cd "$tmate_cwd" && tmate -2 new-session -s $base_session)
     fi
 else
     # Make sure we are not already in a tmate session
@@ -98,14 +88,6 @@ else
         # When we detach from it, kill the session
         #tmate kill-session -t $session_id
     fi
-fi 
-
-sessions=$(tmate ls 2> /dev/null && tmate ls)
-sessions=$(echo "$sessions" | grep "$1")
-if [[ -z "$sessions" ]]; then
-    . ~/bin/mount_workon
-    workoff "$1"
 fi
 
 test -n "$ITERM_PROFILE" && echo -ne "\e]0;\a"
-
