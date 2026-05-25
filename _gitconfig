@@ -133,6 +133,7 @@
 	versiontag = v
 [init]
 	templatedir = ~/.git_template
+	defaultBranch = master
 [gpgit]
 	interactive = false
 [git-up "push"]
