@@ -4,6 +4,8 @@ set -euo pipefail
 ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 STATE_BIN="$ROOT/bin/tmux-tab-state"
 FORMAT_BIN="$ROOT/bin/tmux-tab-format"
+COMPAT_STATE_BIN="$ROOT/bin/tmux-ai-tab-state"
+COMPAT_FORMAT_BIN="$ROOT/bin/tmux-ai-tab-format"
 
 TMPDIR="$(mktemp -d)"
 trap 'rm -rf "$TMPDIR"' EXIT
@@ -95,5 +97,10 @@ assert_not_contains "$cleared" "fg=colour16"
 
 ag_out="$(printf '{}' | "$STATE_BIN" antigravity waiting Stop)"
 [ "$ag_out" = '{"decision":"allow"}' ]
+
+printf '{}' | "$COMPAT_STATE_BIN" legacy waiting Stop >/dev/null
+compat_highlight="$("$COMPAT_FORMAT_BIN" "@7" 0)"
+assert_contains "$compat_highlight" "3:codex"
+assert_contains "$compat_highlight" "fg=colour16"
 
 printf 'tmux tab state tests passed\n'
