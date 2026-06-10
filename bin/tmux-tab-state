@@ -67,5 +67,11 @@ else
   } >"$state_file"
 fi
 
+if [ "$state" = "waiting" ]; then
+  tmux set-window-option -q -t "$window_id" @tmux_tab_waiting 1 >/dev/null 2>&1 || true
+else
+  tmux set-window-option -q -u -t "$window_id" @tmux_tab_waiting >/dev/null 2>&1 || true
+fi
+
 tmux refresh-client -S >/dev/null 2>&1 || true
 emit_output
