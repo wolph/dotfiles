@@ -146,3 +146,11 @@
 [diff "sqlite3"]
     binary = true
     textconv = "echo .dump | sqlite3"
+[pull]
+	rebase = false
+[credential "https://github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
+[credential "https://gist.github.com"]
+	helper =
+	helper = !/usr/bin/gh auth git-credential
