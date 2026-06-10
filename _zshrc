@@ -48,6 +48,13 @@ function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
 
+# Auto-start/attach tmux when connecting via SSH (replace shell with tmx).
+if [[ -o interactive ]] && [[ -z "$TMUX" ]] && [[ "$TMX_AUTO_ATTACH" != 0 ]] && [[ "$NO_TMUX" != 1 ]]; then
+    if [[ -t 0 && -t 1 ]] && [[ -n "$SSH_CONNECTION" || -n "$SSH_TTY" || -n "$SSH_CLIENT" ]] && command -v tmx >/dev/null 2>&1; then
+        exec tmx "${TMX_AUTO_ATTACH_SESSION:-default}"
+    fi
+fi
+
 ticfile="$TERM.ti"
 if command_exists tic && [ -f "$ticfile" ]; then
     tic "$ticfile"
@@ -713,7 +720,18 @@ test -f "${ROOT_DIR}.zshrc.local" && source "${ROOT_DIR}.zshrc.local"
 
 export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 
-test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+if [[ -z "$TMX_DISABLE_ITERM" ]]; then
+    test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
+fi
+
+# Refresh X11 environment from tmux.
+if [ -n "$TMUX" ]; then
+    autoload -U add-zsh-hook
+    function _tmux_refresh_env() {
+        eval "$(tmux show-environment -s DISPLAY XAUTHORITY 2>/dev/null)"
+    }
+    add-zsh-hook precmd _tmux_refresh_env
+fi
 
 ###-begin-pm2-completion-###
 ### credits to npm for the completion file model

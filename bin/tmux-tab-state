@@ -1,0 +1,71 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+source="${1:-unknown}"
+state="${2:-waiting}"
+event="${3:-}"
+
+# Consume hook input so hook runners can close stdin cleanly.
+cat >/dev/null || true
+
+emit_output() {
+  case "$source:$event" in
+    claude:*)
+      ;;
+    antigravity:Stop)
+      printf '{"decision":"allow"}\n'
+      ;;
+    antigravity:PreInvocation)
+      printf '{"injectSteps":[]}\n'
+      ;;
+    antigravity:PostInvocation)
+      printf '{"injectSteps":[],"terminationBehavior":""}\n'
+      ;;
+    *)
+      printf '{}\n'
+      ;;
+  esac
+}
+
+sanitize_id() {
+  printf '%s' "$1" | tr -c 'A-Za-z0-9_.-' '_'
+}
+
+state_dir="${XDG_RUNTIME_DIR:-/tmp}/tmux-tabs-${UID}"
+pane="${TMUX_PANE:-}"
+
+if [ -z "$pane" ] || ! command -v tmux >/dev/null 2>&1; then
+  emit_output
+  exit 0
+fi
+
+window_id="$(tmux display-message -p -t "$pane" '#{window_id}' 2>/dev/null || true)"
+if [ -z "$window_id" ]; then
+  emit_output
+  exit 0
+fi
+
+case "$state" in
+  waiting|busy|clear) ;;
+  idle) state="clear" ;;
+  *) state="busy" ;;
+esac
+
+umask 077
+mkdir -p "$state_dir"
+state_file="$state_dir/$(sanitize_id "$window_id")"
+
+if [ "$state" = "clear" ]; then
+  rm -f "$state_file"
+else
+  {
+    printf 'source=%s\n' "$source"
+    printf 'state=%s\n' "$state"
+    printf 'event=%s\n' "$event"
+    printf 'pane=%s\n' "$pane"
+    printf 'ts=%s\n' "$(date +%s)"
+  } >"$state_file"
+fi
+
+tmux refresh-client -S >/dev/null 2>&1 || true
+emit_output

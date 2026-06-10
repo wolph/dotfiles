@@ -1,0 +1,90 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+window_id="${1:-}"
+is_current="${2:-0}"
+
+ACCENTS=(
+  colour81
+  colour114
+  colour141
+  colour150
+  colour179
+  colour209
+  colour213
+  colour215
+  colour222
+)
+MUTED=(
+  colour30
+  colour64
+  colour61
+  colour65
+  colour94
+  colour130
+  colour96
+  colour95
+  colour100
+)
+
+state_dir="${XDG_RUNTIME_DIR:-/tmp}/tmux-tabs-${UID}"
+
+sanitize_id() {
+  printf '%s' "$1" | tr -c 'A-Za-z0-9_.-' '_'
+}
+
+read_field() {
+  local file="$1"
+  local key="$2"
+  awk -F= -v key="$key" '$1 == key { print substr($0, index($0, "=") + 1); exit }' "$file" 2>/dev/null || true
+}
+
+tmux_escape() {
+  local value="$1"
+  value="${value//#/##}"
+  printf '%s' "$value"
+}
+
+window_exists() {
+  tmux display-message -p -t "$window_id" '#{window_id}' >/dev/null 2>&1
+}
+
+if [ -z "$window_id" ] || ! command -v tmux >/dev/null 2>&1 || ! window_exists; then
+  exit 0
+fi
+
+window_index="$(tmux display-message -p -t "$window_id" '#{window_index}' 2>/dev/null || true)"
+window_name="$(tmux display-message -p -t "$window_id" '#{window_name}' 2>/dev/null || true)"
+label=" ${window_index}:${window_name} "
+safe_label="$(tmux_escape "$label")"
+
+hash="$(printf '%s' "${window_id}:${window_name}" | cksum | awk '{print $1}')"
+palette_index=$((hash % ${#ACCENTS[@]}))
+accent="${ACCENTS[$palette_index]}"
+muted="${MUTED[$palette_index]}"
+
+state=""
+state_file="$state_dir/$(sanitize_id "$window_id")"
+if [ -f "$state_file" ]; then
+  state="$(read_field "$state_file" state)"
+  pane="$(read_field "$state_file" pane)"
+  if [ -n "$pane" ]; then
+    pane_window="$(tmux display-message -p -t "$pane" '#{window_id}' 2>/dev/null || true)"
+    if [ "$pane_window" != "$window_id" ]; then
+      rm -f "$state_file"
+      state=""
+    fi
+  fi
+fi
+
+case "$state:$is_current" in
+  waiting:*)
+    printf '#[fg=colour16,bg=%s,bold]%s#[default]' "$accent" "$safe_label"
+    ;;
+  *:1)
+    printf '#[fg=%s,bg=colour236,bold]%s#[default]' "$accent" "$safe_label"
+    ;;
+  *)
+    printf '#[fg=%s,bg=default]%s#[default]' "$muted" "$safe_label"
+    ;;
+esac
