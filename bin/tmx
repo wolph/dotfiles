@@ -1,6 +1,7 @@
 #!/usr/bin/env zsh
 
 TMX_WORKSPACE_DIR="${TMX_WORKSPACE_DIR:-$HOME/workspace}"
+export TMX_DISABLE_ITERM=1
 
 #
 # Tmux launcher
@@ -82,12 +83,24 @@ if [[ "$tmux_nb" == "0" ]]; then
         (cd "$tmux_cwd" && . $rc)
     else
         echo creating
-        tmux -2 new-session -s $base_session -c "$tmux_cwd"
+
+        # Always create detached first
+        # Pass TMX_DISABLE_ITERM=1 explicitly to ensure it propagates to the session
+        tmux -2 new-session -d -s "$base_session" -e "TMX_DISABLE_ITERM=1" -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY" -c "$tmux_cwd"
+
+        if [ -t 0 ]; then
+            tmux -2 attach-session -t $base_session
+        fi
         echo created session
     fi
 else
     # Make sure we are not already in a tmux session
     if [[ -z "$TMUX" ]]; then
+        if [ ! -t 0 ]; then
+            echo "Session $base_session exists. No TTY detected to attach."
+            exit 0
+        fi
+
         # Kill defunct sessions first
         old_sessions=$(tmux ls 2>/dev/null | egrep "^[0-9]{14}.*[0-9]+\)$" | cut -f 1 -d:)
         for old_session_id in $old_sessions; do
@@ -98,12 +111,22 @@ else
         # Session is is date and time to prevent conflict
         session_id="${base_session}-$(date +%Y%m%d%H%M%S)"
 
-        # Create a new session (without attaching it) and link to base session 
+        # Create a new session (without attaching it) and link to base session
         # to share windows
-        tmux new-session -d -t $base_session -s $session_id
+        tmux new-session -d -t $base_session -s $session_id -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY"
 
         # Attach to the new session
         echo "Attaching tmux -2 attach-session -t $session_id"
+        if [ -n "$DISPLAY" ]; then
+            tmux set-environment -t "$base_session" DISPLAY "$DISPLAY"
+        else
+            tmux set-environment -t "$base_session" -u DISPLAY
+        fi
+        if [ -n "$XAUTHORITY" ]; then
+            tmux set-environment -t "$base_session" XAUTHORITY "$XAUTHORITY"
+        else
+            tmux set-environment -t "$base_session" -u XAUTHORITY
+        fi
         tmux -2 attach-session -t $session_id
 
         # When we detach from it, kill the session
