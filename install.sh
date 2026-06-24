@@ -57,10 +57,14 @@ ln -sf "$HOME/.vim" "$HOME/.config/nvim"
 ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 ln -sf vim.lua "$HOME/.config/nvim/init.lua"
 
-# Claude Code: only track individual config files; ~/.claude holds runtime
-# state (sessions, plugins, settings.json with secrets) and must not be linked wholesale.
-mkdir -p "$HOME/.claude"
+# AI agent config: track only individual portable files; ~/.claude, ~/.codex and
+# ~/.gemini hold runtime state (sessions, plugins, settings/config with secrets)
+# and must not be linked wholesale.
+mkdir -p "$HOME/.claude" "$HOME/.codex" "$HOME/.gemini"
 ln -sf "$PWD/claude/statusline.js" "$HOME/.claude/statusline.js"
+ln -sf "$PWD/claude/RTK.md" "$HOME/.claude/RTK.md"
+# Generate CLAUDE.md / AGENTS.md / GEMINI.md from the shared base + per-tool overrides.
+"$PWD/bin/sync-agent-config"
 
 # kubernetes aliases
 if type kubectl > /dev/null; then
