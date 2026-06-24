@@ -62,7 +62,6 @@ ln -sf vim.lua "$HOME/.config/nvim/init.lua"
 # and must not be linked wholesale.
 mkdir -p "$HOME/.claude" "$HOME/.codex" "$HOME/.gemini"
 ln -sf "$PWD/claude/statusline.js" "$HOME/.claude/statusline.js"
-ln -sf "$PWD/claude/RTK.md" "$HOME/.claude/RTK.md"
 # Generate CLAUDE.md / AGENTS.md / GEMINI.md from the shared base + per-tool overrides.
 "$PWD/bin/sync-agent-config"
 
