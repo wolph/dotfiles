@@ -27,6 +27,18 @@ _insert_to_path() {
     fi
 }
 
+# Added by Antigravity CLI installer
+export PATH="$HOME/.local/bin:$PATH"
+# Added by Antigravity IDE
+export PATH="$HOME/.antigravity-ide/antigravity-ide/bin:$PATH"
+
+# bun completions
+[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
+
+# bun
+export BUN_INSTALL="$HOME/.bun"
+export PATH="$BUN_INSTALL/bin:$PATH"
+
 _append_to_path /sbin
 _append_to_path /bin
 _append_to_path /usr/sbin

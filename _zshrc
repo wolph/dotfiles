@@ -40,8 +40,16 @@ fi
 #     export TERM=xterm-256color
 # fi
 
-if [ -n "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != ~/.ssh/auth_sock ] && [ -z "$TMUX" ]; then
-    ln -sf "$SSH_AUTH_SOCK" ~/.ssh/auth_sock && export SSH_AUTH_SOCK=~/.ssh/auth_sock
+if [ -z "$SSH_AUTH_SOCK" ] && [[ "$OSTYPE" == darwin* ]] && command -v launchctl >/dev/null 2>&1; then
+    launchd_ssh_auth_sock=$(launchctl getenv SSH_AUTH_SOCK 2>/dev/null)
+    if [ -S "$launchd_ssh_auth_sock" ]; then
+        export SSH_AUTH_SOCK="$launchd_ssh_auth_sock"
+    fi
+    unset launchd_ssh_auth_sock
+fi
+
+if [ -n "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/auth_sock" ] && [ -z "$TMUX" ]; then
+    ln -sf "$SSH_AUTH_SOCK" "$HOME/.ssh/auth_sock" && export SSH_AUTH_SOCK="$HOME/.ssh/auth_sock"
 fi
 
 function command_exists(){
@@ -263,6 +271,15 @@ alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 alias docker-compose='docker compose'
 #alias mplayer='open -a MplayerX.App --args '
 
+# AI agent CLI defaults (override bare commands; zsh won't re-expand an alias for
+# its own name, so these run the real binaries with flags prepended; tab-completion
+# still resolves to the underlying command). Headroom routing is configured in
+# the persistent env block below. Edit/remove any line to taste.
+alias claude='claude --permission-mode plan --allow-dangerously-skip-permissions'  # start in plan; bypass available to engage in-session
+alias codex='codex --ask-for-approval on-request --sandbox workspace-write'        # ask on-request; in-workspace edits ok, outside/network needs approval
+alias gemini='gemini --approval-mode auto_edit'                                    # auto-approve edits, prompt for the rest
+alias agy='agy --sandbox'                                                          # agy's only safety lever (no plan/approval flag exists)
+
 # Little trick to change the name of the shell
 # . ${ROOT_DIR}bin/iterm2_helpers
 
@@ -286,13 +303,23 @@ function mosh(){
 function ssh(){
     if [[ "$@" =~ "BatchMode" ]]; then
         /usr/bin/ssh $*
-    else
-        if [ -n "$1" ]; then
-            title "$*"
-        fi
-        /usr/bin/ssh $*
-        title ""
+        return
     fi
+    local arg host="" skip_next=0
+    for arg in "$@"; do
+        if (( skip_next )); then skip_next=0; continue; fi
+        case "$arg" in
+            -[BbcDEeFIiJLlmOopQRSWw])      skip_next=1; continue;;
+            -[BbcDEeFIiJLlmOopQRSWw]*|-*)  continue;;
+            *) host="${arg##*@}"; break;;
+        esac
+    done
+    [ -n "$1" ] && title "$*"
+    local prev_color="$_TAB_COLOR_RGB"
+    [ -n "$host" ] && (( $+functions[tab_color_from_string] )) && tab_color_from_string "$host"
+    /usr/bin/ssh $*
+    (( $+functions[tab_color_restore] )) && tab_color_restore "$prev_color"
+    title ""
 }
 
 
@@ -317,6 +344,56 @@ torandomparentdir(){
     cd ..
     echo "$PWD"
     torandomdir
+}
+
+random_select(){
+    emulate -L zsh
+    (( $# )) || return 1
+
+    zmodload zsh/datetime 2>/dev/null
+    zmodload zsh/system 2>/dev/null
+
+    local random_seed random_index
+    random_seed=${EPOCHREALTIME//[^0-9]/}
+    (( random_index = (RANDOM + ${sysparams[pid]:-0} + 10#${random_seed[-9,-1]:-0}) % $# + 1 ))
+    print -r -- "${@[random_index]}"
+}
+
+random_run(){
+    emulate -L zsh
+
+    local -a command_args
+    while (( $# )); do
+        [[ "$1" == "::" ]] && { shift; break; }
+        command_args+=("$1")
+        shift
+    done
+
+    if (( ! ${#command_args} || ! $# )); then
+        print -u2 'usage: random_run command [args ... {} ...] :: files...'
+        return 2
+    fi
+
+    local selected inserted=0 i
+    selected=$(random_select "$@") || return
+
+    for i in {1..${#command_args}}; do
+        if [[ "${command_args[i]}" == "{}" ]]; then
+            command_args[i]="$selected"
+            inserted=1
+        fi
+    done
+
+    (( inserted )) || command_args+=("$selected")
+    "${command_args[@]}"
+}
+
+mpvrandom(){
+    emulate -L zsh
+
+    local selected
+    selected=$(random_select "$@") || return
+    mpv -- "$selected"
 }
 
 # ec2 utils
@@ -383,10 +460,6 @@ activate(){
     _activate_file ./.venv/bin/activate && return 0
     return 1
 }
-
-if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
-    activate
-fi
 
 # # reset all bindkeys, this makes vi mode work _much_ faster
 # bindkey -rpM viins '\e'
@@ -723,6 +796,7 @@ export PATH="$HOME/.yarn/bin:$HOME/.config/yarn/global/node_modules/.bin:$PATH"
 if [[ -z "$TMX_DISABLE_ITERM" ]]; then
     test -e "${HOME}/.iterm2_shell_integration.zsh" && source "${HOME}/.iterm2_shell_integration.zsh"
 fi
+test -e "${HOME}/bin/iterm2_tab_color" && source "${HOME}/bin/iterm2_tab_color"
 
 # Refresh X11 environment from tmux.
 if [ -n "$TMUX" ]; then
@@ -796,17 +870,38 @@ fi
 
 fpath+=~/.zfunc
 
-# bun completions
-[ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-# bun
-export BUN_INSTALL="$HOME/.bun"
-export PATH="$BUN_INSTALL/bin:$PATH"
-
 export NVM_DIR="$HOME/.nvm"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
 [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
 
 if [ -f "$HOME/.zshrc.local" ] && [ "$HOME/.zshrc.local" != "${ROOT_DIR}.zshrc.local" ]; then
     source "$HOME/.zshrc.local"
+fi
+
+export CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1
+
+# >>> headroom persistent env >>>
+if command_exists headroom; then
+    export HEADROOM_PORT="${HEADROOM_PORT:-8787}"
+    export HEADROOM_HOST="${HEADROOM_HOST:-127.0.0.1}"
+    export HEADROOM_MODE="${HEADROOM_MODE:-token}"
+    export HEADROOM_BACKEND="${HEADROOM_BACKEND:-anthropic}"
+    export HEADROOM_TELEMETRY="${HEADROOM_TELEMETRY:-off}"
+    export HEADROOM_RETRY_MAX_ATTEMPTS="${HEADROOM_RETRY_MAX_ATTEMPTS:-10}"
+    export HEADROOM_PROXY_URL="http://${HEADROOM_HOST}:${HEADROOM_PORT}"
+
+    # Route AI CLIs through Headroom in every new zsh session.
+    export ANTHROPIC_BASE_URL="${ANTHROPIC_BASE_URL:-$HEADROOM_PROXY_URL}"
+    export OPENAI_BASE_URL="${OPENAI_BASE_URL:-${HEADROOM_PROXY_URL}/v1}"
+
+    # Route Headroom's Anthropic upstream through TeamClaude when available.
+    if command_exists teamclaude; then
+        export ANTHROPIC_TARGET_API_URL="${ANTHROPIC_TARGET_API_URL:-http://127.0.0.1:3456}"
+    fi
+fi
+# <<< headroom persistent env <<<
+
+# Activate virtualenv all the way at the bottom so the PATH does not get clobbered
+if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
+    activate
 fi
