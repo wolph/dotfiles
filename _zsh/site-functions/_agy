@@ -1,0 +1,42 @@
+#compdef agy
+# Zsh completion for the agy CLI.
+# Hand-written: agy is a Go (flag-package) binary with no completion generator
+# (it tries to open a TTY on `agy completion`).
+# Source of truth: `agy --help`. Update flags if the CLI changes.
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+local -a commands
+commands=(
+  'changelog:Show changelog and release notes'
+  'help:Show help for subcommands'
+  'install:Configure environment paths and shell settings'
+  'models:List available models'
+  'plugin:Manage plugins (install, uninstall, list, enable, disable)'
+  'plugins:Alias for plugin'
+  'update:Update CLI'
+)
+
+_arguments -s -C \
+  '*--add-dir[Add a directory to the workspace (repeatable)]:directory:_files -/' \
+  '(-c --continue)'{-c,--continue}'[Continue the most recent conversation]' \
+  '--conversation[Resume a previous conversation by ID]:id:' \
+  '--dangerously-skip-permissions[Auto-approve all tool permission requests]' \
+  '(-i --prompt-interactive)'{-i,--prompt-interactive}'[Run an initial prompt interactively and continue the session]:prompt:' \
+  '--log-file[Override CLI log file path]:path:_files' \
+  '--model[Model for the current CLI session]:model:' \
+  '(-p --print --prompt)'{-p,--print,--prompt}'[Run a single prompt non-interactively and print the response]' \
+  '--print-timeout[Timeout for print mode wait]:duration:' \
+  '--sandbox[Run in a sandbox with terminal restrictions enabled]' \
+  '1: :->command_or_prompt' \
+  '*:: :->rest' \
+  && return 0
+
+case $state in
+  command_or_prompt)
+    _describe -t commands 'agy command' commands
+    ;;
+esac
+
+return 1

@@ -1,0 +1,59 @@
+#compdef gemini
+# Zsh completion for Gemini CLI.
+# Hand-written: yargs' dynamic `gemini completion` shells out to the live CLI
+# (network + workspace-trust gated), so a static compdef is preferred.
+# Source of truth: `gemini --help`. Update flags if the CLI changes.
+
+local curcontext="$curcontext" state line
+typeset -A opt_args
+
+local -a commands
+commands=(
+  'mcp:Manage MCP servers'
+  'extensions:Manage Gemini CLI extensions'
+  'skills:Manage agent skills'
+  'hooks:Manage Gemini CLI hooks'
+  'gemma:Manage local Gemma model routing'
+)
+
+_arguments -s -C \
+  '(-d --debug)'{-d,--debug}'[Run in debug mode (open debug console with F12)]' \
+  '(-m --model)'{-m,--model}'[Model]:model:' \
+  '(-p --prompt)'{-p,--prompt}'[Run in non-interactive (headless) mode with the given prompt]:prompt:' \
+  '(-i --prompt-interactive)'{-i,--prompt-interactive}'[Execute the prompt and continue in interactive mode]:prompt:' \
+  '--skip-trust[Trust the current workspace for this session]' \
+  '(-w --worktree)'{-w,--worktree}'[Start Gemini in a new git worktree]::name:' \
+  '(-s --sandbox)'{-s,--sandbox}'[Run in sandbox]' \
+  '(-y --yolo)'{-y,--yolo}'[Automatically accept all actions (YOLO mode)]' \
+  '--approval-mode[Set the approval mode]:mode:(default auto_edit yolo plan)' \
+  '*--policy[Additional policy files or directories to load]:policy:_files' \
+  '*--admin-policy[Additional admin policy files or directories to load]:policy:_files' \
+  '--acp[Start the agent in ACP mode]' \
+  '--experimental-acp[(deprecated) Start the agent in ACP mode]' \
+  '*--allowed-mcp-server-names[Allowed MCP server names]:name:' \
+  '*--allowed-tools[(deprecated) Tools allowed to run without confirmation]:tool:' \
+  '(-e --extensions)'{-e,--extensions}'[Extensions to use]:extension:' \
+  '(-l --list-extensions)'{-l,--list-extensions}'[List all available extensions and exit]' \
+  '(-r --resume)'{-r,--resume}'[Resume a previous session (latest or index)]:session:' \
+  '--session-file[Load a session from a JSON file]:file:_files' \
+  '--session-id[Start a new session with a manually provided UUID]:uuid:' \
+  '--list-sessions[List available sessions for the current project and exit]' \
+  '--delete-session[Delete a session by index number]:index:' \
+  '*--include-directories[Additional directories to include in the workspace]:dir:_files -/' \
+  '--screen-reader[Enable screen reader mode for accessibility]' \
+  '(-o --output-format)'{-o,--output-format}'[The format of the CLI output]:format:(text json stream-json)' \
+  '--raw-output[Disable sanitization of model output]' \
+  '--accept-raw-output-risk[Suppress the security warning when using --raw-output]' \
+  '(-v --version)'{-v,--version}'[Show version number]' \
+  '(-h --help)'{-h,--help}'[Show help]' \
+  '1: :->command_or_query' \
+  '*:: :->rest' \
+  && return 0
+
+case $state in
+  command_or_query)
+    _describe -t commands 'gemini command' commands
+    ;;
+esac
+
+return 1
