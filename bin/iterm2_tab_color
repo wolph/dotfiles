@@ -1,0 +1,68 @@
+#!/usr/bin/env zsh
+# Deterministic iTerm2 tab coloring via OSC 6.
+# Source this file (or run under zsh) to get:
+#   tab_color_from_string <s>  - hash s, pick a curated palette color, emit OSC 6
+#   tab_color_reset            - clear the per-tab color
+#   tab_color_set <r> <g> <b>  - raw RGB setter (0-255 each)
+
+# No-op outside iTerm2 so escape bytes never leak into other terminals / CI.
+[[ -n "$ITERM_PROFILE" ]] || return 0 2>/dev/null || exit 0
+
+tab_color_set() {
+    printf '\033]6;1;bg;red;brightness;%d\a'   "$1"
+    printf '\033]6;1;bg;green;brightness;%d\a' "$2"
+    printf '\033]6;1;bg;blue;brightness;%d\a'  "$3"
+    export _TAB_COLOR_RGB="$1 $2 $3"
+}
+
+tab_color_reset() {
+    unset _TAB_COLOR_STRING _TAB_COLOR_RGB
+    printf '\033]6;1;bg;red;default\a'
+    printf '\033]6;1;bg;green;default\a'
+    printf '\033]6;1;bg;blue;default\a'
+}
+
+# Emit a snapshot of the current tab color (RGB triple or empty).
+# Capture into a local before changing the color; pass back to tab_color_restore.
+tab_color_snapshot() {
+    printf '%s' "$_TAB_COLOR_RGB"
+}
+
+# 14-color curated palette. Picked for distinguishability at Compact-tab fill.
+typeset -ga _ITERM2_TAB_PALETTE=(
+    "220 60 60"     # red
+    "230 130 40"    # orange
+    "230 175 40"    # amber
+    "210 200 50"    # yellow
+    "150 210 60"    # lime
+    "70 180 70"     # green
+    "60 190 170"    # teal
+    "70 190 220"    # cyan
+    "80 160 230"    # sky
+    "70 120 220"    # blue
+    "120 100 230"   # indigo
+    "170 90 220"    # violet
+    "220 90 200"    # magenta
+    "230 90 140"    # rose
+)
+
+tab_color_from_string() {
+    local s="$1"
+    [[ -z "$s" ]] && return 0
+    local hash
+    hash=$(printf '%s' "$s" | cksum | awk '{print $1}')
+    local idx=$(( hash % ${#_ITERM2_TAB_PALETTE[@]} + 1 ))  # zsh arrays are 1-indexed
+    local rgb=(${=_ITERM2_TAB_PALETTE[$idx]})
+    tab_color_set "$rgb[1]" "$rgb[2]" "$rgb[3]"
+    export _TAB_COLOR_STRING="$s"
+}
+
+# Restore previous color from a snapshot ("R G B" triple), or clear if empty.
+tab_color_restore() {
+    if [[ -n "$1" ]]; then
+        local rgb=(${=1})
+        tab_color_set "$rgb[1]" "$rgb[2]" "$rgb[3]"
+    else
+        tab_color_reset
+    fi
+}

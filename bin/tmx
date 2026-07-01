@@ -58,7 +58,14 @@ function title(){
     fi
 }
 
-test -n "$ITERM_PROFILE" && echo -ne "\e]1;$base_session\a"
+_tmx_prev_color="$_TAB_COLOR_RGB"
+if test -n "$ITERM_PROFILE"; then
+    echo -ne "\e]1;$base_session\a"
+    if [ -r "$HOME/bin/iterm2_tab_color" ]; then
+        source "$HOME/bin/iterm2_tab_color"
+        tab_color_from_string "$base_session"
+    fi
+fi
 # Set terminal name
 title "$1"
 
@@ -135,3 +142,6 @@ else
 fi
 
 test -n "$ITERM_PROFILE" && echo -ne "\e]0;\a"
+if test -n "$ITERM_PROFILE" && (( $+functions[tab_color_restore] )); then
+    tab_color_restore "$_tmx_prev_color"
+fi
