@@ -1,0 +1,103 @@
+#!/bin/sh
+# Install durable user services for Claude/Codex routing:
+# shell -> Headroom -> TeamClaude -> Anthropic.
+#
+# Requirements:
+# - headroom on PATH, usually ~/.local/bin/headroom
+# - optional teamclaude on PATH with ~/.config/teamclaude.json
+# - Linux user systemd
+
+set -eu
+
+PATH="$HOME/.local/bin:$PATH"
+export PATH
+
+command_exists() {
+    command -v "$1" >/dev/null 2>&1
+}
+
+if [ "$(uname -s)" != Linux ]; then
+    echo "setup-headroom-teamclaude only manages Linux systemd user services" >&2
+    exit 1
+fi
+
+if ! command_exists systemctl; then
+    echo "systemctl not found" >&2
+    exit 1
+fi
+
+if ! command_exists headroom; then
+    echo "headroom not found on PATH" >&2
+    exit 1
+fi
+
+service_dir="$HOME/.config/systemd/user"
+mkdir -p "$service_dir"
+
+headroom_bin=$(command -v headroom)
+headroom_host=${HEADROOM_HOST:-127.0.0.1}
+headroom_port=${HEADROOM_PORT:-8787}
+headroom_mode=${HEADROOM_MODE:-token}
+headroom_backend=${HEADROOM_BACKEND:-anthropic}
+retry_max=${HEADROOM_RETRY_MAX_ATTEMPTS:-10}
+teamclaude_url=${TEAMCLAUDE_URL:-http://127.0.0.1:3456}
+
+use_teamclaude=0
+if command_exists teamclaude && [ -f "$HOME/.config/teamclaude.json" ]; then
+    use_teamclaude=1
+    teamclaude_bin=$(command -v teamclaude)
+    cat > "$service_dir/teamclaude.service" <<EOF
+[Unit]
+Description=TeamClaude proxy
+After=network-online.target
+
+[Service]
+Type=simple
+ExecStart=$teamclaude_bin server --headless
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+EOF
+fi
+
+headroom_after="After=network-online.target"
+headroom_wants=""
+headroom_upstream_args=""
+if [ "$use_teamclaude" -eq 1 ]; then
+    headroom_after="After=network-online.target teamclaude.service"
+    headroom_wants="Wants=teamclaude.service"
+    headroom_upstream_args=" --anthropic-api-url $teamclaude_url"
+fi
+
+cat > "$service_dir/headroom-default.service" <<EOF
+[Unit]
+Description=Headroom proxy (default)
+$headroom_after
+$headroom_wants
+
+[Service]
+Type=simple
+ExecStart=$headroom_bin proxy --host $headroom_host --port $headroom_port --mode $headroom_mode --backend $headroom_backend$headroom_upstream_args --no-subscription-tracking --retry-max-attempts $retry_max
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=default.target
+EOF
+
+systemctl --user daemon-reload
+if [ "$use_teamclaude" -eq 1 ]; then
+    systemctl --user enable --now teamclaude.service
+    systemctl --user restart teamclaude.service
+fi
+systemctl --user enable --now headroom-default.service
+systemctl --user restart headroom-default.service
+
+echo "headroom-default.service configured on ${headroom_host}:${headroom_port}"
+if [ "$use_teamclaude" -eq 1 ]; then
+    echo "teamclaude.service configured and Headroom upstream set to $teamclaude_url"
+else
+    echo "teamclaude not configured; Headroom upstream left at provider default"
+fi
