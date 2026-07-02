@@ -69,7 +69,6 @@ T=0
 t(){
     T="$(gdate +%s%N)"
 }
-t
 td(){
     # Time delta
     TD="$(($(gdate +%s%N)-T))"
@@ -465,21 +464,23 @@ _zpcompinit_custom() {
   autoload -Uz compinit
   local zcd=${ZDOTDIR:-$HOME}/.zcompdump
   local zcdc="$zcd.zwc"
-  # Compile the completion dump to increase startup speed, if dump is newer or doesn't exist,
-  # in the background as this is doesn't affect the current session
-  # if [[ -f "$zcd"(#qN.m+1) ]]; then
-  #       compinit -i -d "$zcd"
-  #       { rm -f "$zcdc" && zcompile "$zcd" } &!
-  # else
-  #       compinit -C -d "$zcd"
-  #       { [[ ! -f "$zcdc" || "$zcd" -nt "$zcdc" ]] && rm -f "$zcdc" && zcompile "$zcd" } &!
-  # fi
-  compinit
+  if [[ -f "$zcd"(#qN.mh-24) ]]; then
+    # Dump is less than 24h old: trust it and skip the full fpath rescan.
+    compinit -C -d "$zcd"
+    { [[ ! -f "$zcdc" || "$zcd" -nt "$zcdc" ]] && rm -f "$zcdc" && zcompile "$zcd" } &!
+  else
+    # Stale or missing: full rebuild (-i skips insecure dirs instead of
+    # prompting), recompile in the background.
+    compinit -i -d "$zcd"
+    { rm -f "$zcdc" && zcompile "$zcd" } &!
+  fi
 }
 
+# compinit first — bashcompinit is documented to run after it (it triggers a
+# bare full compinit itself when compdef is missing, bypassing the fast path).
+_zpcompinit_custom
 autoload bashcompinit
 bashcompinit
-_zpcompinit_custom
 
 
 # Group matches and describe.
@@ -688,9 +689,21 @@ if [ 1 -eq "$DEBUG" ]; then
     zprof
 fi
 
+# Lazy-load nvm: sourcing nvm.sh eagerly costs hundreds of ms per shell.
+# Stubs self-destruct and load the real thing on first use. Note: `command
+# node` bypasses the stub, and PATH lacks nvm's node bin dir until first call.
 export NVM_DIR="$HOME/.nvm"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"  # This loads nvm
-[ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"  # This loads nvm bash_completion
+if [ -s "$NVM_DIR/nvm.sh" ]; then
+    _nvm_lazy_load() {
+        unfunction nvm node npm npx corepack _nvm_lazy_load 2>/dev/null
+        \. "$NVM_DIR/nvm.sh"
+        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
+    }
+    for _lazy_cmd in nvm node npm npx corepack; do
+        eval "${_lazy_cmd}(){ _nvm_lazy_load; ${_lazy_cmd} \"\$@\"; }"
+    done
+    unset _lazy_cmd
+fi
 
 if [ -f "$HOME/.zshrc.local" ] && [ "$HOME/.zshrc.local" != "${ROOT_DIR}.zshrc.local" ]; then
     source "$HOME/.zshrc.local"
