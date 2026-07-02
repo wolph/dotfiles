@@ -6,6 +6,6 @@ useDefault = true
 [allowlist]
 description = "The scanner and its tests reference token formats by construction, never literally"
 paths = [
-    '''bin/git-scan''',
-    '''tests/git-scan-test\.sh''',
+    '''^bin/git-scan$''',
+    '''^tests/git-scan-test\.sh$''',
 ]
