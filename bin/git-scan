@@ -150,6 +150,9 @@ scan_names() {
     local f base pat hits=0
     for f in "$@"; do
         base="${f:t}"
+        # Public keys ship intentionally (id_rsa.pub is tracked); only the
+        # private halves are sensitive.
+        [[ "$base" == *.pub ]] && continue
         for pat in "${SENSITIVE_NAME_PATTERNS[@]}"; do
             if [[ "$base" == ${~pat} ]]; then
                 print -r -- "blocked sensitive filename: ${f} (pattern: ${pat})"

@@ -146,4 +146,6 @@ else
   printf 'skip: lefthook not installed\n'
 fi
 
+expect_status 0 "names allows public keys" "$SCAN_BIN" names id_rsa.pub .ssh/id_ed25519.pub
+
 printf 'git-scan tests passed\n'
