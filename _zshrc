@@ -99,8 +99,6 @@ fi
 export TZ=Europe/Amsterdam
 
 # Adding my own completion functions
-fpath=(/usr/local/share/zsh-completions $fpath)
-fpath=(/usr/local/share/zsh/site-functions/ $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 
@@ -115,18 +113,9 @@ export PATH="$PATH:~/bin:${ROOT_DIR}bin"
 export PS1="$(print '%{\e[38;5;208m%}%n%{\e[0m%}')$(print '%{\e[38;5;33m%}@%{\e[0m%}')$(print '%{\e[38;5;10m%}%m%{\e[0m%}')# "
 export ORIGINAL_PS1="$PS1"
 export RPS1='%~'
-export ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern cursor)
 
 # esptool settings
 ESPTOOL_BAUD=921600
-
-# Declare the variable
-typeset -A ZSH_HIGHLIGHT_STYLES
-
-
-# To disable highlighting of globbing expressions
-ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
-
 
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
@@ -135,16 +124,6 @@ export PIPENV_VENV_IN_PROJECT=true
 
 # Set the java home
 test -x /usr/libexec/java_home && export JAVA_HOME=$(/usr/libexec/java_home)
-
-# if we're on ec2, set the hostname to the cluster setting if available
-EC2=0
-if [ $(hostname | grep -E '^ip-10-') ]; then
-    host=$(curl --silent http://169.254.169.254/latest/user-data/ | python -mjson.tool | grep cluster | sed 's/.*: *"\([^"]*\)".*/\1/g')
-    if [ "$host" ]; then
-        HOST=$host
-        EC2=1
-    fi
-fi
 
 zstyle ':completion:*' completer _expand _complete _ignored _correct _approximate
 zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*' 'r:|[._-]=** r:|=**'
@@ -159,11 +138,9 @@ if command_exists ssh-agent && [ -z "$SSH_AUTH_SOCK" ]; then
     eval $(ssh-agent) > /dev/null
 fi
 
-# Enable keychain or ssh-add
+# Load ssh keys into the agent
 if [ -z "$SSH_AUTH_SOCK" ]; then
-    if command_exists keychain; then
-        eval $(keychain --ignore-missing -Q -q --eval $SSH_KEYS)
-    elif command_exists ssh-add; then
+    if command_exists ssh-add; then
         for key in $SSH_KEYS; do
             if [ -f "$key" ]; then
                 if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
@@ -342,25 +319,6 @@ mpvrandom(){
     mpv -- "$selected"
 }
 
-# ec2 utils
-ec2ssh(){
-    host=$(echo $@ | sed 's/.*://')
-    label=$(echo $@ | sed 's/:.*//')
-    echo "Connecting to $label ($host)"
-    ssh-keygen -f "$HOME/.ssh/known_hosts" -R "$host"
-    rsync -av ~/.ec2_skel/ $host:~/
-    ssh -t $host exec zsh
-}
-
-update_ec2(){
-    "$HOME/.ec2/list_instances.py"
-}
-
-_ec2ssh(){
-    reply=(`cat ~/.ec2/instances`)
-}
-compctl -K _ec2ssh ec2ssh
-
 alias s='sudo -i zsh'
 
 # UV environment variables and path to be fully contained in ~/workspace
@@ -502,7 +460,6 @@ hosts=(
   "$_ssh_hosts[@]"
   "$_etc_hosts[@]"
   "$_ssh_config_hosts[@]"
-  "$HOST"
   localhost
 )
 
@@ -644,22 +601,6 @@ zstyle ':completion:*' menu select=5
 # No shared history between tabs
 unsetopt sharehistory
 
-# Disabled syntax highlighting because it is not compatible with jetbrains
-# terminals. It makes the caret/cursor invisible during movement.
-# /usr/local/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh \
-for i in \
-    /usr/local/share/zsh-autosuggestions/zsh-autosuggestions.zsh \
-; do
-    if [ -e "$i" ]; then
-        source "$i"
-    fi
-done
-
-export ZSH_AUTOSUGGEST_MANUAL_REBIND=true
-export ZSH_AUTOSUGGEST_USE_ASYNC=true
-export ZSH_AUTOSUGGEST_STRATEGY=(history)
-export ZSH_AUTOSUGGEST_BUFFER_MAX_SIZE=20
-
 if [ -d ~/.zsh/plugins/ ]; then
     for f in ~/.zsh/plugins/*sh; do
         . "$f"
@@ -711,10 +652,6 @@ function init_fzf(){
 if [ -f ~/.fzf.zsh ]; then
     source ~/.fzf.zsh
     init_fzf
-elif [ -f /usr/local/share/examples/fzf/shell/completion.zsh ]; then
-    source /usr/local/share/examples/fzf/shell/completion.zsh
-    source /usr/local/share/examples/fzf/shell/key-bindings.zsh
-    init_fzf
 elif command_exists fzf; then
     source <(fzf --zsh)
     init_fzf
@@ -739,47 +676,6 @@ if [ -n "$TMUX" ]; then
     add-zsh-hook precmd _tmux_refresh_env
 fi
 
-###-begin-pm2-completion-###
-### credits to npm for the completion file model
-#
-# Installation: pm2 completion >> ~/.bashrc  (or ~/.zshrc)
-#
-
-COMP_WORDBREAKS=${COMP_WORDBREAKS/=/}
-COMP_WORDBREAKS=${COMP_WORDBREAKS/@/}
-export COMP_WORDBREAKS
-
-if type complete &>/dev/null; then
-  _pm2_completion () {
-    local si="$IFS"
-    IFS=$'\n' COMPREPLY=($(COMP_CWORD="$COMP_CWORD" \
-                           COMP_LINE="$COMP_LINE" \
-                           COMP_POINT="$COMP_POINT" \
-                           pm2 completion -- "${COMP_WORDS[@]}" \
-                           2>/dev/null)) || return $?
-    IFS="$si"
-  }
-  complete -o default -F _pm2_completion pm2
-elif type compctl &>/dev/null; then
-  _pm2_completion () {
-    local cword line point words si
-    read -Ac words
-    read -cn cword
-    let cword-=1
-    read -l line
-    read -ln point
-    si="$IFS"
-    IFS=$'\n' reply=($(COMP_CWORD="$cword" \
-                       COMP_LINE="$line" \
-                       COMP_POINT="$point" \
-                       pm2 completion -- "${words[@]}" \
-                       2>/dev/null)) || return $?
-    IFS="$si"
-  }
-  compctl -K _pm2_completion + -f + pm2
-fi
-###-end-pm2-completion-###
-
 # Zoxide and Direnv initialization
 if command_exists zoxide; then
     eval "$(zoxide init zsh)"
@@ -787,10 +683,6 @@ fi
 if command_exists direnv; then
     eval "$(direnv hook zsh)"
 fi
-
-export PATH="/usr/local/opt/gnu-getopt/bin:$PATH"
-export PATH="/usr/local/opt/helm@2/bin:$PATH"
-export PATH="/usr/local/opt/helm@2/bin:$PATH"
 
 if [ 1 -eq "$DEBUG" ]; then
     # turn off tracing
