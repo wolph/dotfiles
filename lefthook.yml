@@ -1,0 +1,21 @@
+# Security hooks for this public repo (activated by install.sh -> lefthook install).
+# All jobs run in parallel. Bypass a single commit with: LEFTHOOK=0 git commit
+pre-commit:
+  parallel: true
+  jobs:
+    - name: secrets
+      run: bin/git-scan secrets --staged
+    - name: machine-paths
+      run: bin/git-scan paths --staged
+    - name: sensitive-names
+      run: bin/git-scan names {staged_files}
+    - name: shell-syntax
+      run: bin/git-scan syntax {staged_files}
+
+pre-push:
+  parallel: true
+  jobs:
+    - name: secrets-range
+      run: bin/git-scan secrets --range
+    - name: machine-paths-range
+      run: bin/git-scan paths --range

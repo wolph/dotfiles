@@ -127,4 +127,23 @@ expect_status 0 "syntax passes valid sh" "$SCAN_BIN" syntax "$TMPDIR/fine.sh"
 expect_status 0 "syntax skips non-shell files" "$SCAN_BIN" syntax "$TMPDIR/notes.txt"
 expect_status 0 "syntax with no files is clean" "$SCAN_BIN" syntax
 
+if command -v lefthook > /dev/null 2>&1; then
+  make_repo "$TMPDIR/hook-repo"
+  mkdir -p "$TMPDIR/hook-repo/bin"
+  cp "$SCAN_BIN" "$TMPDIR/hook-repo/bin/git-scan"
+  cp "$ROOT/lefthook.yml" "$ROOT/.gitleaks.toml" "$TMPDIR/hook-repo/"
+  ( cd "$TMPDIR/hook-repo" && lefthook install > /dev/null )
+  printf 'token = "%s"\n' "$FAKE_TOKEN" > "$TMPDIR/hook-repo/leak.txt"
+  git -C "$TMPDIR/hook-repo" add leak.txt
+  ( cd "$TMPDIR/hook-repo" && expect_status 1 "pre-commit hook blocks a staged token" \
+      git commit -m leak )
+  git -C "$TMPDIR/hook-repo" rm -q --cached leak.txt
+  printf 'all fine\n' > "$TMPDIR/hook-repo/fine.txt"
+  git -C "$TMPDIR/hook-repo" add fine.txt
+  ( cd "$TMPDIR/hook-repo" && expect_status 0 "pre-commit hook passes a clean commit" \
+      git commit -q -m fine )
+else
+  printf 'skip: lefthook not installed\n'
+fi
+
 printf 'git-scan tests passed\n'
