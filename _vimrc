@@ -31,24 +31,8 @@ let g:plug_threads = 16
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Make sure neovim uses a stable Python host
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if has("nvim")
-    " if filereadable('/usr/local/bin/python2')
-    "     let g:python_host_prog = '/usr/local/bin/python2'
-    " elseif filereadable('/usr/bin/python2')
-    "     let g:python_host_prog = '/usr/bin/python2'
-    " " else
-    " "     echom "WARNING: no valid python2 install found"
-    " endif
-    " " echom "Using python 2 prog: " . g:python_host_prog
-
-    if filereadable('/usr/local/bin/python3')
-        let g:python3_host_prog = '/usr/local/bin/python3'
-    elseif filereadable('/usr/bin/python3')
-        let g:python3_host_prog = '/usr/bin/python3'
-    " else
-    "     echom "WARNING: no valid python3 install found"
-    endif
-    " echom "Using python 3 prog: " . g:python3_host_prog
+if has('nvim') && executable('python3')
+    let g:python3_host_prog = exepath('python3')
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -65,7 +49,6 @@ call plug#begin(expand('~/.vim/bundle'))
 Plug 'preservim/nerdtree'
 " A Git wrapper so awesome, it should be illegal
 Plug 'tpope/vim-fugitive'
-" Snipmate and requirements for TextMate snippets
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'lepture/vim-jinja'
@@ -122,12 +105,17 @@ autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=234
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Fuzzy finder (fzf)
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
-    if isdirectory('/usr/local/opt/fzf')
-        Plug '/usr/local/opt/fzf'
-    else
-        Plug expand('~/.fzf')
+" Find fzf wherever this machine has it (Apple Silicon brew, Intel brew,
+" or the git install); fall back to CtrlP when there is no fzf at all.
+let s:fzf_dir = ''
+for s:dir in ['/opt/homebrew/opt/fzf', '/usr/local/opt/fzf', expand('~/.fzf')]
+    if isdirectory(s:dir)
+        let s:fzf_dir = s:dir
+        break
     endif
+endfor
+if s:fzf_dir != ''
+    execute 'Plug ' . string(s:fzf_dir)
 
     Plug 'junegunn/fzf.vim'
 
@@ -140,9 +128,6 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
         \ 'ctrl-v': 'rightbelow vsplit' }
 
     let g:fzf_command_prefix = ''
-
-    " [Tags] Command to generate tags file
-    let g:fzf_tags_command = 'ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./.tags $(python -c "import os, sys; print('' ''.join(''{}''.format(d) for d in sys.path if os.path.isdir(d)))")'
 
     " Default fzf layout
     " - down / up / left / right
@@ -501,16 +486,6 @@ set foldopen-=undo
 nmap < :foldclose<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Matchit
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let b:match_ignorecase = 1
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Perl
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let perl_extended_vars=1 " highlight advanced perl vars inside strings
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Mappings
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Change paging overlap amount from 2 to 5 (+3)
@@ -525,10 +500,6 @@ inoremap <F5> <C-R>=strftime("%F")<CR>
 " Insert the current filename
 nnoremap <F6> "=expand("%:t:r")<CR>P
 inoremap <F6> <C-R>=expand("%:t:r")<CR>
-" Going to matching braces
-inoremap } }<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ] ]<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
-inoremap ) )<Left><c-o>%<c-o>:sleep 500m<CR><c-o>%<c-o>a
 
 " Disable Ex mode
 nnoremap Q <nop>
@@ -551,7 +522,7 @@ autocmd FileType yaml setlocal ts=2 sts=2 sw=2 expandtab
 " Colors 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable 256 color support when available
-if (&term == 'nvim' && $TERM != 'xterm')
+if has('nvim')
     set termguicolors
     silent! colo desert
 elseif (&term == 'xterm-256color') || (&term == 'screen-256color')
@@ -560,7 +531,7 @@ elseif (&term == 'xterm-256color') || (&term == 'screen-256color')
     set t_Sf=[3%dm
     silent! colo desert256
     if &diff
-        colorscheme xorium
+        silent! colorscheme xorium
     endif
 else
     silent! colo desert
