@@ -21,7 +21,7 @@ link(){
 
     if [ -h "$destination" ]; then
         echo "$destination already linked, not linking."
-        continue
+        return
     elif [ -e "$destination" ]; then
         if [ $replace ]; then
             mv -vi "$destination" "${destination}.bak"
@@ -64,6 +64,44 @@ mkdir -p "$HOME/.claude" "$HOME/.codex" "$HOME/.gemini"
 ln -sf "$PWD/claude/statusline.js" "$HOME/.claude/statusline.js"
 # Generate CLAUDE.md / AGENTS.md / GEMINI.md from the shared base + per-tool overrides.
 "$PWD/bin/sync-agent-config"
+
+# Git security hooks: lefthook runs bin/git-scan (secrets, machine paths,
+# sensitive filenames, shell syntax) on pre-commit and pre-push. gitleaks is
+# the primary secret engine; without it git-scan warns and uses a weaker
+# builtin fallback scan.
+ensure_tool(){
+    tool="$1"
+    formula="$2"
+    gopkg="$3"
+    if command -v "$tool" > /dev/null 2>&1; then
+        return 0
+    fi
+    if command -v brew > /dev/null 2>&1 && brew install "$formula" && command -v "$tool" > /dev/null 2>&1; then
+        return 0
+    fi
+    if command -v go > /dev/null 2>&1 && go install "$gopkg"; then
+        # go installs into GOPATH/bin, which is often not on PATH yet.
+        PATH="$PATH:$(go env GOPATH 2>/dev/null || echo "$HOME/go")/bin"
+        export PATH
+        if command -v "$tool" > /dev/null 2>&1; then
+            return 0
+        fi
+    fi
+    if [ "$tool" = lefthook ] && command -v npm > /dev/null 2>&1 && npm install -g lefthook && command -v "$tool" > /dev/null 2>&1; then
+        return 0
+    fi
+    return 1
+}
+
+if ensure_tool lefthook lefthook github.com/evilmartians/lefthook@latest; then
+    lefthook install
+else
+    echo "WARNING: could not install lefthook (no brew/go/npm); git security hooks NOT active."
+    echo "         Install lefthook manually, then run: lefthook install"
+fi
+if ! ensure_tool gitleaks gitleaks github.com/gitleaks/gitleaks/v8@latest; then
+    echo "WARNING: gitleaks unavailable; secret scan uses the weaker builtin fallback."
+fi
 
 # kubernetes aliases
 if type kubectl > /dev/null; then
