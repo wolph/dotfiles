@@ -22,11 +22,6 @@ if [ 1 -eq "$DEBUG" ]; then
     setopt xtrace prompt_subst
 fi
 
-# Fixing OS X Path annoyances
-# if [ -x /usr/libexec/path_helper ]; then
-#     echo 'Removing the execute flag from the OS X path helper as it is broken'
-#     sudo chmod ugo-x /usr/libexec/path_helper
-# fi
 
 if [ -x ~/bin/tmx ]; then
     export ROOT_DIR=~/
@@ -36,9 +31,6 @@ else
     export ROOT_DIR=~rick/
 fi
 
-# if [ "$TERM" = "xterm" ]; then
-#     export TERM=xterm-256color
-# fi
 
 if [ -z "$SSH_AUTH_SOCK" ] && [[ "$OSTYPE" == darwin* ]] && command -v launchctl >/dev/null 2>&1; then
     launchd_ssh_auth_sock=$(launchctl getenv SSH_AUTH_SOCK 2>/dev/null)
@@ -112,17 +104,6 @@ fpath=(/usr/local/share/zsh/site-functions/ $fpath)
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 
-# # Antigen bundles
-# . ${ROOT_DIR}.antigen.zsh
-# antigen bundle WoLpH/zsh-completions src
-# antigen bundle git
-# antigen bundle svn
-# antigen bundle python
-# antigen bundle pip
-# antigen bundle extract
-# antigen bundle sharat87/zsh-vim-mode
-# antigen bundle kennethreitz/autoenv
-# antigen apply
 
 # $PATH changes are done in .zprofile
 if [ -d "$HOME/.local/bin" ]; then
@@ -131,7 +112,6 @@ fi
 export PATH="$PATH:~/bin:${ROOT_DIR}bin"
 
 # Prompts
-#export PS1="$(print '%{\e[0;91m%}%n%{\e[0m%}')$(print '%{\e[0;94m%}@%{\e[0m%}')$(print '%{\e[0;92m%}%m%{\e[0m%}')# "
 export PS1="$(print '%{\e[38;5;208m%}%n%{\e[0m%}')$(print '%{\e[38;5;33m%}@%{\e[0m%}')$(print '%{\e[38;5;10m%}%m%{\e[0m%}')# "
 export ORIGINAL_PS1="$PS1"
 export RPS1='%~'
@@ -143,22 +123,10 @@ ESPTOOL_BAUD=921600
 # Declare the variable
 typeset -A ZSH_HIGHLIGHT_STYLES
 
-# # To differentiate aliases from other command types
-# ZSH_HIGHLIGHT_STYLES[alias]='fg=magenta,bold'
-# 
-# # To have paths colored instead of underlined
-# ZSH_HIGHLIGHT_STYLES[path]='fg=cyan'
 
 # To disable highlighting of globbing expressions
 ZSH_HIGHLIGHT_STYLES[globbing]='fg=cyan'
 
-# Show the vim mode
-# function zle-line-init zle-keymap-select {
-#     RPS1="%~ ${${KEYMAP/vicmd/[NORMAL]}/(main|viins)/[INSERT]} $EPS1"
-#     zle reset-prompt
-# }
-# zle -N zle-line-init
-# zle -N zle-keymap-select
 
 # Enable Jedi within the normal Python interpreter
 export PYTHONSTARTUP="$HOME/.pythonrc.py"
@@ -183,15 +151,6 @@ zstyle ':completion:*' matcher-list '' 'm:{[:lower:]}={[:upper:]}' 'l:|=* r:|=*'
 zstyle ':completion:*' max-errors 2
 zstyle :compinstall filename '~/.zshrc'
 
-# Allow local X access, seems to be needed for OSX to work with X properly...
-#if [ -x /usr/bin/xhost ] && [ -n "$DISPLAY" ]; then
-#    xhost +$(hostname -s) > /dev/null
-#    xhost +$(hostname -f) > /dev/null
-#fi
-
-# if [ -x ${ROOT_DIR}bin/start_supervisord ]; then
-#     sudo ${ROOT_DIR}bin/start_supervisord
-# fi
 
 
 SSH_KEYS=(~/.ssh/id_rsa ~/.ssh/id_dsa)
@@ -218,9 +177,6 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
 fi
 
 # Some convenient aliases
-# Enable spellcheck/autocorrect?
-# setopt correct
-# export SPROMPT="Correct $fg[red]%R$reset_color to $fg[green]%r?$reset_color (Yes, No, Abort, Edit) "
 
 alias mv='nocorrect mv'       # no spelling correction on mv
 alias cp='nocorrect cp'       # no spelling correction on cp
@@ -244,9 +200,6 @@ alias push='git pull; git push'
 export GIT_MERGE_AUTOEDIT=no
 export HOMEBREW_CASK_OPTS=--no-quarantine
 
-# Some people might not like this but I find it convenient. It makes find
-# search in symlinks by default
-# alias find='find -L'
 alias grep='grep --color=auto --directories=skip'
 alias locate='/opt/homebrew/opt/findutils/libexec/gnubin/locate -d /var/db/locate.gnu-all.db:/var/db/locate.gnu-users.db'
 alias updatedb-all='sudo /usr/local/bin/updatedb-all'
@@ -272,7 +225,6 @@ alias tb='nc termbin.com 9999'
 alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
 alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
 alias docker-compose='docker compose'
-#alias mplayer='open -a MplayerX.App --args '
 
 # AI agent CLI defaults (override bare commands; zsh won't re-expand an alias for
 # its own name, so these run the real binaries with flags prepended; tab-completion
@@ -283,16 +235,7 @@ alias codex='codex --ask-for-approval on-request --sandbox workspace-write'     
 alias gemini='gemini --approval-mode auto_edit'                                    # auto-approve edits, prompt for the rest
 alias agy='agy --sandbox'                                                          # agy's only safety lever (no plan/approval flag exists)
 
-# Little trick to change the name of the shell
-# . ${ROOT_DIR}bin/iterm2_helpers
 
-# moved to bin/title
-# function title(){
-#     if [ "$1" != "default" ]; then
-#         echo -ne "\033]0;$1\007"
-#         printf "\033k$1\033\\"
-#     fi
-# }
 
 function mosh(){
     if [ -n "$1" ]; then
@@ -419,9 +362,6 @@ _ec2ssh(){
 compctl -K _ec2ssh ec2ssh
 
 alias s='sudo -i zsh'
-# s(){
-#     sudo su -m $@ -c 'exec zsh'
-# }
 
 # UV environment variables and path to be fully contained in ~/workspace
 export TMX_WORKSPACE_DIR="${TMX_WORKSPACE_DIR:-${HOME}/workspace}"
@@ -464,8 +404,6 @@ activate(){
     return 1
 }
 
-# # reset all bindkeys, this makes vi mode work _much_ faster
-# bindkey -rpM viins '\e'
 
 # Vim mode
 bindkey -v
@@ -491,7 +429,6 @@ bindkey '^E' edit-command-line
 #And DEL too, as well as PGDN and insert:
 bindkey '^[[3~' delete-char
 bindkey '^[[6~' end-of-history
-#bindkey '\e[2~' redisplay
 
 #Now bind pgup to paste the last word of the last command,
 bindkey '\e[5~' insert-last-word
@@ -651,12 +588,6 @@ zstyle ':completion:*:history-words' remove-all-dups yes
 zstyle ':completion:*:history-words' list false
 zstyle ':completion:*:history-words' menu yes
 
-# Include non-hidden directories in globbed file completions
-# for certain commands
-
-zstyle ':completion::complete:*' '\'
-
-# tag-order 'globbed-files directories' all-files
 zstyle ':completion::complete:*:tar:directories' file-patterns '*~.*(-/)'
 
 # Don't complete backup files as executables
@@ -665,8 +596,6 @@ zstyle ':completion:*:complete:-command-::commands' ignored-patterns '*\~'
 # Don't complete files that vim shouldn't handle
 zstyle ':completion:*:*:(vi|vim|nvim|vimdiff):*:*' ignored-patterns '*?.pyc' \
     '*?.pyo' '*?.pdf' '*?.o'
-# zstyle ':completion:*:*:(vi|vim|nvim|vimdiff):*:directories' ignored-patterns \
-#     '(*/)*.egg-info'
 
 # Ignore these everywhere except for rm
 zstyle ':completion:*:*:*' ignored-patterns '(|*/)__pycache__' \
