@@ -30,6 +30,17 @@ require_diff_mode() {
     esac
 }
 
+# Resolve the outgoing-commit range for --range mode: explicit ref if given,
+# else @{push}..HEAD when a push ref exists, else empty (caller falls back to
+# scanning commits missing from every remote).
+resolve_range_ref() {
+    local ref="${1:-}"
+    if [ -z "$ref" ] && git rev-parse --quiet --verify '@{push}' > /dev/null 2>&1; then
+        ref='@{push}..HEAD'
+    fi
+    print -r -- "$ref"
+}
+
 # Print the unified-0 diff selected by --staged or --range. --range without a
 # ref uses @{push}..HEAD; with no push ref it falls back to every commit
 # missing from all remotes (new branch / no upstream).
@@ -40,9 +51,7 @@ emit_diff() {
             git diff --cached --unified=0 --no-color
             ;;
         (--range)
-            if [ -z "$ref" ] && git rev-parse --quiet --verify '@{push}' > /dev/null 2>&1; then
-                ref='@{push}..HEAD'
-            fi
+            ref="$(resolve_range_ref "$ref")"
             if [ -n "$ref" ]; then
                 git diff --unified=0 --no-color "$ref"
             else
@@ -82,15 +91,38 @@ match_added_lines() {
 }
 
 builtin_secret_scan() {
-    emit_diff "$@" | match_added_lines "$SECRET_PATTERN"
+    emit_diff "$@" | match_added_lines "$SECRET_PATTERN" '# gitleaks:allow'
+}
+
+# gitleaks git wraps `git diff`/`git log` scanning itself; --staged mirrors
+# emit_diff's --staged mode, --range mirrors emit_diff's ref-resolution logic
+# (default to @{push}..HEAD, falling back to commits missing from all
+# remotes) so both engines scan the same input.
+run_gitleaks() {
+    local mode="${1:-}" ref="${2:-}"
+    case "$mode" in
+        (--staged)
+            gitleaks git --pre-commit --staged --redact --no-banner --verbose
+            ;;
+        (--range)
+            ref="$(resolve_range_ref "$ref")"
+            if [ -n "$ref" ]; then
+                gitleaks git --redact --no-banner --verbose --log-opts "$ref"
+            else
+                gitleaks git --redact --no-banner --verbose --log-opts 'HEAD --not --remotes'
+            fi
+            ;;
+        (*)
+            usage
+            ;;
+    esac
 }
 
 scan_secrets() {
     require_diff_mode "${1:-}"
     local ret_status=0
     if command -v gitleaks > /dev/null 2>&1; then
-        # Replaced with the real gitleaks invocation in the next task.
-        builtin_secret_scan "$@" || ret_status=1
+        run_gitleaks "$@" || ret_status=1
     else
         print -u2 'WARNING: gitleaks not installed - falling back to the weaker builtin secret scan.'
         print -u2 '         Install it with: brew install gitleaks'
