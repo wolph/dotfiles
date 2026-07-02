@@ -83,4 +83,20 @@ git -C "$TMPDIR/secrets-repo" add conf
 
 expect_status 2 "secrets without a mode is a usage error" env PATH="$RESTRICTED_PATH" "$SCAN_BIN" secrets
 
+if command -v gitleaks > /dev/null 2>&1; then
+  printf 'token = "%s"\n' "$FAKE_TOKEN" > "$TMPDIR/secrets-repo/conf"
+  git -C "$TMPDIR/secrets-repo" add conf
+  ( cd "$TMPDIR/secrets-repo" && expect_status 1 "gitleaks blocks staged token" \
+      "$SCAN_BIN" secrets --staged )
+  git -C "$TMPDIR/secrets-repo" rm -q --cached conf
+else
+  printf 'skip: gitleaks not installed\n'
+fi
+
+printf 'token = "%s" # gitleaks:allow\n' "$FAKE_TOKEN" > "$TMPDIR/secrets-repo/conf"
+git -C "$TMPDIR/secrets-repo" add conf
+( cd "$TMPDIR/secrets-repo" && expect_status 0 "builtin honors gitleaks:allow marker" \
+    env PATH="$RESTRICTED_PATH" "$SCAN_BIN" secrets --staged )
+git -C "$TMPDIR/secrets-repo" rm -q --cached conf
+
 printf 'git-scan tests passed\n'
