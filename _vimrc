@@ -52,14 +52,6 @@ if has("nvim")
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Check python version if available
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let python_version=0
-if has("python")
-    python import vim; from sys import version_info as v; vim.command('let python_version=%d' % (v[0] * 100 + v[1]))
-endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Automatically fix common typos
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 iabbrev improt import
@@ -70,41 +62,17 @@ iabbrev teh the
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin(expand('~/.vim/bundle'))
 " Tree like file browser
-Plug 'scrooloose/nerdtree'
+Plug 'preservim/nerdtree'
 " A Git wrapper so awesome, it should be illegal
 Plug 'tpope/vim-fugitive'
 " Snipmate and requirements for TextMate snippets
 Plug 'tpope/vim-eunuch'
 Plug 'tpope/vim-repeat'
 Plug 'lepture/vim-jinja'
-Plug 'thiderman/vim-supervisor'
 Plug 'chr4/nginx.vim'
-Plug 'alfredodeza/coveragepy.vim'
-Plug 'alfredodeza/pytest.vim'
-Plug 'vim-scripts/pig.vim'
-Plug 'rizzatti/dash.vim'
-Plug 'vim-scripts/vim-coffee-script'
-Plug 'tshirtman/vim-cython'
-Plug 'robbles/logstash.vim'
 
-Plug 'rstacruz/sparkup'
-
-if has('mac')
-    Plug 'vim-scripts/copy-as-rtf'
-endif
-Plug 'mikewest/vimroom'
-Plug 'guns/xterm-color-table.vim'
-
-Plug 'tfnico/vim-gradle'
-Plug 'MarcWeber/vim-addon-local-vimrc'
-
-Plug 'zainin/vim-mikrotik'
-Plug 'Chiel92/vim-autoformat'
-Plug 'gorkunov/smartpairs.vim'
 Plug 'Vimjas/vim-python-pep8-indent'
 Plug 'AndrewRadev/linediff.vim'
-Plug 'elzr/vim-json'
-let g:vim_json_syntax_conceal = 0
 
 Plug 'junegunn/vim-easy-align'
 xmap ga <Plug>(EasyAlign)
@@ -113,41 +81,9 @@ nmap ga <Plug>(EasyAlign)
 Plug 'tomtom/tcomment_vim'
 vmap / gc<cr>
 
-Plug 'mattboehm/vim-unstack'
-
-if has("nvim")
-    Plug 'sbdchd/neoformat'
-endif
-
-Plug 'robertklep/vim-berry'
-
-" Json stuff
-Plug 'Shougo/unite.vim'
-Plug 'Quramy/vison'
-
-" Easy import sorting for Python
-map <leader>i :Isort<cr>
-command! -range=% Isort :<line1>,<line2>! isort -
-
-Plug 'mattn/emmet-vim'
-
-Plug 'othree/javascript-libraries-syntax.vim'
-let g:used_javascript_libs = 'jquery'
-
-Plug 'ap/vim-css-color'
 Plug 'junegunn/vim-peekaboo'
-Plug 'powerman/vim-plugin-AnsiEsc'
-
-Plug 'leafgarland/typescript-vim'
-
-if has("nvim") && has("macunix")
-    " due to bug in neovim, disable fsync for now...
-    " https://github.com/neovim/neovim/issues/6725
-    set nofsync
-endif
 
 if has("nvim")
-    Plug 'kassio/neoterm'
     tnoremap <C-w><C-w> <C-\><C-n><C-w><C-w>
     tnoremap <C-w>h <C-\><C-n><C-w>h
     tnoremap <C-w>j <C-\><C-n><C-w>j
@@ -173,41 +109,6 @@ autocmd FileType python let b:switch_custom_definitions =
             \ [
             \ {'"': '''',},
             \ ]
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Mirror tasks on multiple machines
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'zenbro/mirror.vim'
-
-let g:mirror#ssh_auto_cd = 1
-let g:mirror#diff_layout = 'vsplit'
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" arduino support
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'stevearc/vim-arduino'
-let g:arduino_run_headless = 1
-let g:arduino_args = '--verbose-upload'
-" let g:arduino_board = 'arduino:avr:uno'
-" let g:arduino_programmer = 'arduino:usbasp'
-" let g:arduino_serial_baud = 115200
-let g:arduino_auto_baud = 1
-let g:arduino_serial_tmux = 'split-window -d'
-nnoremap <buffer> <leader>am :ArduinoVerify<CR>
-nnoremap <buffer> <leader>au :ArduinoUpload<CR>
-nnoremap <buffer> <leader>ad :ArduinoUploadAndSerial<CR>
-nnoremap <buffer> <leader>ab :ArduinoChooseBoard<CR>
-nnoremap <buffer> <leader>ap :ArduinoChooseProgrammer<CR>
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" javascript highlighting and indenting
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-Plug 'pangloss/vim-javascript'
-let g:javascript_plugin_jsdoc = 1
-let g:javascript_plugin_ngdoc = 1
-let g:javascript_plugin_flow = 1
-
-Plug 'jelera/vim-javascript-syntax'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Vim indent guides
@@ -303,15 +204,10 @@ else
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Neovim completion manager
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plug 'chase/vim-ansible-yaml'
-let g:ansible_options = {'ignore_blank_lines': 0}
-let g:ansible_options = {'documentation_mapping': '<C-K>'}
+let g:ansible_options = {'ignore_blank_lines': 0, 'documentation_mapping': '<C-K>'}
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Gundo/Mundo, the holy grail in undos
@@ -322,12 +218,6 @@ nnoremap U :silent MundoToggle<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Snippets
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Track the engine.
-
-Plug 'MarcWeber/vim-addon-mw-utils'
-Plug 'tomtom/tlib_vim'
-
-
 " Rainbow parenthesis
 Plug 'luochen1990/rainbow'
 let g:rainbow_active=1
@@ -335,11 +225,6 @@ let g:rainbow_active=1
 command! -nargs=1 Silent
 \ | execute ':silent !'.<q-args>
 \ | execute ':redraw!'
-
-let g:black_skip_string_normalization = 1
-let g:black_linelength = 78
-
-" Replaced with the ruff language server in ~/.vim/init.lua
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Enable the system clipboard if available
@@ -364,16 +249,6 @@ autocmd FileType rst vmap m S:math<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " reStructuedText in Vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-let g:riv_default_path = "~/Desktop/TU"
-let main_project = {'path': './',  'build_path': 'build'}
-let sphinx_project = {'path': './docs/',  'build_path': './docs/_build'}
-let g:riv_projects = [main_project, sphinx_project]
-
-" Set the default (web|file)browser for OS X
-let g:riv_ft_browser = "open"
-let g:riv_web_browser = "open"
-let g:riv_file_link_style = 2
-
 augroup filetypedetect
     au BufNewFile,BufRead *.rst set suffixesadd+=.rst
     au BufNewFile,BufRead *.rst set ft=doctest
@@ -387,98 +262,9 @@ let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-
-" Syntastic is awesome, but slow as ... on Vim
-" if version >= 702
-if has("nvim")
-    Plug 'w0rp/ale'
-
-    " constantly writing means constant asking whether I want to save...
-    " annoying AF
-    let g:ale_lint_on_text_changed = 'never'
-    let g:ale_python_black_options = "--skip-string-normalization"
-
-    " pylint is too whiny for my taste... disable it until I find a proper
-    " config
-    " pip2 install -U requests[security] urllib3 pyopenssl ndg-httpsclient
-    " pip2 install -U pyasn1 autopep8 isort flake8 yapf pylint
-    " pip3 install -U mypy
-    let g:ale_linters = {
-    \    'python': ['autopep8', 'flake8', 'isort', 'yapf'],
-    \}
-    " \    'python': ['autopep8', 'flake8', 'isort', 'mypy', 'pylint', 'yapf']
-
-    let b:ale_python_flake8_options = '--ignore=D300'
-
-    let g:ale_fixers = {
-    \    'python': [
-    \        'add_blank_lines_for_python_control_statements',
-    \        'autopep8',
-    \        'isort',
-    \        'yapf',
-    \        'remove_trailing_lines',
-    \    ],
-    \}
-
-    " Plug 'Syntastic' 
-
-    " " shouldn't do Python for us
-    " let g:syntastic_python_checkers = []
-endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Active Python environment support
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if python_version >= 205
-    " WARNING: jedi currently has a bug that the dominant system python
-    " decides the Python path so symlink venv/lib/python3.x to
-    " venv/lib/python3.4 (or whatever your system python is)
-
-    python << EOF
-import os
-import sys
-import glob
-
-venv = os.getenv('VIRTUAL_ENV')
-if venv:
-    paths = glob.glob(os.path.join(venv, 'lib', 'python*', 'site-packages'))
-
-    for path in paths:
-        sys.path.insert(0, path)
-
-    vim.command('let g:deoplete#sources#jedi#extra_path="%s"' % paths[0])
-EOF
-
-endif
-
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Python Jedi plugin for better autocompletion
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-if python_version >= 205
-    Plug 'davidhalter/jedi-vim'
-endif
-
-" I find buffer to be quite convenient, but tabs or splits are also an option
-let g:jedi#use_tabs_not_buffers = 0
-let g:jedi#use_splits_not_buffers = 1
-
-" Shortcuts
-let g:jedi#goto_assignments_command = "<leader>g"
-let g:jedi#goto_definitions_command = "<leader>d"
-" let g:jedi#documentation_command = "K"
-let g:jedi#usages_command = "<leader>n"
-let g:jedi#completions_command = "<C-Space>"
-let g:jedi#rename_command = "<leader>r"
-let g:jedi#show_call_signatures = "2"
-let g:jedi#smart_auto_mappings = 0
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Really nice color schemes for 256 colors shell
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plug 'vim-scripts/desert256.vim'
-Plug 'vim-scripts/oceandeep'
 Plug 'vim-scripts/xorium.vim'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -715,34 +501,6 @@ set foldopen-=undo
 nmap < :foldclose<cr>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" CTags
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Location of ctags
-let Tlist_Ctags_Cmd = 'ctags' 
-" order by 
-let Tlist_Sort_Type = "name" 
-" split to the right side of the screen
-let Tlist_Use_Right_Window = 1 
-" show small meny
-let Tlist_Compact_Format = 1 
-" if you are the last, kill yourself
-let Tlist_Exist_OnlyWindow = 1 
-" Do not close tags for other files
-let Tlist_File_Fold_Auto_Close = 0 
-" Do show folding tree
-let Tlist_Enable_Fold_Column = 1 
-" 50 cols wide, so I can (almost always) read my functions
-let Tlist_WinWidth = 50 
-" don't show variables in php
-let tlist_php_settings = 'php;c:class;d:constant;f:function' 
-" just functions and subs
-let tlist_aspvbs_settings = 'asp;f:function;s:sub' 
-" just functions and classes
-let tlist_aspjscript_settings = 'asp;f:function;c:class' 
-" just functions and classes
-let tlist_vb_settings = 'asp;f:function;c:class' 
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Matchit
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 let b:match_ignorecase = 1
@@ -781,11 +539,8 @@ nnoremap Q <nop>
 " Map filetypes to get proper highlighting
 augroup filetypedetect
     au BufNewFile,BufRead */apache/* setf apache
-    au BufNewFile,BufRead */supervisor/* setf supervisor
     au BufNewFile,BufRead */nginx/* setf nginx
-    au BufNewFile,BufRead */logstash/* setf logstash
     au BufNewFile,BufRead *.html setf jinja
-    au BufNewFile,BufRead *.pig set filetype=pig syntax=pig 
     au BufNewFile,BufRead *.qvpp set filetype=html
 augroup END
 
