@@ -45,4 +45,12 @@ make_repo() {
 expect_status 2 "no arguments is a usage error" "$SCAN_BIN"
 expect_status 2 "unknown subcommand is a usage error" "$SCAN_BIN" bogus
 
+expect_status 1 "names blocks .env" "$SCAN_BIN" names .env
+expect_status 1 "names blocks nested pem" "$SCAN_BIN" names conf/tls/server.pem
+expect_status 1 "names blocks id_rsa" "$SCAN_BIN" names .ssh/id_rsa
+expect_status 0 "names allows normal files" "$SCAN_BIN" names _zshrc bin/tmx README.rst
+expect_status 0 "names with no files is clean" "$SCAN_BIN" names
+assert_contains "$("$SCAN_BIN" names .env 2>&1 || true)" "blocked sensitive filename"
+assert_contains "$("$SCAN_BIN" names .env 2>&1 || true)" "LEFTHOOK=0"
+
 printf 'git-scan tests passed\n'
