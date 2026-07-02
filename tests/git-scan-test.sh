@@ -99,4 +99,22 @@ git -C "$TMPDIR/secrets-repo" add conf
     env PATH="$RESTRICTED_PATH" "$SCAN_BIN" secrets --staged )
 git -C "$TMPDIR/secrets-repo" rm -q --cached conf
 
+make_repo "$TMPDIR/range-repo"
+printf 'token = "%s"\n' "$FAKE_TOKEN" > "$TMPDIR/range-repo/creds.txt"
+git -C "$TMPDIR/range-repo" add creds.txt
+git -C "$TMPDIR/range-repo" commit -q --no-verify -m "sneaky"
+( cd "$TMPDIR/range-repo" && expect_status 1 "range scan catches committed secret" \
+    "$SCAN_BIN" secrets --range )
+printf 'cache = "%s"\n' "$BAD_PATH" > "$TMPDIR/range-repo/paths.txt"
+git -C "$TMPDIR/range-repo" add paths.txt
+git -C "$TMPDIR/range-repo" commit -q --no-verify -m "sneaky path"
+( cd "$TMPDIR/range-repo" && expect_status 1 "range scan catches committed machine path" \
+    "$SCAN_BIN" paths --range )
+make_repo "$TMPDIR/range-clean"
+printf 'nothing here\n' > "$TMPDIR/range-clean/note"
+git -C "$TMPDIR/range-clean" add note
+git -C "$TMPDIR/range-clean" commit -q -m "clean"
+( cd "$TMPDIR/range-clean" && expect_status 0 "range scan passes clean history" \
+    "$SCAN_BIN" secrets --range )
+
 printf 'git-scan tests passed\n'
