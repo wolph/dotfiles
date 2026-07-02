@@ -14,16 +14,18 @@ filetype off
 let iCanHazPlug=1
 let plugPath=expand('~/.vim/autoload/plug.vim')
 if !filereadable(plugPath)
-    echo "Installing Plug to " . plugPath 
+    echo "Installing Plug to " . plugPath
     echo ""
-        if executable('curl')
-            silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-        else
-            silent !curl -qO ~/.vim/autoload/plug.vim https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-        endif
+    if executable('curl')
+        silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+    else
+        echohl WarningMsg | echo 'curl not found: cannot install vim-plug automatically' | echohl None
+    endif
 
+    if filereadable(plugPath)
         source ~/.vim/autoload/plug.vim
-    let iCanHazPlug=0
+        let iCanHazPlug=0
+    endif
 endif
 
 let g:plug_threads = 16
@@ -201,7 +203,7 @@ Plug 'simnalamburt/vim-mundo'
 nnoremap U :silent MundoToggle<CR>
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Snippets
+" Rainbow parenthesis and misc commands
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Rainbow parenthesis
 Plug 'luochen1990/rainbow'

@@ -4,6 +4,11 @@
 # - [modern] checks run only when nvim >= 0.11 and pyright/ruff exist
 # - [fzf] check runs only when an fzf installation directory exists
 # Exit 0 iff every applicable check passes.
+#
+# NOTE: this harness tests the INSTALLED config (~/.vimrc, ~/.vim), which the
+# dotfiles install.sh symlinks into place from this repo. On an uninstalled
+# clone (install.sh never run), results reflect whatever is already installed
+# on the machine, not the files in this repo checkout.
 
 fail=0
 pass(){ printf 'PASS: %s\n' "$*"; }
@@ -60,8 +65,8 @@ else
 fi
 
 # 4. [fzf] :FZF command is wired when fzf is installed
-if [ "$modern" = 1 ] || command -v nvim >/dev/null 2>&1; then
-    if [ -d /opt/homebrew/opt/fzf ] || [ -d /usr/local/opt/fzf ] || [ -d "$HOME/.fzf" ]; then
+if [ -d /opt/homebrew/opt/fzf ] || [ -d /usr/local/opt/fzf ] || [ -d "$HOME/.fzf" ]; then
+    if command -v nvim >/dev/null 2>&1; then
         r=$(nvim --headless \
             -c 'lua io.stdout:write(tostring(vim.fn.exists(":FZF")))' \
             -c 'qa!' 2>/dev/null)
@@ -71,8 +76,10 @@ if [ "$modern" = 1 ] || command -v nvim >/dev/null 2>&1; then
             failed ":FZF exists() = ${r:-?} (want 2) - fzf plugin not wired"
         fi
     else
-        printf 'SKIP: no fzf installation directory found\n'
+        printf 'SKIP: fzf present but nvim not installed to verify :FZF\n'
     fi
+else
+    printf 'SKIP: no fzf installation directory found\n'
 fi
 
 exit "$fail"
