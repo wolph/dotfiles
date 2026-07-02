@@ -10,6 +10,33 @@
 # Exit codes: 0 = clean, 1 = findings, 2 = usage error.
 set -u
 
+SENSITIVE_NAME_PATTERNS=(
+    '.env' '.env.*' '*.pem' '*.key' '*.p12' '*.pfx'
+    'id_rsa*' 'id_ed25519*' '*.sparseimage'
+    '*history' '*_history' 'credentials*' '*.keychain'
+)
+
+scan_names() {
+    (( $# )) || return 0
+    local f base pat hits=0
+    for f in "$@"; do
+        base="${f:t}"
+        for pat in "${SENSITIVE_NAME_PATTERNS[@]}"; do
+            if [[ "$base" == ${~pat} ]]; then
+                print -r -- "blocked sensitive filename: ${f} (pattern: ${pat})"
+                hits=$(( hits + 1 ))
+                break
+            fi
+        done
+    done
+    if (( hits )); then
+        print -u2 'Sensitive filenames must not be committed to this public repo.'
+        print -u2 'Bypass once with: LEFTHOOK=0 git commit'
+        return 1
+    fi
+    return 0
+}
+
 usage() {
     print -u2 'usage: git-scan secrets|paths --staged|--range [ref]'
     print -u2 '       git-scan names|syntax <file...>'
@@ -21,7 +48,8 @@ main() {
     local cmd="$1"
     shift
     case "$cmd" in
-        (secrets|paths|names|syntax) usage ;;
+        (names)   scan_names "$@" ;;
+        (secrets|paths|syntax) usage ;;
         (*) usage ;;
     esac
 }
