@@ -16,6 +16,79 @@ SENSITIVE_NAME_PATTERNS=(
     '*history' '*_history' 'credentials*' '*.keychain'
 )
 
+MACHINE_PATH_PATTERN='/(Users|home)/[A-Za-z0-9._-]+'
+
+# Diff-mode arguments must be validated before emit_diff runs inside a
+# pipeline: usage()'s exit 2 would otherwise die in the pipe subshell and the
+# pipeline would report a misleading 0.
+require_diff_mode() {
+    case "${1:-}" in
+        (--staged|--range) ;;
+        (*) usage ;;
+    esac
+}
+
+# Print the unified-0 diff selected by --staged or --range. --range without a
+# ref uses @{push}..HEAD; with no push ref it falls back to every commit
+# missing from all remotes (new branch / no upstream).
+emit_diff() {
+    local mode="${1:-}" ref="${2:-}"
+    case "$mode" in
+        (--staged)
+            git diff --cached --unified=0 --no-color
+            ;;
+        (--range)
+            if [ -z "$ref" ] && git rev-parse --quiet --verify '@{push}' > /dev/null 2>&1; then
+                ref='@{push}..HEAD'
+            fi
+            if [ -n "$ref" ]; then
+                git diff --unified=0 --no-color "$ref"
+            else
+                git log --patch --unified=0 --no-color --pretty=format: HEAD --not --remotes
+            fi
+            ;;
+        (*)
+            usage
+            ;;
+    esac
+}
+
+# Read a unified-0 diff on stdin; print "file:line: content" for added lines
+# matching the ERE in $1. Lines containing the literal marker $2 are allowed.
+# Returns 1 if anything matched.
+match_added_lines() {
+    local pattern="$1" allow_marker="${2:-}"
+    local line file='' lineno=0 hits=0 content
+    while IFS= read -r line; do
+        case "$line" in
+            ('+++ b/'*) file="${line#+++ b/}" ;;
+            ('+++ /dev/null') file='' ;;
+            ('@@'*) lineno="${${line#*+}%%[ ,@]*}" ;;
+            ('+'*)
+                content="${line#+}"
+                if [ -n "$file" ] && print -r -- "$content" | grep -qE "$pattern"; then
+                    if [ -z "$allow_marker" ] || [[ "$content" != *"$allow_marker"* ]]; then
+                        print -r -- "${file}:${lineno}: ${content}"
+                        hits=$(( hits + 1 ))
+                    fi
+                fi
+                lineno=$(( lineno + 1 ))
+                ;;
+        esac
+    done
+    (( hits == 0 ))
+}
+
+scan_paths() {
+    require_diff_mode "${1:-}"
+    if ! emit_diff "$@" | match_added_lines "$MACHINE_PATH_PATTERN" '# path-ok'; then
+        print -u2 'Machine-specific paths found. Use $HOME, or append "# path-ok" to allow a line.'
+        print -u2 'Bypass once with: LEFTHOOK=0 git commit'
+        return 1
+    fi
+    return 0
+}
+
 scan_names() {
     (( $# )) || return 0
     local f base pat hits=0
@@ -49,7 +122,8 @@ main() {
     shift
     case "$cmd" in
         (names)   scan_names "$@" ;;
-        (secrets|paths|syntax) usage ;;
+        (paths)   scan_paths "$@" ;;
+        (secrets|syntax) usage ;;
         (*) usage ;;
     esac
 }

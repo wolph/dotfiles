@@ -53,4 +53,18 @@ expect_status 0 "names with no files is clean" "$SCAN_BIN" names
 assert_contains "$("$SCAN_BIN" names .env 2>&1 || true)" "blocked sensitive filename"
 assert_contains "$("$SCAN_BIN" names .env 2>&1 || true)" "LEFTHOOK=0"
 
+make_repo "$TMPDIR/paths-repo"
+printf 'export CACHE="%s"\n' "$BAD_PATH" > "$TMPDIR/paths-repo/rc"
+git -C "$TMPDIR/paths-repo" add rc
+( cd "$TMPDIR/paths-repo" && expect_status 1 "paths blocks staged machine path" "$SCAN_BIN" paths --staged )
+( cd "$TMPDIR/paths-repo" && assert_contains "$("$SCAN_BIN" paths --staged 2>&1 || true)" "rc:1" )
+printf 'export CACHE="%s" # path-ok\n' "$BAD_PATH" > "$TMPDIR/paths-repo/rc"
+git -C "$TMPDIR/paths-repo" add rc
+( cd "$TMPDIR/paths-repo" && expect_status 0 "path-ok marker allows the line" "$SCAN_BIN" paths --staged )
+printf 'export CACHE="$HOME/cache"\n' > "$TMPDIR/paths-repo/rc"
+git -C "$TMPDIR/paths-repo" add rc
+( cd "$TMPDIR/paths-repo" && expect_status 0 "HOME-based path is clean" "$SCAN_BIN" paths --staged )
+
+expect_status 2 "paths without a mode is a usage error" "$SCAN_BIN" paths
+
 printf 'git-scan tests passed\n'
