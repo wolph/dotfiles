@@ -718,7 +718,7 @@ if command_exists headroom; then
     export HEADROOM_MODE="${HEADROOM_MODE:-token}"
     export HEADROOM_BACKEND="${HEADROOM_BACKEND:-anthropic}"
     export HEADROOM_TELEMETRY="${HEADROOM_TELEMETRY:-off}"
-    export HEADROOM_RETRY_MAX_ATTEMPTS="${HEADROOM_RETRY_MAX_ATTEMPTS:-10}"
+    export HEADROOM_RETRY_MAX_ATTEMPTS="${HEADROOM_RETRY_MAX_ATTEMPTS:-1}"
     export HEADROOM_PROXY_URL="http://${HEADROOM_HOST}:${HEADROOM_PORT}"
 
     # Route AI CLIs through Headroom in every new zsh session.
