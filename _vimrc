@@ -253,6 +253,16 @@ Plug 'vim-scripts/desert256.vim'
 Plug 'vim-scripts/xorium.vim'
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Treesitter highlighting (modern nvim only; configured in vim.lua)
+" main branch needs nvim 0.12+; the frozen master branch still works on 0.11
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has('nvim-0.12')
+    Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'main', 'do': ':TSUpdate'}
+elseif has('nvim-0.11')
+    Plug 'nvim-treesitter/nvim-treesitter', {'branch': 'master', 'do': ':TSUpdate'}
+endif
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Initialize Plug
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#end()
@@ -642,3 +652,12 @@ if has ('autocmd') " Remain compatible with earlier versions
     autocmd! BufWritePost ~/.gvimrc if has('gui_running') | source % | endif | redraw
   augroup END
 endif " has autocmd
+
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+" Modern neovim layer: native LSP (pyright + ruff) and treesitter.
+" Kept out of init.lua on purpose: an init.lua would conflict with init.vim
+" as nvim's entry point and old systems would break. See vim.lua.
+""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
+if has('nvim-0.11') && filereadable(expand('~/.vim/vim.lua'))
+    execute 'luafile' expand('~/.vim/vim.lua')
+endif
