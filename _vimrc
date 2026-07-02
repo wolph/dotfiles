@@ -11,16 +11,11 @@ filetype off
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Install Plug if it's not installed
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" TODO: replace with dein? https://github.com/Shougo/dein.vim
 let iCanHazPlug=1
 let plugPath=expand('~/.vim/autoload/plug.vim')
 if !filereadable(plugPath)
     echo "Installing Plug to " . plugPath 
     echo ""
-    if has("win32")
-        silent !curl -Lqo .vim\autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
-        source .vim\autoload\plug.vim
-    else
         if executable('curl')
             silent !curl -Lqo ~/.vim/autoload/plug.vim --create-dirs https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
         else
@@ -28,20 +23,10 @@ if !filereadable(plugPath)
         endif
 
         source ~/.vim/autoload/plug.vim
-    endif
     let iCanHazPlug=0
 endif
 
-if has("win32")
-    source .vim\autoload\plug.vim
-endif
-
-" The Raspberry PI has very little memory
-if system("uname -m") == "armv7l\n"
-    let g:plug_threads=4
-else
-    let g:plug_threads=64
-endif
+let g:plug_threads = 16
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Make sure neovim uses a stable Python host
@@ -85,7 +70,6 @@ iabbrev teh the
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 call plug#begin(expand('~/.vim/bundle'))
 " Tree like file browser
-" Plug 'WoLpH/nerdtree', {'tag': 'patch-1'}
 Plug 'scrooloose/nerdtree'
 " A Git wrapper so awesome, it should be illegal
 Plug 'tpope/vim-fugitive'
@@ -102,13 +86,9 @@ Plug 'rizzatti/dash.vim'
 Plug 'vim-scripts/vim-coffee-script'
 Plug 'tshirtman/vim-cython'
 Plug 'robbles/logstash.vim'
-" Bundle 'clickable.vim'
 
-" Javascript/html indending
-" Plug 'polpo/vim-html-js-indent'
 Plug 'rstacruz/sparkup'
 
-" Plug 'markcornick/vim-vagrant'
 if has('mac')
     Plug 'vim-scripts/copy-as-rtf'
 endif
@@ -189,10 +169,6 @@ nmap gs :SplitjoinJoin<cr>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plug 'AndrewRadev/switch.vim'
 let g:switch_mapping = '"'
-" let g:switch_custom_definitions =
-"     \ [
-"     \   ['true', 'false']
-"     \ ]
 autocmd FileType python let b:switch_custom_definitions =
             \ [
             \ {'"': '''',},
@@ -205,28 +181,6 @@ Plug 'zenbro/mirror.vim'
 
 let g:mirror#ssh_auto_cd = 1
 let g:mirror#diff_layout = 'vsplit'
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Easier way to move around in Vim
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plug 'haya14busa/incsearch.vim'
-" Plug 'haya14busa/incsearch-easymotion.vim'
-" Plug 'easymotion/vim-easymotion'
-" " Note: leader is \ by default
-" map <Leader>l <Plug>(easymotion-lineforward)
-" map <Leader>j <Plug>(easymotion-j)
-" map <Leader>k <Plug>(easymotion-k)
-" map <Leader>h <Plug>(easymotion-linebackward)
-" 
-" let g:incsearch#auto_nohlsearch = 1
-" nmap /  <Plug>(incsearch-stay)
-" nmap ?  <Plug>(incsearch-backwards)
-" map n  <Plug>(incsearch-nohl-n)
-" map N  <Plug>(incsearch-nohl-N)
-" map *  <Plug>(incsearch-nohl-*)
-" map #  <Plug>(incsearch-nohl-#)
-" map g* <Plug>(incsearch-nohl-g*)
-" map g# <Plug>(incsearch-nohl-g#)
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " arduino support
@@ -260,7 +214,6 @@ Plug 'jelera/vim-javascript-syntax'
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 Plug 'nathanaelkane/vim-indent-guides'
 let g:indent_guides_enable_on_vim_startup = 1
-" let g:indent_guides_guide_size = 1
 autocmd VimEnter,Colorscheme * :hi IndentGuidesOdd  ctermbg=235
 autocmd VimEnter,Colorscheme * :hi IndentGuidesEven ctermbg=234
 
@@ -288,17 +241,11 @@ if isdirectory('/usr/local/opt/fzf') || isdirectory(expand('~/.fzf'))
     let g:fzf_command_prefix = ''
 
     " [Tags] Command to generate tags file
-    " let g:fzf_tags_command = 'ctags -R'
-    " let g:fzf_tags_command = 'ctags -R $VIRTUAL_ENV/lib/python2.7/site-packages $VIRTUAL_ENV/lib/python3.4/site-packages $VIRTUAL_ENV/lib/python3.5/site-packages $VIRTUAL_ENV/lib/python3.6/site-packages ${PWD}'
     let g:fzf_tags_command = 'ctags -R --fields=+l --languages=python --python-kinds=-iv -f ./.tags $(python -c "import os, sys; print('' ''.join(''{}''.format(d) for d in sys.path if os.path.isdir(d)))")'
 
     " Default fzf layout
     " - down / up / left / right
     let g:fzf_layout = { 'down': '~70%' }
-
-    " " In Neovim, you can set up fzf window using a Vim command
-    " let g:fzf_layout = { 'window': 'enew' }
-    " let g:fzf_layout = { 'window': '-tabnew' }
 
     " Customize fzf colors to match your color scheme
     let g:fzf_colors =
@@ -356,106 +303,8 @@ else
 endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Enhanced diffs
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if has("nvim") || exists("*systemlist")
-"     Plug 'chrisbra/vim-diff-enhanced'
-"     let &diffexpr='EnhancedDiff#Diff("git diff", "--diff-algorithm=patience")'
-" endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" YouCompleteMe
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if has("nvim")
-"     Plug 'Valloric/YouCompleteMe'
-"     let g:ycm_path_to_python_interpreter = '/usr/local/bin/python2'
-" endif
-
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Deoplete autocompleter 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Replaced with ruff and pyright via init.lua
-
-" if has("nvim") && exists("v:t_list")
-"     Plug 'Shougo/deoplete.nvim', { 'do': ':UpdateRemotePlugins' }
-"     Plug 'zchee/deoplete-jedi'
-"     let g:jedi#completions_enabled = 0
-"
-" 	" let g:deoplete#auto_complete_start_length = 1
-" 	" if !exists('g:deoplete#omni#input_patterns')
-"   	" 	let g:deoplete#omni#input_patterns = {}
-" 	" endif
-" 	" " let g:deoplete#disable_auto_complete = 1
-" 	" autocmd InsertLeave,CompleteDone * if pumvisible() == 0 | pclose | endif
-"
-" 	" " omnifuncs
-" 	" augroup omnifuncs
-"   	" 	autocmd!
-"   	" 	autocmd FileType css setlocal omnifunc=csscomplete#CompleteCSS
-"   	" 	autocmd FileType html,markdown setlocal omnifunc=htmlcomplete#CompleteTags
-"   	" 	autocmd FileType javascript setlocal omnifunc=javascriptcomplete#CompleteJS
-"   	" 	autocmd FileType python setlocal omnifunc=pythoncomplete#Complete
-"   	" 	autocmd FileType xml setlocal omnifunc=xmlcomplete#CompleteTags
-" 	" augroup end
-" 	" " tern
-" 	" if exists('g:plugs["tern_for_vim"]')
-"   	" 	let g:tern_show_argument_hints = 'on_hold'
-"   	" 	let g:tern_show_signature_in_pum = 1
-"   	" 	autocmd FileType javascript setlocal omnifunc=tern#Complete
-" 	" endif
-"
-" 	" " deoplete tab-complete
-" 	" inoremap <expr><tab> pumvisible() ? "\<c-n>" : "\<tab>"
-" 	" " tern
-" 	" autocmd FileType javascript nnoremap <silent> <buffer> gb :TernDef<CR>
-"     let g:deoplete#enable_at_startup = 1
-" " else
-" "   Plug 'Shougo/deoplete.nvim'
-" "   Plug 'roxma/nvim-yarp'
-" "   Plug 'roxma/vim-hug-neovim-rpc'
-" endif
-"
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Neovim completion manager
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if has("nvim")
-if has("nvim") && !exists("v:t_list")
-    Plug 'roxma/nvim-completion-manager'
-    Plug 'roxma/python-support.nvim'
-
-    " don't give |ins-completion-menu| messages.  For example,
-    " '-- XXX completion (YYY)', 'match 1 of 2', 'The only match',
-    set shortmess+=c
-
-    " When the <Enter> key is pressed while the popup menu is visible, it only
-    " hides the menu. Use this mapping to hide the menu and also start a new
-    " line.
-    inoremap <expr> <CR> (pumvisible() ? "\<c-y>\<cr>" : "\<CR>")
-
-    " Here is an example for expanding snippet in the popup menu with <Enter>
-    " key. Suppose you use the <C-U> key for expanding snippet.
-    imap <expr> <CR>  (pumvisible() ?  "\<c-y>\<Plug>(expand_or_nl)" : "\<CR>")
-    imap <expr> <Plug>(expand_or_nl) (cm#completed_is_snippet() ? "\<C-U>":"\<CR>")
-
-    " Use <TAB> to select the popup menu:
-    inoremap <expr> <Tab> pumvisible() ? "\<C-n>" : "\<Tab>"
-    inoremap <expr> <S-Tab> pumvisible() ? "\<C-p>" : "\<S-Tab>"
-
-    Plug 'roxma/ncm-clang'
-    Plug 'roxma/ncm-flow'
-    Plug 'roxma/ncm-elm-oracle'
-    Plug 'roxma/ncm-rct-complete'
-    Plug 'roxma/ncm-phpactor'
-    Plug 'roxma/ncm-github'
-    Plug 'calebeby/ncm-css'
-    Plug 'katsika/ncm-lbdb'
-    Plug 'fgrsnau/ncm-otherbuf'
-    Plug 'gaalcaras/ncm-R'
-    Plug 'othree/csscomplete.vim'
-    Plug 'Shougo/neco-vim'
-    Plug 'Shougo/neco-syntax'
-    Plug 'Shougo/neoinclude.vim'
-endif
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Ansible Vim syntax
@@ -478,48 +327,15 @@ nnoremap U :silent MundoToggle<CR>
 Plug 'MarcWeber/vim-addon-mw-utils'
 Plug 'tomtom/tlib_vim'
 
-" Not really using snippets... I should really get into that
-" Plug 'garbas/vim-snipmate'
-" " Lots of snippets
-" Plug 'honza/vim-snippets'
-" " snippets for BibTeX files
-" Plug 'rbonvall/snipmate-snippets-bib'
-" " snippets for Arduino files
-" Plug 'sudar/vim-arduino-snippets'
-" " snippets for Twitter Bootstrap markup, in HTML and Haml
-" Plug 'bonsaiben/bootstrap-snippets'
-
 
 " Rainbow parenthesis
 Plug 'luochen1990/rainbow'
 let g:rainbow_active=1
 
-" " If you want :UltiSnipsEdit to split your window.
-" let g:UltiSnipsEditSplit="vertical"
-
 command! -nargs=1 Silent
 \ | execute ':silent !'.<q-args>
 \ | execute ':redraw!'
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Check flake8 whenever a Python file is written
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plug 'nvie/vim-flake8'
-" autocmd BufWritePost *.py call Flake8()
-" let g:flake8_show_quickfix=0
-" let g:flake8_show_in_gutter=1
-" let g:flake8_show_in_file=0
-" Plug 'andviro/flake8-vim'
-" let g:PyFlakeOnWrite = 1
-" let g:PyFlakeCWindow = 0 
-" let g:PyFlakeDisabledMessages = 'W391'
-" 
-" " Remove trailing whitespace in Python before saving
-" autocmd BufWritePre *.py :%s/\s\+$//e
-
-" Plug 'psf/black', {'branch': 'stable'}
-" automatic black execution on write... enable at your own risk
-" autocmd BufWritePre *.py silent! execute ':Black' | redraw!
 let g:black_skip_string_normalization = 1
 let g:black_linelength = 78
 
@@ -537,9 +353,6 @@ if has("clipboard")
   endif
 endif
 
-" Toggle paste mode with ctrl+i
-" set pastetoggle=<C-i>
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Surround text/selection with tags
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
@@ -551,8 +364,6 @@ autocmd FileType rst vmap m S:math<CR>
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " reStructuedText in Vim
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Plug 'Rykka/riv.vim'
-" Set the default path for Riv (Not supported yet, will work in 0.75 and up)
 let g:riv_default_path = "~/Desktop/TU"
 let main_project = {'path': './',  'build_path': 'build'}
 let sphinx_project = {'path': './docs/',  'build_path': './docs/_build'}
@@ -575,22 +386,7 @@ Plug 'ervandew/supertab'
 let g:SuperTabDefaultCompletionType = "context"
 let g:SuperTabContextDefaultCompletionType = "<c-x><c-o>"
 
-" I prefer to let the completion go from top to bottom
-" let g:SuperTabDefaultCompletionType = "<c-n>"
-
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Syntastic, uber awesome syntax and errors highlighter
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-
-" ALE is writing too much, so lets try neomake again
-" if has("nvim")
-"     Plug 'neomake/neomake'
-" 
-"     let g:neomake_python_enabled_makers = ['flake8', 'pep8']
-"     " E501 is line length of 80 characters
-"     let g:neomake_python_flake8_maker = { 'args': ['--ignore=E501'], }
-"     let g:neomake_python_pep8_maker = { 'args': ['--max-line-length=105'], }
-" endif
 
 
 " Syntastic is awesome, but slow as ... on Vim
@@ -656,91 +452,6 @@ EOF
 
 endif
 
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" Python Mode
-"
-" Lint, code completion, documentation lookup, jumping to classes/methods,
-" etc... Essential package for Python development
-""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
-" if python_version >= 205
-"     Plug 'klen/python-mode'
-"     Plug 'klen/rope-vim'
-" endif
-" " Python-mode
-" " Activate rope
-" " Keys:
-" " K             Show python docs
-" " <Ctrl-Space>  Rope autocomplete
-" " <Ctrl-c>g     Rope goto definition
-" " <Ctrl-c>d     Rope show documentation
-" " <Ctrl-c>f     Rope find occurrences
-" " <Leader>b     Set, unset breakpoint (g:pymode_breakpoint enabled)
-" " [[            Jump on previous class or function (normal, visual, operator modes)
-" " ]]            Jump on next class or function (normal, visual, operator modes)
-" " [M            Jump on previous class or method (normal, visual, operator modes)
-" " ]M            Jump on next class or method (normal, visual, operator modes)
-" 
-" " No need for Rope completion with Jedi
-" " Load rope plugin
-" let g:pymode_rope = 1
-" 
-" " Map keys for autocompletion
-" let g:pymode_rope_autocomplete_map = '<C-Space>'
-" 
-" " Auto create and open ropeproject
-" let g:pymode_rope_auto_project = 1
-" 
-" " Enable autoimport
-" let g:pymode_rope_enable_autoimport = 1
-" 
-" " Auto generate global cache
-" let g:pymode_rope_autoimport_generate = 1
-" let g:pymode_rope_autoimport_underlineds = 0
-" let g:pymode_rope_codeassist_maxfixes = 10
-" let g:pymode_rope_sorted_completions = 1
-" let g:pymode_rope_extended_complete = 1
-" let g:pymode_rope_autoimport_modules = ["os","shutil","datetime", "sys"]
-" let g:pymode_rope_confirm_saving = 1
-" let g:pymode_rope_global_prefix = "<C-x>p"
-" let g:pymode_rope_local_prefix = "<C-c>r"
-" let g:pymode_rope_vim_completion = 1
-" let g:pymode_rope_guess_project = 1
-" let g:pymode_rope_goto_def_newwin = ""
-" let g:pymode_rope_always_show_complete_menu = 1
-" let g:pymode_rope_short_prefix = "<C-x>t"
-" 
-" " Documentation
-" " let g:pymode_doc = 1
-" " let g:pymode_doc_key = 'K'
-" 
-" "Linting
-" let g:pymode_lint = 1
-" " let g:pymode_lint_checker = "pep8,pyflakes"
-" " Auto check on save
-" let g:pymode_lint_write = 1
-" " Check while typing
-" let g:pymode_lint_onfly = 0
-" " Don't open the error window
-" let g:pymode_lint_cwindow = 0
-" " Show an error message at the cursor
-" let g:pymode_lint_message = 1
-" " I prefer a blank line at the end of files
-" let g:pymode_lint_ignore = "W391"
-" " Enable breakpoints plugin
-" let g:pymode_breakpoint = 1
-" let g:pymode_breakpoint_key = '<leader>b'
-" 
-" " syntax highlighting
-" let g:pymode_syntax = 1
-" let g:pymode_syntax_all = 1
-" let g:pymode_syntax_indent_errors = g:pymode_syntax_all
-" let g:pymode_syntax_space_errors = g:pymode_syntax_all
-" 
-" " Don't autofold code
-" let g:pymode_folding = 0
-" 
-" " Load rope plugin
-" let g:pymode_rope = 0
 
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " Python Jedi plugin for better autocompletion
@@ -777,8 +488,6 @@ call plug#end()
 
 if iCanHazPlug == 0
     PlugInstall
-
-    " call neomake#configure#automake('nw')
 endif
 
 
@@ -922,18 +631,11 @@ set visualbell
 " always show the status line
 set laststatus=2 
 
-" statusline example: ~\myfile[+] [FORMAT=format] [TYPE=type] [ASCII=000] 
-" [HEX=00] [POS=0000,0000][00%] [LEN=000]
-" set statusline=%F%m%r%h%w\ [FORMAT=%{&ff}]\ [TYPE=%Y]\ [ASCII=\%03.3b]\ 
-" [HEX=\%02.2B]\ [POS=%04l,%04v][%p%%]\ [LEN=%L]
 " Pretty status line
 set statusline=   " clear the statusline for when vimrc is reloaded
 set statusline+=%-3.3n\                      " buffer number
 set statusline+=%f\                          " file name
 set statusline+=%h%m%r%w                     " flags
-" set statusline+=[%{strlen(&ft)?&ft:'none'},  " filetype
-" set statusline+=%{strlen(&fenc)?&fenc:&enc}, " encoding
-" set statusline+=%{&fileformat}]              " file format
 set statusline+=%=                           " right align
 set statusline+=%{synIDattr(synID(line('.'),col('.'),1),'name')}\  " highlight
 set statusline+=%b,0x%-8B\                   " current char
@@ -1124,10 +826,6 @@ augroup resCur
   autocmd BufWinEnter * call ResCur()
 augroup END
 
-" For weird PATH stuff on OS X either enable this, or make the path_helper not
-" executable anymore: sudo chmod ugo-x /usr/libexec/path_helper
-" set shell=/bin/bash
-
 " Fixing crontab issues on OS X
 au BufEnter /private/tmp/crontab.* setl backupcopy=yes
 
@@ -1173,7 +871,6 @@ autocmd VimEnter * nested call RestoreSess()
 """"""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""""
 " load filetype plugins and indent settings
 filetype plugin indent on 
-" autocmd BufRead *.py silent PyFlake|silent redraw
 " syntax highlighting on
 syntax on 
 
