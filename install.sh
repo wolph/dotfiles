@@ -52,14 +52,15 @@ done
 
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.vim/autoload"
-ln -sf "$HOME/.mpv" "$HOME/.config/mpv"
-ln -sf "$HOME/.vim" "$HOME/.config/nvim"
-ln -sf "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
+ln -sfn "$HOME/.mpv" "$HOME/.config/mpv"
+ln -sfn "$HOME/.vim" "$HOME/.config/nvim"
+ln -sfn "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 # vim.lua is the modern-nvim layer, loaded by the vimrc itself (nvim 0.11+
 # guard). It must NOT exist as ~/.config/nvim/init.lua: nvim would treat it
 # as a conflicting entry point. Clean up links from older installs.
 rm -f "$HOME/.vim/init.lua"
-ln -sf "$PWD/vim.lua" "$HOME/.vim/vim.lua"
+rm -f "$HOME/.config/nvim/init.lua"
+ln -sfn "$PWD/vim.lua" "$HOME/.vim/vim.lua"
 
 # AI agent config: track only individual portable files; ~/.claude, ~/.codex and
 # ~/.gemini hold runtime state (sessions, plugins, settings/config with secrets)

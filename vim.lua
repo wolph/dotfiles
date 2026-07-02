@@ -81,10 +81,9 @@ if ts_ok then
   local configs_ok, configs = pcall(require, 'nvim-treesitter.configs')
   if configs_ok then
     -- master branch (nvim 0.11): setup handles parser install + highlight
-    configs.setup({
-      ensure_installed = langs,
-      highlight = { enable = true },
-    })
+    -- pcall: a future nvim-0.12-vs-master API incompatibility should degrade
+    -- silently instead of erroring at startup.
+    pcall(configs.setup, { ensure_installed = langs, highlight = { enable = true } })
   else
     -- main branch (nvim 0.12+): explicit install + per-filetype start
     ts.install(langs)
