@@ -166,6 +166,55 @@ scan_names() {
     return 0
 }
 
+check_zsh() {
+    zsh -n "$1"
+}
+
+check_sh() {
+    sh -n "$1" || return 1
+    if command -v shellcheck > /dev/null 2>&1; then
+        shellcheck --severity=error "$1"
+    else
+        print -u2 "note: shellcheck not installed; only sh -n ran for $1"
+    fi
+}
+
+check_bash() {
+    bash -n "$1" || return 1
+    if command -v shellcheck > /dev/null 2>&1; then
+        shellcheck --severity=error "$1"
+    fi
+}
+
+scan_syntax() {
+    (( $# )) || return 0
+    local f shebang fails=0
+    for f in "$@"; do
+        [ -f "$f" ] || continue
+        shebang="$(head -n 1 -- "$f" 2> /dev/null)" || shebang=''
+        case "${f:t}" in
+            (*.zsh|_zshrc|_zprofile|_zshenv)
+                check_zsh "$f" || fails=$(( fails + 1 ))
+                continue
+                ;;
+            (*.sh)
+                check_sh "$f" || fails=$(( fails + 1 ))
+                continue
+                ;;
+        esac
+        case "$shebang" in
+            ('#!'*zsh*)  check_zsh "$f"  || fails=$(( fails + 1 )) ;;
+            ('#!'*bash*) check_bash "$f" || fails=$(( fails + 1 )) ;;
+            ('#!'*sh*)   check_sh "$f"   || fails=$(( fails + 1 )) ;;
+        esac
+    done
+    if (( fails )); then
+        print -u2 "Shell syntax check failed for ${fails} file(s). Bypass once with: LEFTHOOK=0 git commit"
+        return 1
+    fi
+    return 0
+}
+
 usage() {
     print -u2 'usage: git-scan secrets|paths --staged|--range [ref]'
     print -u2 '       git-scan names|syntax <file...>'
@@ -180,7 +229,7 @@ main() {
         (names)   scan_names "$@" ;;
         (paths)   scan_paths "$@" ;;
         (secrets) scan_secrets "$@" ;;
-        (syntax)  usage ;;
+        (syntax)  scan_syntax "$@" ;;
         (*) usage ;;
     esac
 }
