@@ -117,4 +117,14 @@ git -C "$TMPDIR/range-clean" commit -q -m "clean"
 ( cd "$TMPDIR/range-clean" && expect_status 0 "range scan passes clean history" \
     "$SCAN_BIN" secrets --range )
 
+printf '#!/usr/bin/env zsh\nif true; then\n' > "$TMPDIR/broken.zsh"
+printf '#!/usr/bin/env zsh\nprint ok\n' > "$TMPDIR/fine-shebang"
+printf '#!/bin/sh\nif [ 1 ]; then echo y; fi\n' > "$TMPDIR/fine.sh"
+printf 'just text, not a script\n' > "$TMPDIR/notes.txt"
+expect_status 1 "syntax blocks broken zsh" "$SCAN_BIN" syntax "$TMPDIR/broken.zsh"
+expect_status 0 "syntax passes zsh shebang file" "$SCAN_BIN" syntax "$TMPDIR/fine-shebang"
+expect_status 0 "syntax passes valid sh" "$SCAN_BIN" syntax "$TMPDIR/fine.sh"
+expect_status 0 "syntax skips non-shell files" "$SCAN_BIN" syntax "$TMPDIR/notes.txt"
+expect_status 0 "syntax with no files is clean" "$SCAN_BIN" syntax
+
 printf 'git-scan tests passed\n'
