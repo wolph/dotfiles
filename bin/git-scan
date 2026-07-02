@@ -1,0 +1,29 @@
+#!/usr/bin/env zsh
+# git-scan — security scans for staged changes and outgoing commits.
+# Wired into git via lefthook (see lefthook.yml); also usable standalone.
+#
+#   git-scan secrets --staged | --range [ref]
+#   git-scan paths   --staged | --range [ref]
+#   git-scan names   <file...>
+#   git-scan syntax  <file...>
+#
+# Exit codes: 0 = clean, 1 = findings, 2 = usage error.
+set -u
+
+usage() {
+    print -u2 'usage: git-scan secrets|paths --staged|--range [ref]'
+    print -u2 '       git-scan names|syntax <file...>'
+    exit 2
+}
+
+main() {
+    (( $# >= 1 )) || usage
+    local cmd="$1"
+    shift
+    case "$cmd" in
+        (secrets|paths|names|syntax) usage ;;
+        (*) usage ;;
+    esac
+}
+
+main "$@"

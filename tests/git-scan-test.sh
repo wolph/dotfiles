@@ -1,0 +1,48 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+SCAN_BIN="$ROOT/bin/git-scan"
+
+TMPDIR="$(mktemp -d)"
+trap 'rm -rf "$TMPDIR"' EXIT
+
+# Fixtures are assembled at runtime so this file never contains a literal
+# token or machine path that would trip the hooks scanning this repo itself.
+FAKE_TOKEN="ghp_""9f4Kq2Lm8Zx3Vb7Nc1Rt5Wy0Pd6Sg4Hj2Ek8"
+BAD_PATH="$(printf '/%s/%s/secret' Users nobody)"
+
+assert_contains() {
+  local haystack="$1"
+  local needle="$2"
+  if [[ "$haystack" != *"$needle"* ]]; then
+    printf 'expected output to contain %q, got: %s\n' "$needle" "$haystack" >&2
+    exit 1
+  fi
+}
+
+# expect_status <expected-exit> <description> <cmd...>
+expect_status() {
+  local expected="$1" desc="$2" status=0
+  shift 2
+  "$@" > "$TMPDIR/last.out" 2>&1 || status=$?
+  if [ "$status" -ne "$expected" ]; then
+    printf 'FAIL %s: expected exit %s, got %s\noutput:\n' "$desc" "$expected" "$status" >&2
+    cat "$TMPDIR/last.out" >&2
+    exit 1
+  fi
+  printf 'ok: %s\n' "$desc"
+}
+
+make_repo() {
+  local dir="$1"
+  git init -q "$dir"
+  git -C "$dir" config user.email test@example.com
+  git -C "$dir" config user.name test
+  git -C "$dir" commit -q --allow-empty -m init
+}
+
+expect_status 2 "no arguments is a usage error" "$SCAN_BIN"
+expect_status 2 "unknown subcommand is a usage error" "$SCAN_BIN" bogus
+
+printf 'git-scan tests passed\n'
