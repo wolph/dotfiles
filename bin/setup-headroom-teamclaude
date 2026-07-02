@@ -34,12 +34,12 @@ fi
 service_dir="$HOME/.config/systemd/user"
 mkdir -p "$service_dir"
 
-headroom_bin=$(command -v headroom)
+headroom_bin=${HEADROOM_BIN:-$(command -v headroom)}
 headroom_host=${HEADROOM_HOST:-127.0.0.1}
 headroom_port=${HEADROOM_PORT:-8787}
 headroom_mode=${HEADROOM_MODE:-token}
 headroom_backend=${HEADROOM_BACKEND:-anthropic}
-retry_max=${HEADROOM_RETRY_MAX_ATTEMPTS:-10}
+retry_max=${HEADROOM_RETRY_MAX_ATTEMPTS:-1}
 teamclaude_url=${TEAMCLAUDE_URL:-http://127.0.0.1:3456}
 
 use_teamclaude=0
