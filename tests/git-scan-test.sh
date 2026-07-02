@@ -67,4 +67,20 @@ git -C "$TMPDIR/paths-repo" add rc
 
 expect_status 2 "paths without a mode is a usage error" "$SCAN_BIN" paths
 
+RESTRICTED_PATH="/usr/bin:/bin"
+make_repo "$TMPDIR/secrets-repo"
+printf 'token = "%s"\n' "$FAKE_TOKEN" > "$TMPDIR/secrets-repo/conf"
+git -C "$TMPDIR/secrets-repo" add conf
+( cd "$TMPDIR/secrets-repo" && expect_status 1 "fallback blocks staged token" \
+    env PATH="$RESTRICTED_PATH" "$SCAN_BIN" secrets --staged )
+( cd "$TMPDIR/secrets-repo" && assert_contains \
+    "$(env PATH="$RESTRICTED_PATH" "$SCAN_BIN" secrets --staged 2>&1 || true)" \
+    "WARNING: gitleaks not installed" )
+printf 'greeting = "hello world, nothing secret"\n' > "$TMPDIR/secrets-repo/conf"
+git -C "$TMPDIR/secrets-repo" add conf
+( cd "$TMPDIR/secrets-repo" && expect_status 0 "fallback passes clean staged content" \
+    env PATH="$RESTRICTED_PATH" "$SCAN_BIN" secrets --staged )
+
+expect_status 2 "secrets without a mode is a usage error" env PATH="$RESTRICTED_PATH" "$SCAN_BIN" secrets
+
 printf 'git-scan tests passed\n'

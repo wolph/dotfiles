@@ -18,6 +18,8 @@ SENSITIVE_NAME_PATTERNS=(
 
 MACHINE_PATH_PATTERN='/(Users|home)/[A-Za-z0-9._-]+'
 
+SECRET_PATTERN="(ghp_[A-Za-z0-9]{20,}|gho_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]{20,}|sk-[A-Za-z0-9_-]{16,}|AKIA[0-9A-Z]{16}|xox[baprs]-[A-Za-z0-9-]{10,}|AIza[A-Za-z0-9_-]{30,}|-----BEGIN [A-Z ]*PRIVATE KEY-----|eyJ[A-Za-z0-9_-]{20,}\\.[A-Za-z0-9_-]{10,}|(api[_-]?key|secret|password|token)[[:space:]]*[:=][[:space:]]*['\"][^'\"]{8,})"
+
 # Diff-mode arguments must be validated before emit_diff runs inside a
 # pipeline: usage()'s exit 2 would otherwise die in the pipe subshell and the
 # pipeline would report a misleading 0.
@@ -79,6 +81,28 @@ match_added_lines() {
     (( hits == 0 ))
 }
 
+builtin_secret_scan() {
+    emit_diff "$@" | match_added_lines "$SECRET_PATTERN"
+}
+
+scan_secrets() {
+    require_diff_mode "${1:-}"
+    local ret_status=0
+    if command -v gitleaks > /dev/null 2>&1; then
+        # Replaced with the real gitleaks invocation in the next task.
+        builtin_secret_scan "$@" || ret_status=1
+    else
+        print -u2 'WARNING: gitleaks not installed - falling back to the weaker builtin secret scan.'
+        print -u2 '         Install it with: brew install gitleaks'
+        builtin_secret_scan "$@" || ret_status=1
+    fi
+    if (( ret_status != 0 )); then
+        print -u2 'Potential secret found. False positive? Append "# gitleaks:allow" to the line'
+        print -u2 'or extend the .gitleaks.toml allowlist. Bypass once with: LEFTHOOK=0 git commit'
+    fi
+    return $ret_status
+}
+
 scan_paths() {
     require_diff_mode "${1:-}"
     if ! emit_diff "$@" | match_added_lines "$MACHINE_PATH_PATTERN" '# path-ok'; then
@@ -123,7 +147,8 @@ main() {
     case "$cmd" in
         (names)   scan_names "$@" ;;
         (paths)   scan_paths "$@" ;;
-        (secrets|syntax) usage ;;
+        (secrets) scan_secrets "$@" ;;
+        (syntax)  usage ;;
         (*) usage ;;
     esac
 }
