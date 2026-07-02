@@ -108,6 +108,61 @@ if ! ensure_tool gitleaks gitleaks github.com/gitleaks/gitleaks/v8@latest; then
     echo "WARNING: gitleaks unavailable; secret scan uses the weaker builtin fallback."
 fi
 
+# Download a URL to stdout with whichever of curl/wget this system has.
+fetch(){
+    url="$1"
+    if command -v curl > /dev/null 2>&1; then
+        curl -LsSf "$url"
+    elif command -v wget > /dev/null 2>&1; then
+        wget -qO- "$url"
+    else
+        return 1
+    fi
+}
+
+# uv: Python package/project manager. Official installer puts it in
+# ~/.local/bin (zshrc adds that to PATH permanently).
+if ! command -v uv > /dev/null 2>&1; then
+    fetch https://astral.sh/uv/install.sh | sh
+fi
+
+# fzf: brew where available, else the official git install into ~/.fzf
+# (zshrc sources ~/.fzf.zsh, vimrc probes ~/.fzf - both already wired).
+if ! command -v fzf > /dev/null 2>&1 && [ ! -d "$HOME/.fzf" ]; then
+    if command -v brew > /dev/null 2>&1; then
+        brew install fzf
+    else
+        git clone --depth 1 https://github.com/junegunn/fzf.git "$HOME/.fzf" \
+            && "$HOME/.fzf/install" --key-bindings --completion --no-update-rc
+    fi
+fi
+
+# claude: Claude Code CLI, official native installer (installs to ~/.local/bin).
+if ! command -v claude > /dev/null 2>&1; then
+    fetch https://claude.ai/install.sh | bash
+fi
+
+# codex: OpenAI Codex CLI - brew, else npm.
+if ! command -v codex > /dev/null 2>&1; then
+    if command -v brew > /dev/null 2>&1; then
+        brew install codex
+    elif command -v npm > /dev/null 2>&1; then
+        npm install -g @openai/codex
+    fi
+fi
+
+# Installers above drop binaries in ~/.local/bin; make them visible to the
+# rest of this run (zshrc handles PATH permanently). Pipe exit codes lie
+# (`fetch|sh` returns sh's status even when the download failed), so success
+# is checked by locating each binary instead.
+PATH="$PATH:$HOME/.local/bin:$HOME/.fzf/bin"
+export PATH
+for tool in uv fzf claude codex; do
+    if ! command -v "$tool" > /dev/null 2>&1; then
+        echo "WARNING: $tool not installed; install it manually."
+    fi
+done
+
 # kubernetes aliases
 if type kubectl > /dev/null; then
     ./generate-kubernetes-aliases.sh

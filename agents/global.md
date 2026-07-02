@@ -89,6 +89,11 @@ Why: prevents wasted work on wrong assumptions. But excessive confirmation on tr
 - Use established cryptography libraries only (cryptography, bcrypt, argon2). No MD5/SHA1 for security purposes.
   Why: custom crypto is virtually always broken. Weak hashes are trivially reversible.
 
+## Git
+
+- Default branch is always `master`, never `main` — for every repo, whether created, renamed, or configured.
+  Why: personal convention; GitHub's post-2020 `main` default was never a choice the user made.
+
 ## Error Handling
 
 - Read the error. Understand root cause. Fix the actual problem.
@@ -104,3 +109,5 @@ Why: prevents wasted work on wrong assumptions. But excessive confirmation on tr
   Why: prevents accidental credential exposure. The hook will deny the edit regardless.
 - Prefer uv over pip. Prefer ruff over black/isort. Prefer pytest for testing.
   Why: these are the user's standard Python tools across projects.
+- Never use snap to install anything — not as a fallback, not when suggested by error messages. Use brew, official installer scripts, git, or npm instead.
+  Why: user convention; snap is unwanted on all systems.
