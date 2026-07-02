@@ -70,6 +70,65 @@ ln -sf "$PWD/claude/statusline.js" "$HOME/.claude/statusline.js"
 # Generate CLAUDE.md / AGENTS.md / GEMINI.md from the shared base + per-tool overrides.
 "$PWD/bin/sync-agent-config"
 
+# Tool installs below never assume sudo, brew, or writable system dirs:
+# everything can land user-local in ~/.local/bin. Put it on PATH now so
+# same-run checks and `lefthook install` see fresh installs (zshrc handles
+# PATH permanently).
+PATH="$PATH:$HOME/.local/bin:$HOME/.fzf/bin"
+export PATH
+
+# Download a URL to stdout with whichever of curl/wget this system has.
+fetch(){
+    url="$1"
+    if command -v curl > /dev/null 2>&1; then
+        curl -LsSf "$url"
+    elif command -v wget > /dev/null 2>&1; then
+        wget -qO- "$url"
+    else
+        return 1
+    fi
+}
+
+# npm without sudo: when the global prefix isn't user-writable (system npm
+# on shared hosts), install into ~/.local instead (bin -> ~/.local/bin).
+npm_install_global(){
+    pkg="$1"
+    prefix="$(npm config get prefix 2>/dev/null)"
+    if [ -n "$prefix" ] && { [ -w "$prefix/lib/node_modules" ] || [ -w "$prefix/lib" ] || [ -w "$prefix" ]; }; then
+        npm install -g "$pkg"
+    else
+        npm install -g --prefix "$HOME/.local" "$pkg"
+    fi
+}
+
+github_latest_version(){
+    fetch "https://api.github.com/repos/$1/releases/latest" \
+        | sed -n 's/.*"tag_name": *"v\{0,1\}\([^"]*\)".*/\1/p' | head -1
+}
+
+# Static binaries from GitHub releases for systems with no brew/go/npm.
+# A failed fetch feeds gzip/tar empty input, so they fail and nothing is
+# written; callers re-check with command -v afterwards.
+install_lefthook_binary(){
+    case "$(uname -s)" in Linux) os=Linux ;; Darwin) os=MacOS ;; *) return 1 ;; esac
+    case "$(uname -m)" in x86_64|amd64) arch=x86_64 ;; aarch64|arm64) arch=arm64 ;; *) return 1 ;; esac
+    ver="$(github_latest_version evilmartians/lefthook)"
+    [ -n "$ver" ] || return 1
+    mkdir -p "$HOME/.local/bin"
+    fetch "https://github.com/evilmartians/lefthook/releases/download/v${ver}/lefthook_${ver}_${os}_${arch}.gz" \
+        | gzip -d > "$HOME/.local/bin/lefthook" && chmod +x "$HOME/.local/bin/lefthook"
+}
+
+install_gitleaks_binary(){
+    case "$(uname -s)" in Linux) os=linux ;; Darwin) os=darwin ;; *) return 1 ;; esac
+    case "$(uname -m)" in x86_64|amd64) arch=x64 ;; aarch64|arm64) arch=arm64 ;; *) return 1 ;; esac
+    ver="$(github_latest_version gitleaks/gitleaks)"
+    [ -n "$ver" ] || return 1
+    mkdir -p "$HOME/.local/bin"
+    fetch "https://github.com/gitleaks/gitleaks/releases/download/v${ver}/gitleaks_${ver}_${os}_${arch}.tar.gz" \
+        | tar -xz -C "$HOME/.local/bin" gitleaks
+}
+
 # Git security hooks: lefthook runs bin/git-scan (secrets, machine paths,
 # sensitive filenames, shell syntax) on pre-commit and pre-push. gitleaks is
 # the primary secret engine; without it git-scan warns and uses a weaker
@@ -92,33 +151,26 @@ ensure_tool(){
             return 0
         fi
     fi
-    if [ "$tool" = lefthook ] && command -v npm > /dev/null 2>&1 && npm install -g lefthook && command -v "$tool" > /dev/null 2>&1; then
+    if [ "$tool" = lefthook ] && command -v npm > /dev/null 2>&1 && npm_install_global lefthook && command -v "$tool" > /dev/null 2>&1; then
         return 0
     fi
-    return 1
+    case "$tool" in
+        lefthook) install_lefthook_binary ;;
+        gitleaks) install_gitleaks_binary ;;
+    esac
+    command -v "$tool" > /dev/null 2>&1
 }
 
 if ensure_tool lefthook lefthook github.com/evilmartians/lefthook@latest; then
     lefthook install
 else
-    echo "WARNING: could not install lefthook (no brew/go/npm); git security hooks NOT active."
-    echo "         Install lefthook manually, then run: lefthook install"
+    echo "WARNING: could not install lefthook (brew/go/npm/binary-download all failed);"
+    echo "         git security hooks NOT active. Install lefthook manually, then run: lefthook install"
 fi
 if ! ensure_tool gitleaks gitleaks github.com/gitleaks/gitleaks/v8@latest; then
-    echo "WARNING: gitleaks unavailable; secret scan uses the weaker builtin fallback."
+    echo "WARNING: gitleaks unavailable (brew/go/binary-download all failed);"
+    echo "         secret scan uses the weaker builtin fallback."
 fi
-
-# Download a URL to stdout with whichever of curl/wget this system has.
-fetch(){
-    url="$1"
-    if command -v curl > /dev/null 2>&1; then
-        curl -LsSf "$url"
-    elif command -v wget > /dev/null 2>&1; then
-        wget -qO- "$url"
-    else
-        return 1
-    fi
-}
 
 # uv: Python package/project manager. Official installer puts it in
 # ~/.local/bin (zshrc adds that to PATH permanently).
@@ -147,16 +199,12 @@ if ! command -v codex > /dev/null 2>&1; then
     if command -v brew > /dev/null 2>&1; then
         brew install codex
     elif command -v npm > /dev/null 2>&1; then
-        npm install -g @openai/codex
+        npm_install_global @openai/codex
     fi
 fi
 
-# Installers above drop binaries in ~/.local/bin; make them visible to the
-# rest of this run (zshrc handles PATH permanently). Pipe exit codes lie
-# (`fetch|sh` returns sh's status even when the download failed), so success
-# is checked by locating each binary instead.
-PATH="$PATH:$HOME/.local/bin:$HOME/.fzf/bin"
-export PATH
+# Pipe exit codes lie (`fetch|sh` returns sh's status even when the download
+# failed), so success is checked by locating each binary instead.
 for tool in uv fzf claude codex; do
     if ! command -v "$tool" > /dev/null 2>&1; then
         echo "WARNING: $tool not installed; install it manually."
