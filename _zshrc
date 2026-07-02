@@ -142,10 +142,10 @@ if [ -z "$SSH_AUTH_SOCK" ]; then
         for key in $SSH_KEYS; do
             if [ -f "$key" ]; then
                 if [[ "$OSTYPE" =~ '^(darwin)' ]]; then
-	                ssh-add -q -A -K $key
-	            else
+                    ssh-add -q --apple-use-keychain --apple-load-keychain $key
+                else
                     ssh-add -q $key
-	            fi
+                fi
             fi
         done
     fi
@@ -194,7 +194,7 @@ fi
 
 alias vi='vim'
 alias parallel='parallel --no-notice'
-alias feh='/usr/local/bin/feh --auto-zoom --draw-filename --fullscreen --recursive'
+alias feh='feh --auto-zoom --draw-filename --fullscreen --recursive'
 alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
 alias tb='nc termbin.com 9999'
 alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
@@ -216,7 +216,7 @@ function mosh(){
     if [ -n "$1" ]; then
         title "$1"
     fi
-    /usr/local/bin/mosh $@
+    command mosh $@
     title ""
 }
 
@@ -249,8 +249,7 @@ function autossh(){
         title "$1"
     fi
     monitor_port=$((RANDOM % (65000 - 20000) + 20000))
-    exec /usr/local/bin/autossh -o ControlMaster=no -M $monitor_port $*
-    title ""
+    exec autossh -o ControlMaster=no -M $monitor_port $*
 }
 
 # Little function to go to a random directory, handy if you have a lot of
@@ -449,7 +448,9 @@ LISTMAX=250
 [ -r /etc/ssh/ssh_known_hosts ] && _global_ssh_hosts=(${${${${(f)"$(</etc/ssh/ssh_known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
 [ -r ~/.ssh/known_hosts ] && _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
 [ -r /etc/hosts ] && : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
-# [ -r ~/.ssh/config ] && _ssh_config_hosts=(${(s: :)${(ps:\t:)${(f)"$(<$HOME/.ssh/config|grep 'Host' | grep -v '\*')"}#Host}#Hostname}) || _ssh_config_hosts=()
+# Host lines from ~/.ssh/config: keep `Host`-prefixed lines, strip the prefix,
+# word-split multi-host entries, drop wildcard patterns.
+[ -r ~/.ssh/config ] && _ssh_config_hosts=(${${=${${(M)${(f)"$(<$HOME/.ssh/config)"}:#[Hh]ost *}#[Hh]ost }}:#*[*?]*}) || _ssh_config_hosts=()
 
 hosts=(
   "$_global_ssh_hosts[@]"
