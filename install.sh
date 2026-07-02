@@ -224,13 +224,19 @@ fi
 curl -L https://iterm2.com/shell_integration/zsh \
     -o ~/.iterm2_shell_integration.zsh
 
-if [ ! -d ~/.tmux/plugins/tundle ]; then
-    git clone --depth=1 https://github.com/javier-lopez/tundle \
-        ~/.tmux/plugins/tundle
+# tmux plugins via tpm. Purge stale tundle-era clones first: they occupy
+# the same paths tpm clones into and would shadow the maintained plugins.
+for plugdir in ~/.tmux/plugins/*/; do
+    case "$(git -C "$plugdir" remote get-url origin 2>/dev/null)" in
+        *javier-lopez*) rm -rf "$plugdir" ;;
+    esac
+done
+if [ ! -d ~/.tmux/plugins/tpm ]; then
+    git clone --depth=1 https://github.com/tmux-plugins/tpm \
+        ~/.tmux/plugins/tpm
 fi
+~/.tmux/plugins/tpm/bin/install_plugins
 
 if [ "$TMUX" ]; then
     tmux source-file ~/.tmux.conf
-    ~/.tmux/plugins/tundle/scripts/install_plugins.sh
-    ~/.tmux/plugins/tundle/scripts/update_plugins.sh all
 fi
