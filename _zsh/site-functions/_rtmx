@@ -1,4 +1,4 @@
-#compdef tmx rtmx tmate
+#compdef rtmx
 
 local active_sessions all_sessions
 
@@ -18,5 +18,5 @@ _wanted active_sessions expl 'Active sessions' compadd -a active_sessions
 _all_sessions
 _wanted all_sessions expl 'All sessions' compadd -a all_sessions
 
-_wanted all_sessions expl 'Hosts' compadd -a hosts
+_wanted hosts expl 'Hosts' compadd -a hosts
 
