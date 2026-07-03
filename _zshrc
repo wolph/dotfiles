@@ -467,6 +467,11 @@ _zpcompinit_custom() {
   if [[ -f "$zcd"(#qN.mh-24) ]]; then
     # Dump is less than 24h old: trust it and skip the full fpath rescan.
     compinit -C -d "$zcd"
+    if (( ! $+_comps[tmx] || ! $+_comps[uv] )); then
+      # Sentinel check: dumps written without our site-functions have been
+      # seen in the wild; rebuild instead of trusting one for 24h.
+      compinit -i -d "$zcd"
+    fi
     { [[ ! -f "$zcdc" || "$zcd" -nt "$zcdc" ]] && rm -f "$zcdc" && zcompile "$zcd" } &!
   else
     # Stale or missing: full rebuild (-i skips insecure dirs instead of
