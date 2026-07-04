@@ -379,8 +379,8 @@ set whichwrap+=<,>,h,l
 " use mouse for help but not everywhere
 set mouse=h
 
-" shortens messages to avoid 'press a key' prompt 
-set shortmess=atIF 
+" shortens messages to avoid 'press a key' prompt and hide the startup intro.
+set shortmess=atIF
 " tell us when anything is changed via :...
 set report=0 
 " don't make noise
