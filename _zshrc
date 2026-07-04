@@ -716,6 +716,30 @@ fi
 
 export CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1
 
+# >>> headroom persistent env >>>
+if command_exists headroom; then
+    export HEADROOM_PORT="${HEADROOM_PORT:-8787}"
+    export HEADROOM_HOST="${HEADROOM_HOST:-127.0.0.1}"
+    export HEADROOM_MODE="${HEADROOM_MODE:-token}"
+    export HEADROOM_BACKEND="${HEADROOM_BACKEND:-anthropic}"
+    export HEADROOM_MEMORY_ENABLED="1"
+    export HEADROOM_TELEMETRY="off"
+    export HEADROOM_RETRY_MAX_ATTEMPTS="${HEADROOM_RETRY_MAX_ATTEMPTS:-3}"
+    export HEADROOM_PROXY_URL="http://${HEADROOM_HOST}:${HEADROOM_PORT}"
+
+    # Route AI CLIs through Headroom in every new zsh session.
+    export ANTHROPIC_BASE_URL="${ANTHROPIC_BASE_URL:-$HEADROOM_PROXY_URL}"
+    export COPILOT_PROVIDER_TYPE="anthropic"
+    export COPILOT_PROVIDER_BASE_URL="${COPILOT_PROVIDER_BASE_URL:-${HEADROOM_PROXY_URL}/v1}"
+    export OPENAI_BASE_URL="${OPENAI_BASE_URL:-${HEADROOM_PROXY_URL}/v1}"
+
+    # Route Headroom's Anthropic upstream through TeamClaude when available.
+    if command_exists teamclaude; then
+        export ANTHROPIC_TARGET_API_URL="${ANTHROPIC_TARGET_API_URL:-http://127.0.0.1:3456}"
+    fi
+fi
+# <<< headroom persistent env <<<
+
 
 
 # Activate virtualenv all the way at the bottom so the PATH does not get clobbered
@@ -723,19 +747,3 @@ if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
     activate
 fi
 
-# >>> headroom persistent env >>>
-export HEADROOM_PORT="8787"
-export HEADROOM_HOST="127.0.0.1"
-export HEADROOM_MODE="token"
-export HEADROOM_BACKEND="anthropic"
-export HEADROOM_TELEMETRY="off"
-export HEADROOM_MEMORY_ENABLED="1"
-export HEADROOM_MEMORY_STORAGE="global"
-export HEADROOM_NO_SUBSCRIPTION_TRACKING="1"
-export HEADROOM_RETRY_MAX_ATTEMPTS="10"
-export ANTHROPIC_BASE_URL="http://127.0.0.1:8787"
-export ENABLE_TOOL_SEARCH="true"
-export COPILOT_PROVIDER_TYPE="anthropic"
-export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:8787"
-export OPENAI_BASE_URL="http://127.0.0.1:8787/v1"
-# <<< headroom persistent env <<<
