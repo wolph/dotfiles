@@ -14,3 +14,4 @@ tmp/
 docs/plans/
 docs/specs/
 docs/superpowers/
+.worktrees/
