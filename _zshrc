@@ -51,6 +51,10 @@ function command_exists(){
     type $1 2>/dev/null | grep -vq ' not found'
 }
 
+if [[ "${HOST%%.*}" == lappie ]]; then
+    export TMX_AUTO_ATTACH="${TMX_AUTO_ATTACH:-0}"
+fi
+
 # Auto-start/attach tmux when connecting via SSH (replace shell with tmx).
 if [[ -o interactive ]] && [[ -z "$TMUX" ]] && [[ "$TMX_AUTO_ATTACH" != 0 ]] && [[ "$NO_TMUX" != 1 ]]; then
     if [[ -t 0 && -t 1 ]] && [[ -n "$SSH_CONNECTION" || -n "$SSH_TTY" || -n "$SSH_CLIENT" ]] && command -v tmx >/dev/null 2>&1; then
@@ -155,59 +159,132 @@ fi
 alias mv='nocorrect mv'       # no spelling correction on mv
 alias cp='nocorrect cp'       # no spelling correction on cp
 alias mkdir='nocorrect mkdir' # no spelling correction on mkdir
-alias less='/usr/bin/less -R'
 
-if [[ "$OSTYPE" =~ '^freebsd' ]]; then
-    export LS_OPTIONS='-G'
-elif [[ "$OSTYPE" =~ '^darwin' ]]; then
-    export LS_OPTIONS='--color'
-    alias vlc='open -a vlc'
-else
-    export LS_OPTIONS='--color=auto'
+if command_exists less; then
+    alias less='less -R'
 fi
 
-alias ls="ls $LS_OPTIONS"
-alias l='ls -A'
-alias ll='l -l'
-alias qmv='qmv -f do'
-alias push='git pull; git push'
+if command ls --color=auto -d . >/dev/null 2>&1; then
+    export LS_OPTIONS='--color=auto'
+elif command ls -G -d . >/dev/null 2>&1; then
+    export LS_OPTIONS='-G'
+else
+    export LS_OPTIONS=''
+fi
+
+if [[ "$OSTYPE" =~ '^darwin' ]] && command_exists open; then
+    alias vlc='open -a vlc'
+fi
+
+if command_exists ls; then
+    if [ -n "$LS_OPTIONS" ]; then
+        alias ls="ls $LS_OPTIONS"
+    fi
+    alias l='ls -A'
+    alias ll='l -l'
+fi
+
+if command_exists qmv; then
+    alias qmv='qmv -f do'
+fi
+if command_exists git; then
+    alias push='git pull; git push'
+fi
 export GIT_MERGE_AUTOEDIT=no
 export HOMEBREW_CASK_OPTS=--no-quarantine
 
-alias grep='grep --color=auto --directories=skip'
-alias locate='/opt/homebrew/opt/findutils/libexec/gnubin/locate -d /var/db/locate.gnu-all.db:/var/db/locate.gnu-users.db'
-alias updatedb-all='sudo /usr/local/bin/updatedb-all'
+command grep --color=auto --directories=skip -q '' /dev/null >/dev/null 2>&1
+_grep_status=$?
+if [ "$_grep_status" -lt 2 ]; then
+    alias grep='grep --color=auto --directories=skip'
+else
+    command grep --color=auto -q '' /dev/null >/dev/null 2>&1
+    _grep_status=$?
+    if [ "$_grep_status" -lt 2 ]; then
+        alias grep='grep --color=auto'
+    fi
+fi
+unset _grep_status
+
+if [[ "$OSTYPE" =~ '^darwin' ]]; then
+    for _locate_bin in /opt/homebrew/opt/findutils/libexec/gnubin/locate /usr/local/opt/findutils/libexec/gnubin/locate; do
+        if [ -x "$_locate_bin" ]; then
+            alias locate="$_locate_bin -d /var/db/locate.gnu-all.db:/var/db/locate.gnu-users.db"
+            break
+        fi
+    done
+    unset _locate_bin
+
+    for _updatedb_all in /opt/homebrew/bin/updatedb-all /usr/local/bin/updatedb-all; do
+        if [ -x "$_updatedb_all" ]; then
+            alias updatedb-all="sudo $_updatedb_all"
+            break
+        fi
+    done
+    unset _updatedb_all
+fi
 command_exists hub && alias git=hub
 
 # Link vim to the OS X clipboard
-if command_exists nvim; then
-    alias vim="safe-reattach-to-user-namespace nvim"
-    alias vimdiff="safe-reattach-to-user-namespace nvim -d"
-    alias view="safe-reattach-to-user-namespace nvim -R"
-    export EDITOR=nvim
-else
-    alias vim="safe-reattach-to-user-namespace vim"
-    alias vimdiff="safe-reattach-to-user-namespace vimdiff"
-    export EDITOR=vim
+_vim_command_prefix=''
+if command_exists safe-reattach-to-user-namespace; then
+    _vim_command_prefix='safe-reattach-to-user-namespace '
 fi
 
-alias vi='vim'
-alias parallel='parallel --no-notice'
-alias feh='feh --auto-zoom --draw-filename --fullscreen --recursive'
-alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
-alias tb='nc termbin.com 9999'
+if command_exists nvim; then
+    alias vim="${_vim_command_prefix}nvim"
+    alias vimdiff="${_vim_command_prefix}nvim -d"
+    alias view="${_vim_command_prefix}nvim -R"
+    export EDITOR=nvim
+elif command_exists vim; then
+    alias vim="${_vim_command_prefix}vim"
+    if command_exists vimdiff; then
+        alias vimdiff="${_vim_command_prefix}vimdiff"
+    else
+        alias vimdiff="${_vim_command_prefix}vim -d"
+    fi
+    alias view="${_vim_command_prefix}vim -R"
+    export EDITOR=vim
+fi
+unset _vim_command_prefix
+
+if (( $+aliases[vim] )); then
+    alias vi='vim'
+fi
+if command_exists parallel; then
+    alias parallel='parallel --no-notice'
+fi
+if command_exists feh; then
+    alias feh='feh --auto-zoom --draw-filename --fullscreen --recursive'
+    alias montage='feh --montage --thumb-height 256 --thumb-width 256 --limit-width 2560'
+fi
+if command_exists nc; then
+    alias tb='nc termbin.com 9999'
+fi
 alias isodate='date -u +"%Y-%m-%dT%H:%M:%S"'
-alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
-alias docker-compose='docker compose'
+if command_exists ssh-copy-id; then
+    alias ssh-copy-id='ssh-copy-id -o ControlPath=none'
+fi
+if command_exists docker && docker compose version >/dev/null 2>&1; then
+    alias docker-compose='docker compose'
+fi
 
 # AI agent CLI defaults (override bare commands; zsh won't re-expand an alias for
 # its own name, so these run the real binaries with flags prepended; tab-completion
 # still resolves to the underlying command). Headroom routing is configured in
 # the persistent env block below. Edit/remove any line to taste.
-alias claude='claude --permission-mode plan --allow-dangerously-skip-permissions'  # start in plan; bypass available to engage in-session
-alias codex='codex --ask-for-approval on-request'                                  # ask on-request; in-workspace edits ok, outside/network needs approval
-alias gemini='gemini --approval-mode auto_edit'                                    # auto-approve edits, prompt for the rest
-alias agy='agy --sandbox'                                                          # agy's only safety lever (no plan/approval flag exists)
+if command_exists claude; then
+    alias claude='claude --permission-mode plan --allow-dangerously-skip-permissions'  # start in plan; bypass available to engage in-session
+fi
+if command_exists codex; then
+    alias codex='codex --ask-for-approval on-request'                                  # ask on-request; in-workspace edits ok, outside/network needs approval
+fi
+if command_exists gemini; then
+    alias gemini='gemini --approval-mode auto_edit'                                    # auto-approve edits, prompt for the rest
+fi
+if command_exists agy; then
+    alias agy='agy --sandbox'                                                          # agy's only safety lever (no plan/approval flag exists)
+fi
 
 
 
@@ -315,7 +392,9 @@ mpvrandom(){
     mpv -- "$selected"
 }
 
-alias s='sudo -i zsh'
+if command_exists sudo; then
+    alias s='sudo -i zsh'
+fi
 
 # UV environment variables and path to be fully contained in ~/workspace
 export TMX_WORKSPACE_DIR="${TMX_WORKSPACE_DIR:-${HOME}/workspace}"
@@ -444,9 +523,23 @@ fi
 LISTMAX=250
 
 # use /etc/hosts and known_hosts for hostname completion
-[ -r /etc/ssh/ssh_known_hosts ] && _global_ssh_hosts=(${${${${(f)"$(</etc/ssh/ssh_known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
-[ -r ~/.ssh/known_hosts ] && _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*}) || _ssh_hosts=()
-[ -r /etc/hosts ] && : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}} || _etc_hosts=()
+if [[ -r /etc/ssh/ssh_known_hosts ]]; then
+    _global_ssh_hosts=(${${${${(f)"$(</etc/ssh/ssh_known_hosts)"}:#[\|]*}%%\ *}%%,*})
+else
+    _global_ssh_hosts=()
+fi
+
+if [[ -r "$HOME/.ssh/known_hosts" ]]; then
+    _ssh_hosts=(${${${${(f)"$(<$HOME/.ssh/known_hosts)"}:#[\|]*}%%\ *}%%,*})
+else
+    _ssh_hosts=()
+fi
+
+if [[ -r /etc/hosts ]]; then
+    : ${(A)_etc_hosts:=${(s: :)${(ps:\t:)${${(f)~~"$(</etc/hosts)"}%%\#*}##[:blank:]#[^[:blank:]]#}}}
+else
+    _etc_hosts=()
+fi
 # Host lines from ~/.ssh/config: keep `Host`-prefixed lines, strip the prefix,
 # word-split multi-host entries, drop wildcard patterns.
 [ -r ~/.ssh/config ] && _ssh_config_hosts=(${${=${${(M)${(f)"$(<$HOME/.ssh/config)"}:#[Hh]ost *}#[Hh]ost }}:#*[*?]*}) || _ssh_config_hosts=()
@@ -694,21 +787,17 @@ if [ 1 -eq "$DEBUG" ]; then
     zprof
 fi
 
-# Lazy-load nvm: sourcing nvm.sh eagerly costs hundreds of ms per shell.
-# Stubs self-destruct and load the real thing on first use. Note: `command
-# node` bypasses the stub, and PATH lacks nvm's node bin dir until first call.
-export NVM_DIR="$HOME/.nvm"
-if [ -s "$NVM_DIR/nvm.sh" ]; then
-    _nvm_lazy_load() {
-        unfunction nvm node npm npx corepack _nvm_lazy_load 2>/dev/null
-        \. "$NVM_DIR/nvm.sh"
-        [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
-    }
-    for _lazy_cmd in nvm node npm npx corepack; do
-        eval "${_lazy_cmd}(){ _nvm_lazy_load; ${_lazy_cmd} \"\$@\"; }"
-    done
-    unset _lazy_cmd
+# fnm — fast node version manager (Rust; ~tens of ms vs nvm's ~470ms eager load).
+# Replaces the old nvm lazy-load stubs; node/npm/npx/pm2 are real on-PATH binaries.
+# --use-on-cd auto-switches versions when entering a dir with .nvmrc/.node-version.
+if command -v fnm >/dev/null 2>&1; then
+    eval "$(fnm env --use-on-cd)"
 fi
+
+# nvm / n are gone — node is managed by fnm. Redirect the old managers' commands
+# to fnm so muscle memory just works and never tempts a reinstall.
+nvm() { print -ru2 -- "↪ nvm is gone on this machine; using fnm"; command fnm "$@"; }
+n()   { print -ru2 -- "↪ n is gone on this machine; using fnm";   command fnm "$@"; }
 
 if [ -f "$HOME/.zshrc.local" ] && [ "$HOME/.zshrc.local" != "${ROOT_DIR}.zshrc.local" ]; then
     source "$HOME/.zshrc.local"
