@@ -115,7 +115,7 @@ fpath+=~/.zfunc
 if [ -d "$HOME/.local/bin" ] && [[ ":$PATH:" != *":$HOME/.local/bin:"* ]]; then
     export PATH="$HOME/.local/bin:$PATH"
 fi
-export PATH="$PATH:~/bin:${ROOT_DIR}bin"
+export PATH="$PATH:$HOME/bin:${ROOT_DIR}bin"
 
 # Prompts
 export PS1="$(print '%{\e[38;5;208m%}%n%{\e[0m%}')$(print '%{\e[38;5;33m%}@%{\e[0m%}')$(print '%{\e[38;5;10m%}%m%{\e[0m%}')# "
