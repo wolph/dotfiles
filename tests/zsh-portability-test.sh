@@ -127,5 +127,80 @@ if (( failures )); then
     exit 1
 fi
 
-print 'zsh portability tests passed'
 ZSH
+
+cat > "$TMPDIR/minimal-bin/tmux" <<'SH'
+#!/bin/sh
+
+socket_name=''
+if [ "$1" = -L ]; then
+    socket_name="$2"
+    shift 2
+fi
+
+case "$1" in
+    list-sessions)
+        exit 1
+        ;;
+    new-session)
+        printf -- '-L %s %s\n' "$socket_name" "$*" >> "$TMUX_LOG"
+        exit 0
+        ;;
+    has-session)
+        exit 1
+        ;;
+esac
+
+exit 0
+SH
+chmod +x "$TMPDIR/minimal-bin/tmux"
+
+TMUX_LOG="$TMPDIR/tmux.log"
+export TMUX_LOG
+
+run_keeper_shell() {
+    env \
+        ROOT="$ROOT" \
+        REAL_GREP="$REAL_GREP" \
+        TMPDIR="$TMPDIR" \
+        HOME="$TMPDIR/sandbox" \
+        HOST=lappie \
+        OSTYPE=darwin \
+        PATH="$TMPDIR/minimal-bin" \
+        NO_TMUX=0 \
+        TMUX_AUTO_ATTACH=0 \
+        TMX_KEEPER="$1" \
+        TERM_PROGRAM=iTerm.app \
+        SSH_AUTH_SOCK="$TMPDIR/sandbox/.ssh/auth_sock" \
+        "$ZSH_BIN" -fic 'source "$ROOT/_zshrc"' \
+        >/dev/null 2>"$TMPDIR/keeper-zshrc.err"
+}
+
+: > "$TMUX_LOG"
+if ! run_keeper_shell 1; then
+    printf 'FAIL: keeper shell failed:\n' >&2
+    cat "$TMPDIR/keeper-zshrc.err" >&2
+    exit 1
+fi
+
+expected_keeper_call="-L tmx-interactive new-session -d -s __tmux_keeper -c $TMPDIR/sandbox"
+actual_keeper_call="$(cat "$TMUX_LOG")"
+if [ "$actual_keeper_call" != "$expected_keeper_call" ]; then
+    printf 'FAIL: expected keeper call %s, got %s\n' \
+        "$expected_keeper_call" "$actual_keeper_call" >&2
+    exit 1
+fi
+
+: > "$TMUX_LOG"
+if ! run_keeper_shell 0; then
+    printf 'FAIL: disabled keeper shell failed:\n' >&2
+    cat "$TMPDIR/keeper-zshrc.err" >&2
+    exit 1
+fi
+
+if [ -s "$TMUX_LOG" ]; then
+    printf 'FAIL: TMX_KEEPER=0 started tmux: %s\n' "$(cat "$TMUX_LOG")" >&2
+    exit 1
+fi
+
+printf 'zsh portability tests passed\n'

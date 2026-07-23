@@ -53,6 +53,20 @@ function command_exists(){
 
 if [[ "${HOST%%.*}" == lappie ]]; then
     export TMX_AUTO_ATTACH="${TMX_AUTO_ATTACH:-0}"
+    export TMX_KEEPER="${TMX_KEEPER:-1}"
+    export TMX_SOCKET_NAME="${TMX_SOCKET_NAME:-tmx-interactive}"
+fi
+
+# Keep the tmx wrapper's server tied to iTerm's macOS privacy context without
+# automatically attaching this shell. Existing servers are left untouched.
+if [[ -o interactive ]] && [[ "$OSTYPE" == darwin* ]] && [[ -z "$TMUX" ]] &&
+        [[ "$TMX_KEEPER" == 1 ]] && [[ "$NO_TMUX" != 1 ]] &&
+        [[ "$TERM_PROGRAM" == iTerm.app ]] && command_exists tmux &&
+        ! tmux -L "$TMX_SOCKET_NAME" list-sessions >/dev/null 2>&1; then
+    if ! tmux -L "$TMX_SOCKET_NAME" new-session -d -s __tmux_keeper -c "$HOME" >/dev/null 2>&1 &&
+            ! tmux -L "$TMX_SOCKET_NAME" has-session -t =__tmux_keeper >/dev/null 2>&1; then
+        print -u2 'Failed to start the iTerm-owned tmux keeper session'
+    fi
 fi
 
 # Auto-start/attach tmux when connecting via SSH (replace shell with tmx).

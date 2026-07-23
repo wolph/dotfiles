@@ -111,3 +111,5 @@ Why: prevents wasted work on wrong assumptions. But excessive confirmation on tr
   Why: these are the user's standard Python tools across projects.
 - Never use snap to install anything — not as a fallback, not when suggested by error messages. Use brew, official installer scripts, git, or npm instead.
   Why: user convention; snap is unwanted on all systems.
+- Background monitoring or automation must not create the default tmux server. Unless the user explicitly asks to use their interactive server, use a dedicated socket such as `tmux -L agent-<task>`.
+  Why: a headless process can become the default server owner and leave every later interactive tmux session with the wrong macOS privacy context.

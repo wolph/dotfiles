@@ -3,6 +3,38 @@
 TMX_WORKSPACE_DIR="${TMX_WORKSPACE_DIR:-$HOME/workspace}"
 export TMX_DISABLE_ITERM=1
 
+if [[ "${HOST%%.*}" == lappie ]]; then
+    TMX_SOCKET_NAME="${TMX_SOCKET_NAME:-tmx-interactive}"
+else
+    TMX_SOCKET_NAME="${TMX_SOCKET_NAME:-default}"
+fi
+export TMX_SOCKET_NAME
+
+typeset -a TMX_COMMAND=(tmux -L "$TMX_SOCKET_NAME")
+
+function tmux_command(){
+    command "${TMX_COMMAND[@]}" "$@"
+}
+
+if [[ -n "$TMUX" ]]; then
+    typeset current_tmux_socket
+    current_tmux_socket="${TMUX%%,*}"
+    current_tmux_socket="${current_tmux_socket:t}"
+    if [[ "$current_tmux_socket" != "$TMX_SOCKET_NAME" ]]; then
+        print -u2 "Already inside tmux socket '$current_tmux_socket'; tmx targets '$TMX_SOCKET_NAME'. Open a new terminal tab or set TMX_SOCKET_NAME=$current_tmux_socket."
+        exit 1
+    fi
+fi
+
+if [[ "$OSTYPE" == darwin* ]] && [[ "${HOST%%.*}" == lappie ]] &&
+        [[ "$TMX_SOCKET_NAME" == tmx-interactive ]] &&
+        ! tmux_command list-sessions >/dev/null 2>&1; then
+    if [[ -n "$TMUX" ]] || [[ "$TERM_PROGRAM" != iTerm.app ]]; then
+        print -u2 "Socket '$TMX_SOCKET_NAME' is not running. Open a new iTerm tab outside tmux and rerun tmx."
+        exit 1
+    fi
+fi
+
 #
 # Tmux launcher
 #
@@ -18,7 +50,7 @@ export TMX_DISABLE_ITERM=1
 trim() { echo $1; }
 
 # List all sessions only if there is a server running
-sessions=$(tmux ls 2> /dev/null)
+sessions=$(tmux_command ls 2> /dev/null)
 
 # Clean up old sessions
 old_sessions=$(echo "$sessions" \
@@ -27,11 +59,13 @@ old_sessions=$(echo "$sessions" \
     | grep -E -- '-[0-9]{14}$')
 
 if [ -n "$old_sessions" ]; then
-    echo "$old_sessions" | xargs -L1 tmux kill-session -t
+    for old_session in ${(f)old_sessions}; do
+        tmux_command kill-session -t "$old_session"
+    done
 fi
 
 function available_sessions(){
-    sessions=$(tmux ls 2> /dev/null | grep -Ei "^[a-z]")
+    sessions=$(tmux_command ls 2> /dev/null | grep -Ei "^[a-z]")
     echo "Available sessions:"
     echo "$sessions" | grep -vE -- '-[0-9]{14}:'
     exit
@@ -93,10 +127,10 @@ if [[ "$tmux_nb" == "0" ]]; then
 
         # Always create detached first
         # Pass TMX_DISABLE_ITERM=1 explicitly to ensure it propagates to the session
-        tmux -2 new-session -d -s "$base_session" -e "TMX_DISABLE_ITERM=1" -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY" -c "$tmux_cwd"
+    tmux_command -2 new-session -d -s "$base_session" -e "TMX_DISABLE_ITERM=1" -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY" -c "$tmux_cwd"
 
         if [ -t 0 ]; then
-            tmux -2 attach-session -t $base_session
+    tmux_command -2 attach-session -t $base_session
         fi
         echo created session
     fi
@@ -109,9 +143,9 @@ else
         fi
 
         # Kill defunct sessions first
-        old_sessions=$(tmux ls 2>/dev/null | egrep "^[0-9]{14}.*[0-9]+\)$" | cut -f 1 -d:)
+        old_sessions=$(tmux_command ls 2>/dev/null | egrep "^[0-9]{14}.*[0-9]+\)$" | cut -f 1 -d:)
         for old_session_id in $old_sessions; do
-            tmux kill-session -t $old_session_id
+            tmux_command kill-session -t $old_session_id
         done
 
         echo "Launching copy of base session $base_session ..."
@@ -120,24 +154,24 @@ else
 
         # Create a new session (without attaching it) and link to base session
         # to share windows
-        tmux new-session -d -t $base_session -s $session_id -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY"
+        tmux_command new-session -d -t $base_session -s $session_id -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY"
 
         # Attach to the new session
         echo "Attaching tmux -2 attach-session -t $session_id"
         if [ -n "$DISPLAY" ]; then
-            tmux set-environment -t "$base_session" DISPLAY "$DISPLAY"
+            tmux_command set-environment -t "$base_session" DISPLAY "$DISPLAY"
         else
-            tmux set-environment -t "$base_session" -u DISPLAY
+            tmux_command set-environment -t "$base_session" -u DISPLAY
         fi
         if [ -n "$XAUTHORITY" ]; then
-            tmux set-environment -t "$base_session" XAUTHORITY "$XAUTHORITY"
+            tmux_command set-environment -t "$base_session" XAUTHORITY "$XAUTHORITY"
         else
-            tmux set-environment -t "$base_session" -u XAUTHORITY
+            tmux_command set-environment -t "$base_session" -u XAUTHORITY
         fi
-        tmux -2 attach-session -t $session_id
+        tmux_command -2 attach-session -t $session_id
 
         # When we detach from it, kill the session
-        #tmux kill-session -t $session_id
+        #tmux_command kill-session -t $session_id
     fi
 fi
 

@@ -1,10 +1,11 @@
 #compdef tmx tmate
 
 local active_sessions all_sessions
+local -a tmux_command=(tmux -L "${TMX_SOCKET_NAME:-default}")
 
 _active_sessions() {
-    if [ -n "$(tmux ls 2>/dev/null)" ]; then
-        active_sessions=($(tmux ls | awk -F ':' '{print $1}' | tr '\n' ' '))
+    if [ -n "$("${tmux_command[@]}" ls 2>/dev/null)" ]; then
+        active_sessions=($("${tmux_command[@]}" ls | awk -F ':' '{print $1}' | tr '\n' ' '))
     fi
 }
 
