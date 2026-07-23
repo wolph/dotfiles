@@ -528,10 +528,11 @@ setopt HIST_BEEP                 # Beep when accessing nonexistent history.
 
 
 if [ -f "$PWD/.zshhistory" ]; then
-    export HISTFILE="$PWD/.zshhistory"
+    HISTFILE="$PWD/.zshhistory"
 else
-    export HISTFILE=~/.zshhistory
+    HISTFILE=~/.zshhistory
 fi
+typeset +x HISTFILE
 
 # The maximum amount of search results to show in autocompletion
 LISTMAX=250
@@ -710,6 +711,36 @@ zstyle ':completion:*' menu select=5
 # No shared history between tabs
 unsetopt sharehistory
 
+_fzf_history_candidates() {
+    emulate -L zsh
+    setopt localoptions noaliases
+
+    zmodload -F zsh/parameter p:history 2>/dev/null || return 1
+
+    local global_histfile="${1:-$HOME/.zshhistory}"
+    local sentinel
+    local -a current_commands global_commands
+
+    current_commands=("${(Oa)history[@]}")
+
+    if [[ -r "$global_histfile" && "$HISTFILE" != "$global_histfile" ]]; then
+        if fc -p "$global_histfile" 10000000 0; then
+            {
+                sentinel="__fzf_history_sentinel_${$}_${EPOCHREALTIME}__"
+                print -s -- "$sentinel"
+                global_commands=("${(Oa)history[@]}")
+                global_commands=("${(@)global_commands:#$sentinel}")
+                global_commands=("${(@)global_commands:|current_commands}")
+            } always {
+                HISTFILE=
+                fc -P
+            }
+        fi
+    fi
+
+    printf '%s\0' "${global_commands[@]}" "${current_commands[@]}"
+}
+
 if [ -d ~/.zsh/plugins/ ]; then
     for f in ~/.zsh/plugins/*sh; do
         . "$f"
@@ -718,26 +749,28 @@ fi
 
 function init_fzf(){
     fzf-history-widget-accept() {
-        local selected num
+        local selected action command
+        local -a selection
         setopt localoptions noglobsubst pipefail 2> /dev/null
-        # selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
-        selected=( $(fc -l 1 | eval "$(__fzfcmd) +s --tac +m -n2..,.. --tiebreak=index --toggle-sort=ctrl-r --expect=tab,ctrl-e,left,right $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}") )
+        selected="$(_fzf_history_candidates "$HOME/.zshhistory" |
+            eval "$(__fzfcmd) +s --tac +m --tiebreak=index --toggle-sort=ctrl-r --read0 --print0 --expect=tab,ctrl-e,left,right $FZF_CTRL_R_OPTS -q ${(q)LBUFFER}")"
 
         local ret=$?
         if [ -n "$selected" ]; then
+            selection=("${(0)selected}")
+            action="${selection[1]-}"
+            command="${selection[2]-}"
             local accept=1
             local edit=0
-            if [[ $selected[1] = tab || $selected[1] = left || $selected[1] = right ]]; then
+            if [[ $action = tab || $action = left || $action = right ]]; then
                 accept=0
-                shift selected
-            elif [[ $selected[1] = ctrl-e ]]; then
+            elif [[ $action = ctrl-e ]]; then
                 edit=1
-                shift selected
             fi
 
-            num=$selected[1]
-            if [ -n "$num" ]; then
-                zle vi-fetch-history -n $num
+            if [ -n "$command" ]; then
+                BUFFER="$command"
+                CURSOR=${#BUFFER}
                 [[ $accept = 1 ]] && zle accept-line
                 [[ $edit = 1 ]] && zle edit-command-line
             fi
