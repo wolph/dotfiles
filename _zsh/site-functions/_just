@@ -1,0 +1,62 @@
+#compdef just
+
+_just() {
+    local _CLAP_COMPLETE_INDEX=$(expr $CURRENT - 1)
+    local _CLAP_IFS=$'\n'
+
+    local completions=("${(@f)$( \
+        _CLAP_IFS="$_CLAP_IFS" \
+        _CLAP_COMPLETE_INDEX="$_CLAP_COMPLETE_INDEX" \
+        JUST_COMPLETE="zsh" \
+        just -- "${words[@]}" 2>/dev/null \
+    )}")
+
+    if [[ -n $completions ]]; then
+        local raw_summary=$(just --summary 2>/dev/null)
+        local -a recipe_list=(${=raw_summary})
+
+        local -a recipes=()
+        local -a opts=()
+        local -a dirs=()
+        local -a files=()
+        local completion
+
+        for completion in $completions; do
+            local value="${completion%%:*}"
+            if [[ "$value" == -* ]]; then
+                opts+=("$completion")
+            elif (( ${#recipe_list} > 0 && ${recipe_list[(Ie)$value]} )); then
+                recipes+=("$completion")
+            elif [[ "$value" == */ ]]; then
+                local dir_no_slash="${value%/}"
+                if [[ "$completion" == *:* ]]; then
+                    local desc="${completion#*:}"
+                    dirs+=("$dir_no_slash:$desc")
+                else
+                    dirs+=("$dir_no_slash")
+                fi
+            elif [[ -e "$value" ]]; then
+                files+=("$completion")
+            else
+                recipes+=("$completion")
+            fi
+        done
+
+        local ret=1
+        if [[ -n $recipes ]]; then
+            _describe -t recipes 'recipe' recipes && ret=0
+        fi
+        if [[ -n $opts ]]; then
+            _describe -t options 'option' opts && ret=0
+        fi
+        if [[ -n $dirs ]]; then
+            _describe -t directories 'directory' dirs -S '/' -r '/' && ret=0
+        fi
+        if [[ -n $files ]]; then
+            _describe -t files 'file' files && ret=0
+        fi
+        return $ret
+    fi
+}
+
+_just "$@"
