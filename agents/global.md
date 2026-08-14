@@ -80,6 +80,95 @@ Why: prevents wasted work on wrong assumptions. But excessive confirmation on tr
 - In README.md files, all images must use absolute URLs, never relative URLs.
   Why: relative URLs break on PyPI and other package registries that render README content.
 
+## Writing Style
+
+Condensed from the Mastering Python LLM style guide. The full version lives at
+~/workspace/mastering-python-3/docs/editorial/2026-07-25-llm-style-guide-rick-van-hattem-mastering-python.md
+and wins whenever that repo is the working context. Apply this style to all
+authored prose: documentation, READMEs, docstrings, code comments, changelogs,
+commit messages, release notes, and editorial text.
+
+### Punctuation (hard rules)
+
+- Straight ASCII quotation marks and apostrophes only.
+- ASCII hyphen-minus only. No em dashes, en dashes, Unicode hyphens, or Unicode minus signs.
+- No semicolons. Split the sentence or rewrite the relationship with a period, comma, colon, or conjunction.
+- No ellipsis character.
+- These rules cover headings, prose, captions, callouts, and instruction files. Verbatim quotes and literal command output keep their original punctuation.
+- Before finishing a writing task, scan every changed text file for violations.
+
+### Persona and reader
+
+- Write as an experienced practitioner teaching a capable programmer one desk over, at the terminal.
+- Demystify on contact. When a term sounds grand, state the plain mechanism underneath it in one flat sentence.
+- "You" owns choices, observations, and earned knowledge. "We" builds code and walks examples together. "I" is for owned preference, experience, and confessed mistakes.
+- First-person experience must be real. Never invent war stories, numbers, or personal history.
+- Voice the objection forming in the reader's head, concede it is fair, then answer it.
+- Grant permission to skip prerequisites the reader may know. Refuse to let them skip a genuine pitfall.
+- Never mock the reader. Use contractions naturally.
+
+### Structure
+
+- Bridge from the previous topic in one sentence, then open on deliverables. No philosophy before the first command.
+- Give the problem before the solution. Name the operational situation that demands the feature.
+- Run the example loop: one setup sentence ending in a colon, the code, then a read-back that translates each visible detail of the output into its cause and consequence. Code that is not read back is decoration.
+- For contested style, run the comparison loop: show the clumsy version first, improve it in graded rungs, grade every rung out loud, and let the final form feel earned.
+- Close a section with a first-person verdict and the reason welded on. Close a document with one takeaway and a handoff that sells the next topic in reader-benefit terms.
+- When revising, delete solved problems whole instead of trimming them, and own a reversed verdict in one sentence.
+
+### Callout boxes
+
+- Plan NOTE and TIP boxes with the outline, next to the code they protect. They are load-bearing, not decoration.
+- The body carries the argument. A box carries what is true but off the spine: platform caveats, version boundaries with a fallback for the older side, steps outside the page, definitions at first use, cross-references, dated ecosystem facts, honest disclosure of trimmed or staged output, and skip permissions.
+- Notes explain and warn (something to know). Tips hand over a shortcut or safer default (something to run).
+- A box is one to four sentences, flat register, placed directly against the code it protects. Neither body nor box may refer to the other.
+- If the caution is the lesson of the section, it gets a heading and body prose, not a box.
+- Author boxes as GitHub alerts: a blockquote opening with [!NOTE] or [!TIP]. No other flavors, no nesting.
+
+### Humor
+
+- Dry, embedded in the explanation, aimed at tools, ecosystems, or yourself. Never at the reader.
+- The recipes: understatement one size smaller than the event, spam-and-eggs prop data never announced, one violent verb for a mundane failure inside a calm sentence, deflating grand jargon by reading the name literally, naming the party responsible for an ecosystem hurt, ranking your own demo honestly the moment it ends, one short burst of delight converted into the lesson, and confessing the trap has bitten you right before teaching the fix.
+- Placement: the verdict sentence after output, trailing clauses, code comments and example data, and the summary. Openers stay straight. Boxes stay straight.
+- Keep a line only if it makes the consequence memorable, relieves genuine density, exposes a relevant ecosystem absurdity, owns the example's limits, or shows measured delight. Otherwise delete it.
+- Never joke inside a safety instruction. At most one polished line per subsection. Many pages carry no joke, and that absence is faithful.
+
+### Vocabulary and recommendations
+
+- Working adjectives: useful, convenient, simple, easy, nice, ugly, clunky. Softeners: a tad, a bit, slightly. Make the generic word specific nearby: faster, safer, easier to debug, less error-prone, more readable.
+- Recommendations are habit reports, not feature matrices: what you use, in which situation, and what you switched from. When two tools split the territory, fork by use case, one sentence per branch, and end with a permission slip when both are fine.
+- Hedges have jobs: "at the time of writing" plus a date for advice that will rot, "in my experience" for testimony, a parenthetical "(in my opinion, at least)" to quarantine taste, "if at all possible" for strong defaults. One hedge per claim.
+- Reserve loaded words for the worst offender in a topic, once, aimed at a named party. Reserve absolute prohibitions for interpreter-crashing danger.
+
+### Honesty
+
+- Own imperfect demos. Disclose trimming, staging, cherry-picking, and luck in first person at the moment they would mislead.
+- When the page cannot show a feature, say so and send the reader to their own machine. Never fake a demonstration.
+- Shrink benchmark verdicts to the version and test that produced them. A fast wrong answer is worthless, and say so.
+
+### Rhythm
+
+- One sentence, one job. Split mechanism, caveat, and consequence into separate sentences.
+- Follow a dense causal sentence with a short clarification or a verdict, which may be a fragment.
+- Keep the trailing "however" for earned shrugs and let sentence structure carry the other contrasts.
+- Move cross-references to paragraph endings. Parentheses hold compact asides and quarantined hedges only, and stay out of the strongest clause.
+- A sentence containing a "however", a parenthesis, a cross-reference, and a consequence clause is too heavy. Cut it in two.
+
+### Avoid in prose
+
+- Marketing language: seamless, powerful, game-changing, effortless. Benefits without failure modes.
+- Universal claims without a named boundary, unexplained imperatives, fake neutrality.
+- Formula signposting: "in this section", "as you can see", "it should be noted". Trust the heading and start with the problem.
+- Stacked concession markers, previews and recaps, sentences that teach two mechanisms.
+- Jokes in consecutive paragraphs, memes, internet slang, explained punchlines.
+
+### Before finishing prose
+
+- Verify the chain: problem, mechanism, example, read-back, caveat in place, owned recommendation, handoff.
+- Verify the boxes: planned, typed by the note-versus-tip rule, one breath long, placed against their code.
+- Replace vague "this" and generic praise with the actual object and the specific benefit.
+- Run the punctuation scan last.
+
 ## Security
 
 - Validate and sanitize at system boundaries (user input, API responses, file reads). Trust internal code.
@@ -93,6 +182,15 @@ Why: prevents wasted work on wrong assumptions. But excessive confirmation on tr
 
 - Default branch is always `master`, never `main` — for every repo, whether created, renamed, or configured.
   Why: personal convention; GitHub's post-2020 `main` default was never a choice the user made.
+
+## Releases
+
+- A release has four parts: version bump + changelog entry, pushed git tag, package registry publish (PyPI etc.), and a GitHub release. Verify all four — compare `git tag --sort=-creatordate` against `gh release list`.
+  Why: CI publish workflows typically cover only the registry (e.g. Trusted Publishing to PyPI) and never create GitHub releases; that step is manual and silently skipped (portalocker 4.1.0 shipped to PyPI with no GitHub release).
+- Create missing GitHub releases from the already-pushed tag: extract that version's changelog section to a file, then `gh release create vX.Y.Z --title vX.Y.Z --notes-file <file> --verify-tag`. Match the body format of the repo's previous releases.
+  Why: `--verify-tag` fails instead of minting a new tag from the wrong ref; sourcing the body from the changelog keeps release notes single-sourced and consistent.
+- Afterwards confirm with `gh release list` that the release exists and is marked Latest.
+  Why: verification rule — no completion claims without checked output.
 
 ## Error Handling
 
