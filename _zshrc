@@ -288,7 +288,7 @@ fi
 # still resolves to the underlying command). Headroom routing is configured in
 # the persistent env block below. Edit/remove any line to taste.
 if command_exists claude; then
-    alias claude='claude --permission-mode plan --allow-dangerously-skip-permissions'  # start in plan; bypass available to engage in-session
+    alias claude='claude --allow-dangerously-skip-permissions'  # auto mode default (settings); bypass available to engage in-session
 fi
 if command_exists codex; then
     alias codex='codex --ask-for-approval on-request'                                  # ask on-request; in-workspace edits ok, outside/network needs approval
