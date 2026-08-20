@@ -57,6 +57,8 @@ typeset change_file
 for change_file in "$FIXTURE_IDENTITY_DIR"/*.after(N); do
     /bin/mv "$change_file" "${change_file%.after}"
 done
+
+exit "${FIXTURE_SLEEP_EXIT:-0}"
 EOF
 
 /bin/cat > "$FIXTURE_BIN/date" <<'EOF'
@@ -100,6 +102,7 @@ set_changed_identity() {
 
 run_watchdog() {
     typeset -r graceful_pids="${1:-}"
+    typeset -r sleep_exit="${2:-0}"
     /usr/bin/env \
         WATCHDOG_PS="$FIXTURE_BIN/ps" \
         WATCHDOG_KILL="$FIXTURE_BIN/kill" \
@@ -110,6 +113,7 @@ run_watchdog() {
         FIXTURE_IDENTITY_DIR="$IDENTITY_DIR" \
         FIXTURE_ACTION_LOG="$ACTION_LOG" \
         FIXTURE_GRACEFUL_PIDS="$graceful_pids" \
+        FIXTURE_SLEEP_EXIT="$sleep_exit" \
         /bin/zsh "$WATCHDOG_BIN"
 }
 
@@ -223,6 +227,23 @@ run_watchdog "201"
 assert_file_equals $'TERM 201\nsleep 10' "$ACTION_LOG" "avoid KILL after graceful exit"
 assert_file_equals "2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=201 elapsed=01:00:01 signal=TERM outcome=sent" \
     "$MESSAGE_LOG" "log TERM but no KILL after graceful exit"
+
+reset_case sleep_failure
+print -r -- "251 01:00:01 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash" > "$PROCESS_FILE"
+set_identity 251 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+typeset -i sleep_failure_exit=0
+if run_watchdog "" 1; then
+    sleep_failure_exit=0
+else
+    sleep_failure_exit=$?
+fi
+assert_file_equals $'TERM 251\nsleep 10' "$ACTION_LOG" "skip KILL when the grace sleep fails"
+if (( sleep_failure_exit == 0 )); then
+    print -u2 -r -- "FAIL: return nonzero when the grace sleep fails"
+    exit 1
+fi
+assert_file_equals "2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=251 elapsed=01:00:01 signal=TERM outcome=sent" \
+    "$MESSAGE_LOG" "log only the completed TERM when sleep fails"
 
 reset_case changed_launch_time
 print -r -- "301 01:00:01 Wed Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink" > "$PROCESS_FILE"
