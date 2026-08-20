@@ -3,7 +3,7 @@
 set -eu
 
 typeset -r REPOSITORY_ROOT="${0:A:h:h}"
-typeset -r WATCHDOG_BIN="$REPOSITORY_ROOT/bin/stale-process-watchdog"
+typeset -r WATCHDOG_BIN="${WATCHDOG_UNDER_TEST:-$REPOSITORY_ROOT/bin/stale-process-watchdog}"
 typeset -r FIXTURE_ROOT="$(/usr/bin/mktemp -d "${TMPDIR:-/tmp}/stale-process-watchdog-test.XXXXXX")"
 typeset -r FIXTURE_BIN="$FIXTURE_ROOT/bin"
 
@@ -165,14 +165,63 @@ set_identity 105 "Tue Aug 20 09:59:58 2026 /Applications/Reolink.app/Contents/Fr
 run_watchdog
 assert_file_equals $'TERM 103\nTERM 104\nTERM 105\nsleep 10\nKILL 103\nKILL 104\nKILL 105' "$ACTION_LOG" \
     "select only stale exact ReportCrash and Reolink bundle executables"
-assert_contains "executable=/System/Library/CoreServices/ReportCrash pid=106 elapsed=999:99 signal=none outcome=malformed" \
-    "$MESSAGE_LOG" "log malformed target elapsed time"
+assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=106 elapsed=999:99 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=103 elapsed=01:00:01 signal=TERM outcome=sent\n2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/MacOS/Reolink pid=104 elapsed=02:00:01 signal=TERM outcome=sent\n2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/Frameworks/Reolink Helper.app/Contents/MacOS/Reolink Helper pid=105 elapsed=1-00:00:01 signal=TERM outcome=sent\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=103 elapsed=01:00:01 signal=KILL outcome=sent\n2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/MacOS/Reolink pid=104 elapsed=02:00:01 signal=KILL outcome=sent\n2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/Frameworks/Reolink Helper.app/Contents/MacOS/Reolink Helper pid=105 elapsed=1-00:00:01 signal=KILL outcome=sent' \
+    "$MESSAGE_LOG" "log exact malformed, TERM, and KILL records"
+
+reset_case elapsed_validation
+/bin/cat > "$PROCESS_FILE" <<'EOF'
+501 61:00 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+502 24:00:00 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+503 1:00:01 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+504 01:0:01 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+505 1-1:00:01 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+506 01:00:1 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+507 1-24:00:00 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+EOF
+set_identity 501 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 502 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 503 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 504 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 505 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 506 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 507 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+run_watchdog
+assert_file_equals $'TERM 501\nsleep 10\nKILL 501' "$ACTION_LOG" \
+    "accept growing MM while rejecting invalid elapsed widths and hour ranges"
+assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=502 elapsed=24:00:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=503 elapsed=1:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=504 elapsed=01:0:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=505 elapsed=1-1:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=506 elapsed=01:00:1 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=507 elapsed=1-24:00:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=501 elapsed=61:00 signal=TERM outcome=sent\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=501 elapsed=61:00 signal=KILL outcome=sent' \
+    "$MESSAGE_LOG" "log invalid elapsed records and valid termination actions exactly"
+
+reset_case malformed_launch_time
+/bin/cat > "$PROCESS_FILE" <<'EOF'
+601 61:00 Wed Aug 21 25:00:00 2026 /System/Library/CoreServices/ReportCrash
+602 61:00 /System/Library/CoreServices/ReportCrash
+603 61:00 Fry Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink
+EOF
+set_identity 601 "Wed Aug 21 25:00:00 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 603 "Fry Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink"
+run_watchdog
+assert_file_equals "" "$ACTION_LOG" "fail closed for malformed or missing launch times"
+assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=601 elapsed=61:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=602 elapsed=61:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/MacOS/Reolink pid=603 elapsed=61:00 signal=none outcome=malformed' \
+    "$MESSAGE_LOG" "log recognizable targets with malformed launch times"
+
+reset_case preserved_processes
+/bin/cat > "$PROCESS_FILE" <<'EOF'
+701 59:59 Wed Aug 21 09:00:00 2026 /System/Library/CoreServices/ReportCrash
+702 60:00 Wed Aug 21 08:59:59 2026 /System/Library/CoreServices/ReportCrash
+703 61:00 Wed Aug 21 08:59:58 2026 /tmp/ReportCrash
+704 61:00 Wed Aug 21 08:59:58 2026 /Applications/Reolink Backup.app/Contents/MacOS/Reolink
+EOF
+run_watchdog
+assert_file_equals "" "$ACTION_LOG" "preserve young, boundary, and unrelated processes"
+assert_file_equals "" "$MESSAGE_LOG" "do not log preserved young, boundary, or unrelated processes"
 
 reset_case graceful_exit
 print -r -- "201 01:00:01 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash" > "$PROCESS_FILE"
 set_identity 201 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 run_watchdog "201"
 assert_file_equals $'TERM 201\nsleep 10' "$ACTION_LOG" "avoid KILL after graceful exit"
+assert_file_equals "2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=201 elapsed=01:00:01 signal=TERM outcome=sent" \
+    "$MESSAGE_LOG" "log TERM but no KILL after graceful exit"
 
 reset_case changed_launch_time
 print -r -- "301 01:00:01 Wed Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink" > "$PROCESS_FILE"
@@ -180,12 +229,22 @@ set_identity 301 "Wed Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/Ma
 set_changed_identity 301 "Wed Aug 21 11:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink"
 run_watchdog
 assert_file_equals $'TERM 301\nsleep 10' "$ACTION_LOG" "avoid KILL after PID launch time changes"
+assert_file_equals "2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/MacOS/Reolink pid=301 elapsed=01:00:01 signal=TERM outcome=sent" \
+    "$MESSAGE_LOG" "do not log an identity-mismatched KILL"
 
 reset_case byte_exact_launch_time
 print -r -- "351 01:00:01 Thu Aug  7 08:59:58 2026 /System/Library/CoreServices/ReportCrash" > "$PROCESS_FILE"
 set_identity 351 "Thu Aug 7 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 run_watchdog
 assert_file_equals "" "$ACTION_LOG" "require byte-exact launch time before TERM"
+assert_file_equals "" "$MESSAGE_LOG" "do not log an identity-mismatched TERM"
+
+reset_case space_padded_launch_day
+print -r -- "361 61:00 Thu Aug  7 08:59:58 2026 /System/Library/CoreServices/ReportCrash" > "$PROCESS_FILE"
+set_identity 361 "Thu Aug  7 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+run_watchdog
+assert_file_equals $'TERM 361\nsleep 10\nKILL 361' "$ACTION_LOG" \
+    "accept the macOS space-padded launch day"
 
 reset_case malformed_target
 print -r -- "401 invalid Wed Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink" > "$PROCESS_FILE"
