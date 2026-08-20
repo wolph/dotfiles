@@ -1,0 +1,170 @@
+#!/bin/zsh
+
+set -u
+
+typeset -r PS_COMMAND="${WATCHDOG_PS:-/bin/ps}"
+typeset -r KILL_COMMAND="${WATCHDOG_KILL:-/bin/kill}"
+typeset -r SLEEP_COMMAND="${WATCHDOG_SLEEP:-/bin/sleep}"
+typeset -r DATE_COMMAND="${WATCHDOG_DATE:-/bin/date}"
+typeset -r LOG_FILE="${WATCHDOG_LOG_FILE:-/var/log/stale-process-watchdog.log}"
+typeset -ri MAX_AGE_SECONDS=3600
+typeset -ri TERM_GRACE_SECONDS=10
+typeset -r SNAPSHOT_RECORD_PATTERN='^[[:space:]]*([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.{24})[[:space:]]+(.*)$'
+typeset -r IDENTITY_RECORD_PATTERN='^[[:space:]]*(.{24})[[:space:]]+(.*)$'
+
+elapsed_seconds() {
+    typeset -r elapsed="$1"
+    typeset -i days=0
+    typeset -i hours=0
+    typeset -i minutes=0
+    typeset -i seconds=0
+    typeset first=""
+    typeset remainder=""
+    typeset clock=""
+
+    if [[ "$elapsed" == <->:<-> ]]; then
+        first="${elapsed%%:*}"
+        minutes=$((10#$first))
+        first="${elapsed##*:}"
+        seconds=$((10#$first))
+        (( minutes <= 59 && seconds <= 59 )) || return 1
+    elif [[ "$elapsed" == <->:<->:<-> ]]; then
+        first="${elapsed%%:*}"
+        hours=$((10#$first))
+        remainder="${elapsed#*:}"
+        first="${remainder%%:*}"
+        minutes=$((10#$first))
+        first="${remainder##*:}"
+        seconds=$((10#$first))
+        (( minutes <= 59 && seconds <= 59 )) || return 1
+    elif [[ "$elapsed" == <->-<->:<->:<-> ]]; then
+        first="${elapsed%%-*}"
+        days=$((10#$first))
+        clock="${elapsed#*-}"
+        first="${clock%%:*}"
+        hours=$((10#$first))
+        remainder="${clock#*:}"
+        first="${remainder%%:*}"
+        minutes=$((10#$first))
+        first="${remainder##*:}"
+        seconds=$((10#$first))
+        (( hours <= 23 && minutes <= 59 && seconds <= 59 )) || return 1
+    else
+        return 1
+    fi
+
+    print -r -- $((days * 86400 + hours * 3600 + minutes * 60 + seconds))
+}
+
+is_target_executable() {
+    typeset -r executable="$1"
+    [[ "$executable" == "/System/Library/CoreServices/ReportCrash" || \
+        "$executable" == /Applications/Reolink.app/* ]]
+}
+
+log_record() {
+    typeset -r executable="$1"
+    typeset -r pid="$2"
+    typeset -r elapsed="$3"
+    typeset -r signal_name="$4"
+    typeset -r outcome="$5"
+    typeset -r timestamp="$("$DATE_COMMAND" '+%Y-%m-%dT%H:%M:%S%z')"
+
+    print -r -- "$timestamp executable=$executable pid=$pid elapsed=$elapsed signal=$signal_name outcome=$outcome" >> "$LOG_FILE"
+}
+
+identity_matches() {
+    typeset -r pid="$1"
+    typeset -r expected_launch_time="$2"
+    typeset -r expected_executable="$3"
+    typeset identity=""
+    typeset executable=""
+    typeset launch_time=""
+
+    identity="$("$PS_COMMAND" -p "$pid" -o lstart=,comm= 2>/dev/null)" || return 1
+    [[ -n "$identity" && "$identity" != *$'\n'* ]] || return 1
+    [[ "$identity" =~ ${IDENTITY_RECORD_PATTERN} ]] || return 1
+    launch_time="$match[1]"
+    executable="$match[2]"
+
+    [[ "$launch_time" == "$expected_launch_time" && "$executable" == "$expected_executable" ]]
+}
+
+typeset snapshot=""
+snapshot="$("$PS_COMMAND" -axo pid=,etime=,lstart=,comm=)" || exit 1
+
+typeset -a candidate_pids=()
+typeset -A executable_by_pid=()
+typeset -A launch_time_by_pid=()
+typeset -A elapsed_by_pid=()
+typeset record=""
+
+while IFS= read -r record; do
+    typeset pid=""
+    typeset elapsed=""
+    typeset executable=""
+    typeset launch_time=""
+    typeset age_seconds=""
+
+    [[ -n "$record" ]] || continue
+    if [[ "$record" =~ ${SNAPSHOT_RECORD_PATTERN} ]]; then
+        pid="$match[1]"
+        elapsed="$match[2]"
+        launch_time="$match[3]"
+        executable="$match[4]"
+    else
+        typeset fallback_weekday=""
+        typeset fallback_month=""
+        typeset fallback_month_day=""
+        typeset fallback_start_time=""
+        typeset fallback_year=""
+        read -r pid elapsed fallback_weekday fallback_month fallback_month_day \
+            fallback_start_time fallback_year executable <<< "$record" || continue
+        [[ -n "$executable" ]] || continue
+        is_target_executable "$executable" || continue
+        log_record "$executable" "${pid:-unknown}" "${elapsed:-unknown}" "none" "malformed"
+        continue
+    fi
+    is_target_executable "$executable" || continue
+
+    if [[ "$pid" != <-> ]]; then
+        log_record "$executable" "${pid:-unknown}" "${elapsed:-unknown}" "none" "malformed"
+        continue
+    fi
+
+    age_seconds="$(elapsed_seconds "$elapsed")" || {
+        log_record "$executable" "$pid" "$elapsed" "none" "malformed"
+        continue
+    }
+    (( age_seconds > MAX_AGE_SECONDS )) || continue
+
+    candidate_pids+=("$pid")
+    executable_by_pid[$pid]="$executable"
+    launch_time_by_pid[$pid]="$launch_time"
+    elapsed_by_pid[$pid]="$elapsed"
+done <<< "$snapshot"
+
+typeset -a terminated_pids=()
+typeset pid=""
+
+for pid in "${candidate_pids[@]}"; do
+    identity_matches "$pid" "$launch_time_by_pid[$pid]" "$executable_by_pid[$pid]" || continue
+    if "$KILL_COMMAND" -TERM -- "$pid"; then
+        log_record "$executable_by_pid[$pid]" "$pid" "$elapsed_by_pid[$pid]" "TERM" "sent"
+        terminated_pids+=("$pid")
+    else
+        log_record "$executable_by_pid[$pid]" "$pid" "$elapsed_by_pid[$pid]" "TERM" "failed"
+    fi
+done
+
+(( ${#terminated_pids[@]} > 0 )) || exit 0
+"$SLEEP_COMMAND" "$TERM_GRACE_SECONDS"
+
+for pid in "${terminated_pids[@]}"; do
+    identity_matches "$pid" "$launch_time_by_pid[$pid]" "$executable_by_pid[$pid]" || continue
+    if "$KILL_COMMAND" -KILL -- "$pid"; then
+        log_record "$executable_by_pid[$pid]" "$pid" "$elapsed_by_pid[$pid]" "KILL" "sent"
+    else
+        log_record "$executable_by_pid[$pid]" "$pid" "$elapsed_by_pid[$pid]" "KILL" "failed"
+    fi
+done
