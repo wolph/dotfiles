@@ -166,7 +166,7 @@ Before `TERM`, read identity with:
 "$PS_COMMAND" -p "$pid" -o lstart=,comm=
 ```
 
-Require the returned launch time and executable path to match the snapshot byte-for-byte. Send `"$KILL_COMMAND" -TERM -- "$pid"` for every matching candidate and record only successful signals for the final pass. If at least one `TERM` succeeds, call `"$SLEEP_COMMAND" "$TERM_GRACE_SECONDS"` exactly once. Re-read each successful PID and send `"$KILL_COMMAND" -KILL -- "$pid"` only when both identity fields still match. Log each signal outcome and each malformed target record with timestamp, PID, elapsed value, executable path, signal, and result. Do not evaluate process output.
+Require the returned launch time and executable path to match the snapshot byte-for-byte. Send `"$KILL_COMMAND" -TERM -- "$pid"` for every matching candidate, and retain only successful signals for the final pass. If at least one `TERM` succeeds, call `"$SLEEP_COMMAND" "$TERM_GRACE_SECONDS"` exactly once. If sleep fails or is interrupted, exit nonzero without entering the `KILL` pass. Re-read each successful PID and send `"$KILL_COMMAND" -KILL -- "$pid"` only when both identity fields still match. Log each signal outcome and each malformed target record with timestamp, PID, elapsed value, executable path, signal, and result. Do not evaluate process output.
 
 - [ ] **Step 4: Run the focused test and verify GREEN**
 
