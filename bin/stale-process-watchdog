@@ -29,7 +29,7 @@ elapsed_seconds() {
         minutes=$((10#$first))
         first="${elapsed##*:}"
         seconds=$((10#$first))
-        (( seconds <= 59 )) || return 1
+        (( minutes <= 59 && seconds <= 59 )) || return 1
     elif [[ "$elapsed" == [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ]]; then
         first="${elapsed%%:*}"
         hours=$((10#$first))

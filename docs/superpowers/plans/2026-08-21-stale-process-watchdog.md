@@ -102,7 +102,7 @@ elapsed_seconds() {
   if [[ "$elapsed" == <->:[0-9][0-9] ]]; then
     minutes=${elapsed%%:*}
     seconds=${elapsed##*:}
-    (( seconds <= 59 )) || return 1
+    (( minutes <= 59 && seconds <= 59 )) || return 1
   elif [[ "$elapsed" == [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ]]; then
     hours=${elapsed%%:*}
     typeset -r remainder="${elapsed#*:}"

@@ -171,6 +171,7 @@ assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreSer
 reset_case elapsed_validation
 /bin/cat > "$PROCESS_FILE" <<'EOF'
 501 61:00 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
+508 60:00 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
 502 24:00:00 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
 503 1:00:01 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
 504 01:0:01 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
@@ -179,6 +180,7 @@ reset_case elapsed_validation
 507 1-24:00:00 Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash
 EOF
 set_identity 501 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
+set_identity 508 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 set_identity 502 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 set_identity 503 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 set_identity 504 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
@@ -186,28 +188,27 @@ set_identity 505 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCr
 set_identity 506 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 set_identity 507 "Wed Aug 21 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 run_watchdog
-assert_file_equals $'TERM 501\nsleep 10\nKILL 501' "$ACTION_LOG" \
-    "accept growing MM while rejecting invalid elapsed widths and hour ranges"
-assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=502 elapsed=24:00:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=503 elapsed=1:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=504 elapsed=01:0:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=505 elapsed=1-1:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=506 elapsed=01:00:1 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=507 elapsed=1-24:00:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=501 elapsed=61:00 signal=TERM outcome=sent\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=501 elapsed=61:00 signal=KILL outcome=sent' \
-    "$MESSAGE_LOG" "log invalid elapsed records and valid termination actions exactly"
+assert_file_equals "" "$ACTION_LOG" "reject invalid elapsed widths and ranges without signalling"
+assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=501 elapsed=61:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=508 elapsed=60:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=502 elapsed=24:00:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=503 elapsed=1:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=504 elapsed=01:0:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=505 elapsed=1-1:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=506 elapsed=01:00:1 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=507 elapsed=1-24:00:00 signal=none outcome=malformed' \
+    "$MESSAGE_LOG" "log every invalid elapsed record exactly"
 
 reset_case malformed_launch_time
 /bin/cat > "$PROCESS_FILE" <<'EOF'
-601 61:00 Wed Aug 21 25:00:00 2026 /System/Library/CoreServices/ReportCrash
-602 61:00 /System/Library/CoreServices/ReportCrash
-603 61:00 Fry Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink
+601 01:00:01 Wed Aug 21 25:00:00 2026 /System/Library/CoreServices/ReportCrash
+602 01:00:01 /System/Library/CoreServices/ReportCrash
+603 01:00:01 Fry Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink
 EOF
 set_identity 601 "Wed Aug 21 25:00:00 2026 /System/Library/CoreServices/ReportCrash"
 set_identity 603 "Fry Aug 21 08:59:58 2026 /Applications/Reolink.app/Contents/MacOS/Reolink"
 run_watchdog
 assert_file_equals "" "$ACTION_LOG" "fail closed for malformed or missing launch times"
-assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=601 elapsed=61:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=602 elapsed=61:00 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/MacOS/Reolink pid=603 elapsed=61:00 signal=none outcome=malformed' \
+assert_file_equals $'2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=601 elapsed=01:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/System/Library/CoreServices/ReportCrash pid=602 elapsed=01:00:01 signal=none outcome=malformed\n2026-08-21T12:00:00+0200 executable=/Applications/Reolink.app/Contents/MacOS/Reolink pid=603 elapsed=01:00:01 signal=none outcome=malformed' \
     "$MESSAGE_LOG" "log recognizable targets with malformed launch times"
 
 reset_case preserved_processes
 /bin/cat > "$PROCESS_FILE" <<'EOF'
 701 59:59 Wed Aug 21 09:00:00 2026 /System/Library/CoreServices/ReportCrash
-702 60:00 Wed Aug 21 08:59:59 2026 /System/Library/CoreServices/ReportCrash
+702 01:00:00 Wed Aug 21 08:59:59 2026 /System/Library/CoreServices/ReportCrash
 703 61:00 Wed Aug 21 08:59:58 2026 /tmp/ReportCrash
 704 61:00 Wed Aug 21 08:59:58 2026 /Applications/Reolink Backup.app/Contents/MacOS/Reolink
 EOF
@@ -240,7 +241,7 @@ assert_file_equals "" "$ACTION_LOG" "require byte-exact launch time before TERM"
 assert_file_equals "" "$MESSAGE_LOG" "do not log an identity-mismatched TERM"
 
 reset_case space_padded_launch_day
-print -r -- "361 61:00 Thu Aug  7 08:59:58 2026 /System/Library/CoreServices/ReportCrash" > "$PROCESS_FILE"
+print -r -- "361 01:00:01 Thu Aug  7 08:59:58 2026 /System/Library/CoreServices/ReportCrash" > "$PROCESS_FILE"
 set_identity 361 "Thu Aug  7 08:59:58 2026 /System/Library/CoreServices/ReportCrash"
 run_watchdog
 assert_file_equals $'TERM 361\nsleep 10\nKILL 361' "$ACTION_LOG" \
