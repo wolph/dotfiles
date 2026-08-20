@@ -62,7 +62,7 @@ KILL 104
 KILL 105
 ```
 
-Add separate cases proving a PID listed in `FIXTURE_GRACEFUL_PIDS` is not killed and a PID whose identity fixture changes after `TERM` is not killed. Assert malformed target data produces a log message but no signal. Assert the test exits nonzero when expected and actual actions differ.
+Add separate cases proving a PID listed in `FIXTURE_GRACEFUL_PIDS` is not killed and a PID whose identity changes after `TERM` is not killed. Cover exact elapsed widths and ranges, byte-exact launch identity, malformed or missing launch fields, exact action-log order, and exact message-log records. Assert preserved young, boundary, unrelated, and identity-mismatched processes do not create log records. Run the test against a temporary watchdog copy with termination logging removed and require the expected log assertion to fail.
 
 - [ ] **Step 2: Run the focused test and verify RED**
 
@@ -86,6 +86,10 @@ typeset -r DATE_COMMAND="${WATCHDOG_DATE:-/bin/date}"
 typeset -r LOG_FILE="${WATCHDOG_LOG_FILE:-/var/log/stale-process-watchdog.log}"
 typeset -ri MAX_AGE_SECONDS=3600
 typeset -ri TERM_GRACE_SECONDS=10
+typeset -r SNAPSHOT_RECORD_PATTERN='^[[:space:]]*([^[:space:]]+)[[:space:]]+([^[:space:]]+)[[:space:]]+(.{24})[[:space:]]+(.*)$'
+typeset -r IDENTITY_RECORD_PATTERN='^[[:space:]]*(.{24})[[:space:]]+(.*)$'
+typeset -r LAUNCH_TIME_PATTERN='^(Sun|Mon|Tue|Wed|Thu|Fri|Sat) (Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec) ( [1-9]|[12][0-9]|3[01]) ([01][0-9]|2[0-3]):[0-5][0-9]:[0-5][0-9] [0-9]{4}$'
+typeset -r TARGET_AT_END_PATTERN='[[:space:]](/System/Library/CoreServices/ReportCrash|/Applications/Reolink[.]app/.*)$'
 ```
 
 Implement these functions with the exact interfaces below:
@@ -95,17 +99,17 @@ elapsed_seconds() {
   typeset -r elapsed="$1"
   typeset -i days=0 hours=0 minutes=0 seconds=0
 
-  if [[ "$elapsed" == <->:<-> ]]; then
+  if [[ "$elapsed" == <->:[0-9][0-9] ]]; then
     minutes=${elapsed%%:*}
     seconds=${elapsed##*:}
-    (( minutes <= 59 && seconds <= 59 )) || return 1
-  elif [[ "$elapsed" == <->:<->:<-> ]]; then
+    (( seconds <= 59 )) || return 1
+  elif [[ "$elapsed" == [0-9][0-9]:[0-9][0-9]:[0-9][0-9] ]]; then
     hours=${elapsed%%:*}
     typeset -r remainder="${elapsed#*:}"
     minutes=${remainder%%:*}
     seconds=${remainder##*:}
-    (( minutes <= 59 && seconds <= 59 )) || return 1
-  elif [[ "$elapsed" == <->-<->:<->:<-> ]]; then
+    (( hours <= 23 && minutes <= 59 && seconds <= 59 )) || return 1
+  elif [[ "$elapsed" == <->-[0-9][0-9]:[0-9][0-9]:[0-9][0-9] ]]; then
     days=${elapsed%%-*}
     typeset -r clock="${elapsed#*-}"
     hours=${clock%%:*}
@@ -126,10 +130,25 @@ is_target_executable() {
      "$executable" == /Applications/Reolink.app/* ]]
 }
 
-log_message() {
-  typeset -r message="$1"
-  typeset -r timestamp="$("$DATE_COMMAND" '+%Y-%m-%dT%H:%M:%S%z')"
-  print -r -- "$timestamp $message" >> "$LOG_FILE"
+valid_launch_time() {
+    typeset -r launch_time="$1"
+    [[ "$launch_time" =~ ${LAUNCH_TIME_PATTERN} ]]
+}
+
+recognizable_target() {
+    typeset -r record="$1"
+    [[ "$record" =~ ${TARGET_AT_END_PATTERN} ]] || return 1
+    print -r -- "$match[1]"
+}
+
+log_record() {
+    typeset -r executable="$1"
+    typeset -r pid="$2"
+    typeset -r elapsed="$3"
+    typeset -r signal_name="$4"
+    typeset -r outcome="$5"
+    typeset -r timestamp="$("$DATE_COMMAND" '+%Y-%m-%dT%H:%M:%S%z')"
+    print -r -- "$timestamp executable=$executable pid=$pid elapsed=$elapsed signal=$signal_name outcome=$outcome" >> "$LOG_FILE"
 }
 ```
 
@@ -139,7 +158,7 @@ Read the initial snapshot with:
 "$PS_COMMAND" -axo pid=,etime=,lstart=,comm=
 ```
 
-Parse the fixed fields as PID, elapsed time, five launch-time words, then the remaining executable path. Reject nonnumeric PIDs, missing fields, malformed elapsed times, and target records without a valid age. Only select targets where age is strictly greater than 3600. Store each selected PID, executable path, launch time, and elapsed value in associative arrays.
+Parse PID, elapsed time, the exact 24-byte macOS launch time, and the remaining executable path. Validate launch time weekday, month, day width, clock widths and ranges, and year width before selection. Reject nonnumeric PIDs, missing fields, malformed elapsed times, and target records without valid launch identity. Recognize a target executable at the end of malformed records so it can be logged without signalling. Only select targets where age is strictly greater than 3600. Store each selected PID, executable path, launch time, and elapsed value in associative arrays.
 
 Before `TERM`, read identity with:
 
