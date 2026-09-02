@@ -864,3 +864,9 @@ if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
 fi
 
 export ENABLE_TOOL_SEARCH="true"
+
+
+# Added by LM Studio CLI (lms)
+export PATH="$PATH:$HOME/.lmstudio/bin"
+# End of LM Studio CLI section
+
