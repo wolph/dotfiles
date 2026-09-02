@@ -288,8 +288,7 @@ fi
 
 # AI agent CLI defaults (override bare commands; zsh won't re-expand an alias for
 # its own name, so these run the real binaries with flags prepended; tab-completion
-# still resolves to the underlying command). Headroom routing is configured in
-# the persistent env block below. Edit/remove any line to taste.
+# still resolves to the underlying command). Edit/remove any line to taste.
 if command_exists claude; then
     alias claude='claude --allow-dangerously-skip-permissions'  # auto mode default (settings); bypass available to engage in-session
 fi
@@ -864,33 +863,4 @@ if [[ -z "$VIRTUAL_ENV" || -n "$TMUX" ]]; then
     activate
 fi
 
-# >>> headroom persistent env >>>
-export HEADROOM_PORT="8787"
-export HEADROOM_HOST="127.0.0.1"
-export HEADROOM_MODE="token"
-export HEADROOM_BACKEND="anthropic"
-export HEADROOM_TELEMETRY="off"
-export HEADROOM_MEMORY_ENABLED="1"
-export HEADROOM_READ_MATURATION="1"
-export HEADROOM_PROTECT_TOOL_RESULTS="1"
-export HEADROOM_NO_CCR_INJECT_TOOL="1"
-export HEADROOM_NO_CCR_MARKER="1"
-export HEADROOM_HTTP2="0"
-export HEADROOM_RETRY_MAX_ATTEMPTS="1"
-export HEADROOM_OUTPUT_SHAPER="1"
-export HEADROOM_OUTPUT_HOLDOUT="0.1"
-export HEADROOM_COMPRESSION_TIMEOUT_SECONDS="3"
-export HEADROOM_COMPRESSION_DEADLINE_MS="1500"
-export HEADROOM_KOMPRESS_TIME_BUDGET_SECONDS="1.5"
-export HEADROOM_KOMPRESS_MAX_TOKENS="8000"
-export HEADROOM_TEXT_CRUSHER="1"
-export HEADROOM_COMPRESSION_MAX_WORKERS="2"
-export HEADROOM_KOMPRESS_EXECUTION_TIMEOUT_MS="250"
-export HEADROOM_KOMPRESS_ONNX_INTRA_THREADS="4"
-export HEADROOM_KOMPRESS_ONNX_INTER_THREADS="1"
-# export ANTHROPIC_BASE_URL="http://127.0.0.1:8787"
 export ENABLE_TOOL_SEARCH="true"
-# export COPILOT_PROVIDER_TYPE="anthropic"
-# export COPILOT_PROVIDER_BASE_URL="http://127.0.0.1:8787"
-# export OPENAI_BASE_URL="http://127.0.0.1:8787/v1"
-# <<< headroom persistent env <<<
