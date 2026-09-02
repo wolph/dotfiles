@@ -1,5 +1,8 @@
 # vim: ft=zsh
 #
+# Raise open file limit from macOS default of 256
+ulimit -n 65536 2>/dev/null || ulimit -n 10240 2>/dev/null
+
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
     alias gdate=date
