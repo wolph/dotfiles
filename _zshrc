@@ -309,7 +309,44 @@ function mosh(){
         title "$1"
     fi
     command mosh $@
+    local rc=$?
+    fixterm
     title ""
+    return $rc
+}
+
+# Restore the local terminal after a full-screen program (Claude Code, herdr,
+# tmux, vim, htop, less) died without its teardown, typically because the ssh
+# connection carrying it dropped. ssh restores termios itself, but NOT the
+# xterm modes the program switched on via escape sequences. Each leftover
+# mode has a symptom:
+#   1049/1047/47   alternate screen    prompt draws over the dead frame
+#   1000-1016      mouse tracking      every click/scroll lands in zle as an
+#                                      unknown key: bell plus garbage
+#   1004           focus reporting     clicking the tab sends ESC [ I
+#   1007           alternate scroll    wheel turns into arrow keys
+#   2004           bracketed paste     pastes wrapped in ESC [ 200 ~
+#   2026           synchronized output frames withheld until ESU
+#   CSI > u, CSI > 4 m                 kitty keyboard / modifyOtherKeys: keys
+#                                      arrive as ESC [ ... u sequences
+# Any of those ESCs flips a vi-mode zle into vicmd, so plain typing beeps too.
+# iTerm2 3.6 ignores a bare DECRST 1049 once the program that switched the
+# screen is gone, but honours the pair 1049h + 1049l, so the pair is what we
+# send: on a healthy terminal it is a no-op (cursor saved and restored).
+# No bare DECSTBM (ESC [ r): it homes the cursor, so the next prompt would
+# overwrite the top of the screen. DECSTR resets the margins without that.
+# Pure printf, no terminfo, so it works whatever TERM the remote side left.
+# Always returns 0: a missing tty (scripts, tests) is not an error here.
+function fixterm(){
+    printf '\e[?1049h\e[?1049l\e[?1047l\e[?47l'                                # leave alternate screens first
+    printf '\e[!p'                                                           # DECSTR: cursor keys, keypad, margins, SGR, charsets
+    printf '\e[?1000l\e[?1002l\e[?1003l\e[?1005l\e[?1006l\e[?1015l\e[?1016l' # mouse off
+    printf '\e[?1004l\e[?2004l\e[?1007l\e[?2026l'                            # focus, paste, alt scroll, sync output
+    printf '\e[<u\e[=0;1u\e[>4;0m'                                           # kitty keyboard pop + clear, modifyOtherKeys off
+    printf '\e[?7h\e[?1l\e>\e[?25h\e[?12l\e[0 q'                              # autowrap, cursor keys, keypad, cursor
+    printf '\e[0m\e(B'                                                       # attrs, G0 charset
+    stty sane 2>/dev/null
+    return 0
 }
 
 # Little trick to change the name of the shell
@@ -331,8 +368,11 @@ function ssh(){
     local prev_color="$_TAB_COLOR_RGB"
     [ -n "$host" ] && (( $+functions[tab_color_from_string] )) && tab_color_from_string "$host"
     /usr/bin/ssh $*
+    local rc=$?
+    fixterm
     (( $+functions[tab_color_restore] )) && tab_color_restore "$prev_color"
     title ""
+    return $rc
 }
 
 
