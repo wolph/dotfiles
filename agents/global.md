@@ -185,10 +185,14 @@ commit messages, release notes, and editorial text.
 
 ## Releases
 
-- A release has four parts: version bump + changelog entry, pushed git tag, package registry publish (PyPI etc.), and a GitHub release. Verify all four — compare `git tag --sort=-creatordate` against `gh release list`.
-  Why: CI publish workflows typically cover only the registry (e.g. Trusted Publishing to PyPI) and never create GitHub releases; that step is manual and silently skipped (portalocker 4.1.0 shipped to PyPI with no GitHub release).
+- A release has five parts: version bump + changelog entry, pushed git tag, package registry publish (PyPI etc.), a GitHub release, and the stable branch (master) fast-forwarded to the tag. Verify all five — compare `git tag --sort=-creatordate` against `gh release list`, and check `git rev-list --count origin/master..vX.Y.Z` prints 0.
+  Why: CI publish workflows typically cover only the registry (e.g. Trusted Publishing to PyPI); the GitHub release and the master sync are manual unless explicitly automated, and manual steps get silently skipped (portalocker: 4.1.0 shipped without a GitHub release, 4.2.0 without the master fast-forward).
 - Create missing GitHub releases from the already-pushed tag: extract that version's changelog section to a file, then `gh release create vX.Y.Z --title vX.Y.Z --notes-file <file> --verify-tag`. Match the body format of the repo's previous releases.
   Why: `--verify-tag` fails instead of minting a new tag from the wrong ref; sourcing the body from the changelog keeps release notes single-sourced and consistent.
+- Sync a stale master with `git push origin vX.Y.Z^{commit}:master`.
+  Why: a plain push refuses non-fast-forward updates, so a diverged master fails loudly instead of being overwritten.
+- Automating the master sync in CI requires a fine-grained PAT (Contents + Workflows write) or a write deploy key, passed to actions/checkout as `token:`/`ssh-key:`.
+  Why: GITHUB_TOKEN is forbidden from pushing commits that touch .github/workflows/, and release diffs regularly include workflow changes.
 - Afterwards confirm with `gh release list` that the release exists and is marked Latest.
   Why: verification rule — no completion claims without checked output.
 
