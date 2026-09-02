@@ -64,26 +64,177 @@ if [ -n "$old_sessions" ]; then
     done
 fi
 
+zmodload zsh/datetime 2>/dev/null
+zmodload zsh/stat 2>/dev/null
+
+function build_session_table(){
+    local color_mode="${1:-0}"
+    local tab=$'\t'
+    typeset -A session_windows_map
+    while IFS="$tab" read -r sname win; do
+        [[ -z "$sname" ]] && continue
+        if [[ -n "$session_windows_map[$sname]" ]]; then
+            session_windows_map[$sname]="$session_windows_map[$sname], $win"
+        else
+            session_windows_map[$sname]="$win"
+        fi
+    done < <(tmux_command list-windows -a -F "#{session_name}"$'\t'"#{window_index}:#{window_name}#{?window_active,*,}" 2>/dev/null)
+
+    typeset -A active_names
+    typeset -a all_rows
+
+    while IFS="$tab" read -r sname n_win attached created activity spath; do
+        [[ -z "$sname" ]] && continue
+        [[ "$sname" == __* ]] && continue
+        [[ "$sname" =~ -[0-9]{14}$ ]] && continue
+        active_names[$sname]=1
+
+        local st="D"
+        if (( attached > 0 )); then
+            st="A"
+        fi
+
+        local act_str="-"
+        if [[ -n "$activity" && "$activity" != "0" ]]; then
+            strftime -s act_str "%Y-%m-%d %H:%M" "$activity" 2>/dev/null || act_str="-"
+        fi
+
+        local disp_path="${spath/#$HOME/~}"
+        local wins_summary="${session_windows_map[$sname]:-$n_win}"
+
+        all_rows+=("$st$tab$sname$tab$disp_path$tab$act_str$tab$wins_summary")
+    done < <(tmux_command list-sessions -F "#{session_name}"$'\t'"#{session_windows}"$'\t'"#{session_attached}"$'\t'"#{session_created}"$'\t'"#{session_activity}"$'\t'"#{session_path}" 2>/dev/null)
+
+    if [[ -d "$TMX_WORKSPACE_DIR" ]]; then
+        for wdir in "$TMX_WORKSPACE_DIR"/*(/N); do
+            local wname="${wdir:t}"
+            [[ -n "$active_names[$wname]" ]] && continue
+            [[ "$wname" == .* ]] && continue
+
+            local act_str="-"
+            local -a stat_out
+            if zstat -F "%Y-%m-%d %H:%M" -A stat_out +mtime "$wdir" 2>/dev/null; then
+                act_str="${stat_out[1]}"
+            fi
+            local disp_path="${wdir/#$HOME/~}"
+            all_rows+=("W$tab$wname$tab$disp_path$tab$act_str$tab-")
+        done
+    fi
+
+    local w_st=1 w_sn=7 w_pt=4 w_ac=16
+    for row in "${all_rows[@]}"; do
+        IFS="$tab" read -r r_st r_sn r_pt r_ac r_wn <<< "$row"
+        (( ${#r_sn} > w_sn )) && w_sn=${#r_sn}
+        (( ${#r_pt} > w_pt )) && w_pt=${#r_pt}
+    done
+
+    local h_st="S" h_sn="SESSION" h_pt="PATH" h_ac="ACTIVITY" h_wn="WINDOWS"
+    echo "${(r:$w_st:)h_st}  ${(r:$w_sn:)h_sn}  ${(r:$w_pt:)h_pt}  ${(r:$w_ac:)h_ac}  $h_wn"
+    for row in "${all_rows[@]}"; do
+        IFS="$tab" read -r r_st r_sn r_pt r_ac r_wn <<< "$row"
+        local f_st="${(r:$w_st:)r_st}"
+        local f_sn="${(r:$w_sn:)r_sn}"
+        local f_pt="${(r:$w_pt:)r_pt}"
+        local f_ac="${(r:$w_ac:)r_ac}"
+        if (( color_mode == 1 )); then
+            case "$r_st" in
+                A)
+                    echo -e "\033[1;32m${f_st}\033[0m  \033[1m${f_sn}\033[0m  \033[34m${f_pt}\033[0m  \033[36m${f_ac}\033[0m  \033[35m${r_wn}\033[0m"
+                    ;;
+                D)
+                    echo -e "\033[1;36m${f_st}\033[0m  \033[1m${f_sn}\033[0m  \033[34m${f_pt}\033[0m  \033[36m${f_ac}\033[0m  \033[35m${r_wn}\033[0m"
+                    ;;
+                W)
+                    echo -e "\033[2m${f_st}\033[0m  ${f_sn}  \033[2m${f_pt}\033[0m  \033[2m${f_ac}\033[0m  \033[2m${r_wn}\033[0m"
+                    ;;
+            esac
+        else
+            echo "${f_st}  ${f_sn}  ${f_pt}  ${f_ac}  ${r_wn}"
+        fi
+    done
+}
+
+function select_session_or_list(){
+    if [[ -t 0 && -t 2 ]] && command -v fzf >/dev/null 2>&1; then
+        local preview_cmd="
+st=\$(echo \"{}\" | awk '{print \$1}')
+name=\$(echo \"{}\" | awk '{print \$2}')
+if [[ \"\$st\" == \"A\" || \"\$st\" == \"D\" ]]; then
+    echo '=== Tmux Windows ==='
+    tmux -L \"$TMX_SOCKET_NAME\" list-windows -t \"\$name\" 2>/dev/null
+    echo
+    echo '=== Pane Preview ==='
+    tmux -L \"$TMX_SOCKET_NAME\" capture-pane -p -e -t \"\${name}:\" 2>/dev/null | tail -n 25
+elif [[ \"\$st\" == \"W\" ]]; then
+    p=\"${TMX_WORKSPACE_DIR%/}/\$name\"
+    echo '=== Git Status ==='
+    git -C \"\$p\" status -s 2>/dev/null
+    echo
+    echo '=== Recent Commits ==='
+    git -C \"\$p\" log -n 5 --oneline --color=always 2>/dev/null || ls -la \"\$p\" 2>/dev/null
+fi
+"
+
+        typeset -a fzf_out
+        local fzf_exit
+        fzf_out=("${(@f)$(build_session_table 1 | fzf \
+            --ansi \
+            --header-lines=1 \
+            --reverse \
+            --prompt="tmx > " \
+            --header="Enter: attach/create | Esc: cancel | Type: filter or new name | ?: toggle preview" \
+            --preview="$preview_cmd" \
+            --preview-window="right:45%:hidden" \
+            --bind="?:toggle-preview,ctrl-/:toggle-preview" \
+            --print-query)}")
+        fzf_exit=$?
+
+        if (( fzf_exit != 0 )); then
+            exit 0
+        fi
+
+        local query="${fzf_out[1]}"
+        local selection="${fzf_out[2]}"
+
+        if [[ -n "$selection" ]]; then
+            local clean_selection="${(S)selection//$'\e\['[0-9;]#m/}"
+            typeset -a parts
+            parts=($=clean_selection)
+            base_session="${parts[2]}"
+        elif [[ -n "$query" ]]; then
+            base_session="$query"
+        else
+            exit 0
+        fi
+    else
+        echo "Available sessions:"
+        build_session_table 0
+        exit 0
+    fi
+}
+
 function available_sessions(){
-    sessions=$(tmux_command ls 2> /dev/null | grep -Ei "^[a-z]")
-    echo "Available sessions:"
-    echo "$sessions" | grep -vE -- '-[0-9]{14}:'
-    exit
+    select_session_or_list
 }
 
 if [[ -z "$1" ]]; then
+    if [[ "$PWD" == "$HOME" || "$PWD" -ef "$HOME" || "$PWD" == "/" ]]; then
+        select_session_or_list
+    else
+        base_session="${PWD:t}"
+    fi
+elif [[ "$1" == "ls" ]]; then
+    select_session_or_list
+else
+    base_session="$1"
+fi
+
+if [[ -z "$base_session" ]]; then
     echo "Specify session name as the first argument"
     echo
-    available_sessions
-    exit
+    select_session_or_list
+    exit 0
 fi
-
-# Only because I often issue `ls` to this script by accident
-if [[ "$1" == "ls" ]]; then
-    available_sessions
-fi
-
-base_session="$1"
 
 function title(){
     if [ "$1" != "default" ]; then
