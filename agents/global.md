@@ -97,12 +97,18 @@ commit messages, release notes, and editorial text.
 - These rules cover headings, prose, captions, callouts, and instruction files. Verbatim quotes and literal command output keep their original punctuation.
 - Before finishing a writing task, scan every changed text file for violations.
 
+### Spelling
+
+- British spelling in all authored prose: -ise, -isation, -yse, behaviour, colour, favour, artefact, and licence for the noun.
+- Code, identifiers, API names, package names, and tool output keep their own spelling. Verbatim quotes keep the spelling of their source.
+
 ### Persona and reader
 
 - Write as an experienced practitioner teaching a capable programmer one desk over, at the terminal.
 - Demystify on contact. When a term sounds grand, state the plain mechanism underneath it in one flat sentence.
 - "You" owns choices, observations, and earned knowledge. "We" builds code and walks examples together. "I" is for owned preference, experience, and confessed mistakes.
 - First-person experience must be real. Never invent war stories, numbers, or personal history.
+- Every "I" sentence is the author's. Never write one on their behalf, and in revision never remove or reword one without their answer.
 - Voice the objection forming in the reader's head, concede it is fair, then answer it.
 - Grant permission to skip prerequisites the reader may know. Refuse to let them skip a genuine pitfall.
 - Never mock the reader. Use contractions naturally.
@@ -114,6 +120,7 @@ commit messages, release notes, and editorial text.
 - Run the example loop: one setup sentence ending in a colon, the code, then a read-back that translates each visible detail of the output into its cause and consequence. Code that is not read back is decoration.
 - For contested style, run the comparison loop: show the clumsy version first, improve it in graded rungs, grade every rung out loud, and let the final form feel earned.
 - Close a section with a first-person verdict and the reason welded on. Close a document with one takeaway and a handoff that sells the next topic in reader-benefit terms.
+- A section ends on its last fact or its verdict, never on a sentence announcing the next section. Only the document opening bridges. A forward pointer inside a document goes in a box.
 - When revising, delete solved problems whole instead of trimming them, and own a reversed verdict in one sentence.
 
 ### Callout boxes
@@ -145,6 +152,8 @@ commit messages, release notes, and editorial text.
 - Own imperfect demos. Disclose trimming, staging, cherry-picking, and luck in first person at the moment they would mislead.
 - When the page cannot show a feature, say so and send the reader to their own machine. Never fake a demonstration.
 - Shrink benchmark verdicts to the version and test that produced them. A fast wrong answer is worthless, and say so.
+- Transcripts are recordings. When a version, marker, or timing goes stale, re-run the whole series on current releases and paste the new output. Never patch a number by hand. Disclose a cold cache or an outlier in one clause.
+- Paths in transcripts and prose are anonymised to a fictional machine. The book uses the home directory of a fictional user named wolph on every platform, and its AGENTS.md spells out the exact form. Never a real username, hostname, cache location, or temporary directory. Before finishing, grep the changed files for the real home directory prefixes of every platform you captured on, the system temporary directories, and mounted volumes.
 
 ### Rhythm
 
@@ -153,6 +162,25 @@ commit messages, release notes, and editorial text.
 - Keep the trailing "however" for earned shrugs and let sentence structure carry the other contrasts.
 - Move cross-references to paragraph endings. Parentheses hold compact asides and quarantined hedges only, and stay out of the strongest clause.
 - A sentence containing a "however", a parenthesis, a cross-reference, and a consequence clause is too heavy. Cut it in two.
+
+### Tells of a second writer
+
+Drafted prose drifts from an author in patterns, not sentences. Count each pattern with grep in the draft and in the author's own text before rewriting. A device the reference never uses is yours to remove. A device the reference uses at all is the author's and stays until they answer.
+
+- Reveal hinge: a fact withheld and released after ", yet".
+- Closing aphorism: a polished fragment ending a section after the point is made. A fragment stays only when it carries the mechanism.
+- Thesis callback: "from the start of this chapter", "at module scale". A callback to a concrete earlier example stays. A callback to the theme goes.
+- Narrator bookkeeping: "I still owe you", "as promised", "that I have kept quiet about".
+- Section bridge: a section that ends by announcing the next one.
+- Guide vocabulary on the page: habit report, verdict, earns its keep, read back, load-bearing, spine. These words are for the editor, never for the reader.
+- Coined metaphor system: label, rung, ladder where the author says "points to". The author's plain phrase wins.
+- Reference-manual register: attribute inventories that no transcript on the page shows.
+- Thesis-first opener: a section that opens on the theme instead of the reader's situation.
+- Trailer copy: "the stakes go up", "watch X", "while you watch", "see who wins".
+- Self-interview and question lists: a question answered in a fragment, or an opener listing the questions the section will answer. Voicing the reader's question and answering it in full sentences is the author's move and stays.
+- Frame phrases and unbounded superlatives: "the honest way to think about", "let me be precise", "three weeks from now", "better than anything else in the language".
+- Contraction drought: the reference contracts and the draft does not. Count both.
+- Commentary about the page itself, and bug tracker numbers in prose.
 
 ### Avoid in prose
 
@@ -167,7 +195,9 @@ commit messages, release notes, and editorial text.
 - Verify the chain: problem, mechanism, example, read-back, caveat in place, owned recommendation, handoff.
 - Verify the boxes: planned, typed by the note-versus-tip rule, one breath long, placed against their code.
 - Replace vague "this" and generic praise with the actual object and the specific benefit.
-- Run the punctuation scan last.
+- Sweep for the tells of a second writer, count contractions against the reference, and read the first and last sentence of every section.
+- Check that every "I" sentence is the author's, every path is on the fictional machine, and every cross-reference uses the current title.
+- Run the punctuation and spelling scan last.
 
 ## Security
 
