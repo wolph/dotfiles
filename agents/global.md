@@ -195,6 +195,12 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - Adverbs the reference never uses: genuinely, quietly, deliberately. Count each in both texts. One inside an "I" sentence is the author's.
 - A demonstrative in the first sentence after a box ("is that documented surface"), and a term used before its definition.
 - Internet catchphrases that read as plain English: "with extra steps", "a scavenger hunt".
+- Time-cost motif: "hours", "3 a.m.", "several hours later" as the price of every mistake. Count in both texts, keep the one the reference has.
+- A sentence between a setup colon and its code, usually a version note. It is a box, a deletion, or the setup sentence itself, never a third thing.
+- Two rules for one concept in one chapter's code, such as a registry that accepts "upper-case" and a metaclass that demands an identifier. Grep the blocks for the same policy before reading the prose.
+- A rewritten read-back is a claim to run. Improving the voice of a wrong sentence keeps it wrong.
+- A mechanism retired for a decade is deleted whole, not owned as a reversal. Own a reversal only while the old way is in living memory.
+- Output fences in a form the harness does not lex verify nothing. Count fences by form, and give a noexec block a text fence with a sentence saying where the run came from.
 - Test-pinned prose: read the chapter's test file before a pass, keep pinned sentences verbatim inside any rewrite, and change a pinned heading with its test in one commit.
 - Summary habit fork: quote the body's "I" sentences verbatim. Never paraphrase one into the summary.
 
