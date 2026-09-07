@@ -179,8 +179,21 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - Trailer copy: "the stakes go up", "watch X", "while you watch", "see who wins".
 - Self-interview and question lists: a question answered in a fragment, or an opener listing the questions the section will answer. Voicing the reader's question and answering it in full sentences is the author's move and stays.
 - Frame phrases and unbounded superlatives: "the honest way to think about", "let me be precise", "three weeks from now", "better than anything else in the language".
-- Contraction drought: the reference contracts and the draft does not. Count both.
-- Commentary about the page itself, and bug tracker numbers in prose.
+- Contraction drought: the reference contracts and the draft does not. Count both. The settled rule: contract the negatives (don't, doesn't, can't), leave "it is", "that is", and "you are" as the reference leaves them.
+- Commentary about the page itself, including its own test suite, and bug tracker numbers in prose.
+- Policy register: consumers, installers, resolvers, operators as subjects, "must" and "should" as verbs, almost no "you". Count agentless nouns, "must", and "you" per hundred lines in both texts. When "you" is under a fifth of the reference, the register is the finding and every paragraph is rewritten from the reader's side with the same facts.
+- Antithesis pair: "X rather than Y", "X, not Y". Each becomes one plain statement.
+- Coined abstraction family: boundary, claim, evidence, prove, promise standing where the plain noun would. Once one member appears, count the family, headings included, and keep a word only where it names a real thing.
+- Transcripts that are not what the tool prints (a bare list where the tool prints a table, a hand-sorted listing, an elided version) and pins one release series behind the current one. Rebuild the example from the page's own code blocks, diff every transcript, re-pin before recording, and change the command rather than the output when the real output does not fit the page.
+- Topics covered twice, and paragraphs another chapter already carries. One home per topic, and a one-sentence pointer at the chapter that owns the paragraph.
+- Definition-first opener: a section whose first sentence defines the heading's term ("A composition root is the one place that..."), the vocabulary-chapter form of the thesis-first opener. The reader's situation goes first and the definition second. Count openers that start with the heading's noun against the number of sections.
+- Described output with no transcript: prose that says what a command prints, raises, or returns while no fenced block on the page shows it. Rebuild from the page's own code blocks, record it, and read it back. Count "prints", "raises", "returns", and "fails" in prose against the fenced blocks.
+- Cross-references: the short chapter title on the first mention, the bare number afterwards, and at most one pointer per target chapter per section. Grep the target branch for the word it uses for the concept before pointing at it.
+- Adverbs the reference never uses: genuinely, quietly, deliberately. Count each in both texts. One inside an "I" sentence is the author's.
+- A demonstrative in the first sentence after a box ("is that documented surface"), and a term used before its definition.
+- Internet catchphrases that read as plain English: "with extra steps", "a scavenger hunt".
+- Test-pinned prose: read the chapter's test file before a pass, keep pinned sentences verbatim inside any rewrite, and change a pinned heading with its test in one commit.
+- Summary habit fork: quote the body's "I" sentences verbatim. Never paraphrase one into the summary.
 
 ### Avoid in prose
 
@@ -225,6 +238,13 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
   Why: GITHUB_TOKEN is forbidden from pushing commits that touch .github/workflows/, and release diffs regularly include workflow changes.
 - Afterwards confirm with `gh release list` that the release exists and is marked Latest.
   Why: verification rule — no completion claims without checked output.
+
+## Background Agents
+
+- A spawned agent is not running until its output proves it. Require a progress file as its first action, verify the file exists within a minute, and start a Monitor on it that reports each step and flags ten minutes of silence.
+  Why: a teammate spawn can appear on the roster as "running" while it never started. Trusting the roster cost the user two hours of waiting on a dead agent (mt940 compat audit, 2026-09-07).
+- On every user turn while an agent runs, check its progress before answering. Never wait passively for a completion notification.
+  Why: the notification never arrives for an agent that died at spawn.
 
 ## Error Handling
 
