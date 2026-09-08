@@ -203,6 +203,11 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - Output fences in a form the harness does not lex verify nothing. Count fences by form, and give a noexec block a text fence with a sentence saying where the run came from.
 - Test-pinned prose: read the chapter's test file before a pass, keep pinned sentences verbatim inside any rewrite, and change a pinned heading with its test in one commit.
 - Summary habit fork: quote the body's "I" sentences verbatim. Never paraphrase one into the summary.
+- Thesis word: a plain adjective worn into a system by repetition (a section title, the opening, five verdicts, the summary). Count any adjective in a heading that recurs in more than three verdicts, in both texts. Show the author every place with what each option produces. They decide which places keep it.
+- Undefined acronym at first use where the reference defined it with a link (LBYL, EAFP). Restore the reference definition instead of writing a box.
+- Edition commentary: "the earlier edition", "the original lesson", a box naming editions. A read-back that refers to a lesson the page never sets up is a missing restoration, not a deletion.
+- Back-pointer: two chapters each saying the other owns a topic, so nobody covers it. Grep the target branch for this chapter's number and the previous chapter for promises made to this one before trusting or dropping a pointer.
+- Verification that ends in a box: an undemonstrated version claim that, once run on every supported version, differs across them becomes a version caveat with a fallback, not a cut.
 
 ### Avoid in prose
 
