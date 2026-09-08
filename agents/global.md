@@ -168,16 +168,16 @@ commit messages, release notes, and editorial text.
 Drafted prose drifts from an author in patterns, not sentences. Count each pattern with grep in the draft and in the author's own text before rewriting. A device the reference never uses is yours to remove. A device the reference uses at all is the author's and stays until they answer.
 
 - Reveal hinge: a fact withheld and released after ", yet".
-- Closing aphorism: a polished fragment ending a section after the point is made. A fragment stays only when it carries the mechanism.
+- Closing aphorism: a polished fragment ending a section after the point is made, or a full sentence that restates the sentence before it in a figure ("That is not composition doing you a favour."). A fragment stays only when it carries the mechanism. Read each closer against the sentence before it, and count figurative nouns in closers.
 - Thesis callback: "from the start of this chapter", "at module scale". A callback to a concrete earlier example stays. A callback to the theme goes.
 - Narrator bookkeeping: "I still owe you", "as promised", "that I have kept quiet about".
 - Section bridge: a section that ends by announcing the next one.
 - Guide vocabulary on the page: habit report, verdict, earns its keep, read back, load-bearing, spine. These words are for the editor, never for the reader.
 - Coined metaphor system: label, rung, ladder where the author says "points to". The author's plain phrase wins.
-- Reference-manual register: attribute inventories that no transcript on the page shows.
+- Reference-manual register: attribute inventories that no transcript on the page shows. Cut to a one-sentence pointer only when the reference never showed it either. When the reference has the transcript, restore the demonstration in the chapter's own example.
 - Thesis-first opener: a section that opens on the theme instead of the reader's situation.
 - Trailer copy: "the stakes go up", "watch X", "while you watch", "see who wins".
-- Self-interview and question lists: a question answered in a fragment, or an opener listing the questions the section will answer. Voicing the reader's question and answering it in full sentences is the author's move and stays.
+- Self-interview and question lists: a question answered in a fragment, or an opener listing the questions the section will answer. Voicing the reader's question and answering it in full sentences is the author's move and stays. Count question marks in both texts: a draft with none against a reference with several has lost the move, and the reference's question on the same topic comes back.
 - Frame phrases and unbounded superlatives: "the honest way to think about", "let me be precise", "three weeks from now", "better than anything else in the language".
 - Contraction drought: the reference contracts and the draft does not. Count both. The settled rule: contract the negatives (don't, doesn't, can't), leave "it is", "that is", and "you are" as the reference leaves them.
 - Commentary about the page itself, including its own test suite, and bug tracker numbers in prose.
@@ -202,10 +202,15 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - A mechanism retired for a decade is deleted whole, not owned as a reversal. Own a reversal only while the old way is in living memory.
 - Output fences in a form the harness does not lex verify nothing. Count fences by form, and give a noexec block a text fence with a sentence saying where the run came from.
 - Test-pinned prose: read the chapter's test file before a pass, keep pinned sentences verbatim inside any rewrite, and change a pinned heading with its test in one commit.
-- Summary habit fork: quote the body's "I" sentences verbatim. Never paraphrase one into the summary.
+- Summary habit fork: quote the body's "I" sentences verbatim. Never paraphrase one into the summary. Joining two of the author's own clauses, even from different sections, is allowed when the page names both source lines and the author approves the join.
 - Thesis word: a plain adjective worn into a system by repetition (a section title, the opening, five verdicts, the summary). Count any adjective in a heading that recurs in more than three verdicts, in both texts. Show the author every place with what each option produces. They decide which places keep it.
 - Undefined acronym at first use where the reference defined it with a link (LBYL, EAFP). Restore the reference definition instead of writing a box.
 - Edition commentary: "the earlier edition", "the original lesson", a box naming editions. A read-back that refers to a lesson the page never sets up is a missing restoration, not a deletion.
+- A technical adjective in two senses inside one section ("undecorated" for the decorated fallback and for the handler that register() returns). Check that each repeated technical word means the same thing both times.
+- A deprecated construct inside the supported range (typing.TypeAlias in a block that runs green on 3.10 through 3.15). A green test does not catch a deprecation, so check every typing import and standard-library name against the docs' deprecation notes and the owning chapter's advice.
+- A preservation ledger line is a claim about the text ("The readability verdict remains under ## Summary"). Verify every [adapted] and [retained] line the way a cross-reference is verified.
+- Verification can end in a box: run an undemonstrated claim, and the obvious misuse of the object it describes, on every supported version. A behaviour that changed at a version boundary is a version box, not a cut.
+- A section that only defines a term and has no fenced block is a definition box at first use, not a section.
 - Back-pointer: two chapters each saying the other owns a topic, so nobody covers it. Grep the target branch for this chapter's number and the previous chapter for promises made to this one before trusting or dropping a pointer.
 - Verification that ends in a box: an undemonstrated version claim that, once run on every supported version, differs across them becomes a version caveat with a fallback, not a cut.
 
