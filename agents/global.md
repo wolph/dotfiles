@@ -21,6 +21,9 @@ Never claim work is complete without running it first.
 - Libraries: run test suite or write a smoke test.
 - Web pages: thorough multi-pass visual verification (see below).
 
+- A gate chain never pipes pytest through tail or head: the pipe returns the last command's status and a red test ships with the commit. Run pytest to a log and exit on its own status.
+  Why: chapter 11 shipped one commit red on 2026-09-09 exactly this way.
+
 ### Web Verification Protocol
 
 Every web change requires ALL of these steps:
@@ -179,7 +182,7 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - Trailer copy: "the stakes go up", "watch X", "while you watch", "see who wins".
 - Self-interview and question lists: a question answered in a fragment, or an opener listing the questions the section will answer. Voicing the reader's question and answering it in full sentences is the author's move and stays. Count question marks in both texts: a draft with none against a reference with several has lost the move, and the reference's question on the same topic comes back.
 - Frame phrases and unbounded superlatives: "the honest way to think about", "let me be precise", "three weeks from now", "better than anything else in the language".
-- Contraction drought: the reference contracts and the draft does not. Count both. The settled rule: contract the negatives (don't, doesn't, can't), leave "it is", "that is", and "you are" as the reference leaves them.
+- Contraction drought: the reference contracts and the draft does not. Count both. The settled rule: contract the negatives (don't, doesn't, can't), leave "it is", "that is", and "you are" as the reference leaves them. A non-negative contraction approved before this rule reverts on the next pass.
 - Commentary about the page itself, including its own test suite, and bug tracker numbers in prose.
 - Policy register: consumers, installers, resolvers, operators as subjects, "must" and "should" as verbs, almost no "you". Count agentless nouns, "must", and "you" per hundred lines in both texts. When "you" is under a fifth of the reference, the register is the finding and every paragraph is rewritten from the reader's side with the same facts.
 - Antithesis pair: "X rather than Y", "X, not Y". Each becomes one plain statement.
@@ -213,6 +216,14 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - A section that only defines a term and has no fenced block is a definition box at first use, not a section.
 - Back-pointer: two chapters each saying the other owns a topic, so nobody covers it. Grep the target branch for this chapter's number and the previous chapter for promises made to this one before trusting or dropping a pointer.
 - Verification that ends in a box: an undemonstrated version claim that, once run on every supported version, differs across them becomes a version caveat with a fallback, not a cut.
+- Figures as transcripts: a figure inherited from the previous edition beside retyped code, and a read-back that quotes identifiers the figure no longer shows. Read the identifiers in each image against the block above it and the prose around it, rebuild the page from the chapter's own blocks on the pinned tool, and re-key the pixel manifest.
+- Options counted by the prose: "three more options" above a block that adds four. Count the options in the block and in the sentence, and read back the one the sentence skipped.
+- Luck in a read-back: "in this run", "this time", "happened to" over deterministic behaviour. Check the behaviour before keeping the hedge.
+- The fork stated twice: an imperative use-case fork repeated where the reference had one first-person verdict. Restore the verdict. When a later sentence undercuts the verdict's reason clause, the verdict becomes a use-case fork in the author's voice from the author's own answer, with the mix-and-match case, and a tool named in it is built against the chapter's own package first and dated when its last release is old.
+- Reader routing in the body: "skip this ..." outside a box, and a demonstrative with no referent ("this gallery"). Permission to skip is a box placed before the section it skips, naming that section.
+- Appendix commentary: "portable", "centre of gravity", "next to this chapter" in a companion file's first sentences or in the pointers at it. A companion file is a named appendix in print that opens on what it is.
+- Figure gaps and one-line sections: figure numbers run without gaps within a chapter, appendix included, with files renamed and the manifest re-keyed in one commit, and a section of one sentence and a figure folds into the one before it, with ledger anchors re-pointed and the contract digest recomputed by the test's own algorithm.
+- A humour line the author asks for: ground every candidate in the changelog or source of the author's own packages, show them beside the section, and place only what the author picks, verbatim. A candidate that names a bug still live in the author's package gets the bug fixed on a pushed branch in the same session, with a test that pins the observable the sentence claims.
 
 ### Avoid in prose
 
@@ -263,6 +274,8 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - A spawned agent is not running until its output proves it. Require a progress file as its first action, verify the file exists within a minute, and start a Monitor on it that reports each step and flags ten minutes of silence.
   Why: a teammate spawn can appear on the roster as "running" while it never started. Trusting the roster cost the user two hours of waiting on a dead agent (mt940 compat audit, 2026-09-07).
 - On every user turn while an agent runs, check its progress before answering. Never wait passively for a completion notification.
+- An agent that has written its first artefact and then stays silent for ten minutes is stopped, and its work is taken over on top of what it wrote.
+  Why: the progressbar2 stacklevel agent wrote its test file and stalled for five hours on 2026-09-08 while the fix took twenty minutes by hand.
   Why: the notification never arrives for an agent that died at spawn.
 
 ## Error Handling
