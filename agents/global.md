@@ -224,6 +224,11 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 - Appendix commentary: "portable", "centre of gravity", "next to this chapter" in a companion file's first sentences or in the pointers at it. A companion file is a named appendix in print that opens on what it is.
 - Figure gaps and one-line sections: figure numbers run without gaps within a chapter, appendix included, with files renamed and the manifest re-keyed in one commit, and a section of one sentence and a figure folds into the one before it, with ledger anchors re-pointed and the contract digest recomputed by the test's own algorithm.
 - A humour line the author asks for: ground every candidate in the changelog or source of the author's own packages, show them beside the section, and place only what the author picks, verbatim. A candidate that names a bug still live in the author's package gets the bug fixed on a pushed branch in the same session, with a test that pins the observable the sentence claims.
+- A flourish approved from a label is not approved: six deadpan lines kept when offered as labels in a question all went plain once the author read one in its paragraph. Show a flourish on the page in its paragraph with the plain version beside it, never as a label in a question.
+- An imperative pair that is a recommendation ("Use X for... Use Y once..."): offer the reader's situation and a first-person habit report built from the draft's own facts, and let the author pick. The agent never writes the "I" sentence on its own, but it may offer one.
+- Dry-run every numbered page through the chapter's test file before publishing it. Gate self-tests mutate pinned sentences with replace_once, so a rewritten pin fails before the page goes out, and the pin moves with its prose in the same commit.
+- A fact the agent adds to carry a sentence ("what asyncio was originally built on") is named as an addition in the item's reason and asked about, never slipped in with the rewrite.
+- Shared-build voice: count "we" per thousand prose words separately from "you". The form that is not new content is the setup sentence before a block we define together, in "let's" and "we will". A read-back that narrates the build is new content and the author's call.
 
 ### Avoid in prose
 
