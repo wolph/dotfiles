@@ -38,6 +38,11 @@ link(){
 }
 
 for file in _*; do
+    # mpv warns when both ~/.mpv and ~/.config/mpv exist, even when one is a
+    # symlink to the other, so _mpv gets the XDG path only. See below.
+    if [ "$file" = "_mpv" ]; then
+        continue
+    fi
     destination="$HOME/$(echo $file | sed 's/^_/./')"
     source=$PWD/$file
     link "$source" "$destination"
@@ -52,7 +57,13 @@ done
 
 mkdir -p "$HOME/.config"
 mkdir -p "$HOME/.vim/autoload"
-ln -sfn "$HOME/.mpv" "$HOME/.config/mpv"
+# ~/.mpv is the "bogus" config dir for mpv 0.36 and later: it warns on startup
+# whenever that path exists next to ~/.config/mpv. Drop the link older installs
+# left behind, and point the XDG path straight at the repo.
+if [ -h "$HOME/.mpv" ]; then
+    rm -v "$HOME/.mpv"
+fi
+ln -sfn "$PWD/_mpv" "$HOME/.config/mpv"
 ln -sfn "$HOME/.vim" "$HOME/.config/nvim"
 ln -sfn "$HOME/.vimrc" "$HOME/.config/nvim/init.vim"
 # vim.lua is the modern-nvim layer, loaded by the vimrc itself (nvim 0.11+

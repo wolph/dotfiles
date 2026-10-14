@@ -6,7 +6,6 @@ AGENTS.md
 *.log
 *.local
 *_local
-_mpv/mpv-config/
 .remember/
 .claude/
 .agents/
