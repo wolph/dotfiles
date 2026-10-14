@@ -1,22 +1,39 @@
 #!/usr/bin/env bash
+#
+# brew-cask-postinstall: run brew, then make freshly installed apps usable at once.
+#
+# Homebrew removed --no-quarantine in July 2026 (Homebrew/brew ba25213c81), so
+# every cask install, reinstall and upgrade now leaves com.apple.quarantine on
+# the app bundle and Gatekeeper asks "downloaded from the internet?" on first
+# launch. This wrapper strips that attribute after brew succeeds and refreshes
+# the Spotlight and LaunchServices metadata so Alfred lists the app right away.
+#
+# Usage: brew-cask-postinstall [brew] <subcommand> [args...]
+# Wire it up in zsh with: brew() { brew-cask-postinstall "$@"; }
 
 set -u
 set -o pipefail
 
 LSREGISTER="/System/Library/Frameworks/CoreServices.framework/Frameworks/LaunchServices.framework/Support/lsregister"
+QUARANTINE_ATTRIBUTE="com.apple.quarantine"
+# External trigger of the "Homebrew" Alfred workflow (de.chris-grieser.homebrew):
+# runs Alfred's built-in "reload" command, which rebuilds its application cache.
+ALFRED_RELOAD_URL="alfred://runtrigger/de.chris-grieser.homebrew/reload-app-cache/"
 
 usage() {
     echo "Usage: $(basename "$0") [brew] <subcommand> [args...]" >&2
 }
 
+# Package tokens named on the command line: everything that is not the
+# subcommand and not an option.
 collect_requested_package_tokens() {
     local arg
 
     for arg in "$@"; do
         case "$arg" in
-            install|reinstall)
+            install|reinstall|upgrade)
                 ;;
-            --*)
+            -*)
                 ;;
             *)
                 printf '%s\n' "$arg"
@@ -25,44 +42,83 @@ collect_requested_package_tokens() {
     done
 }
 
+# Casks that a bare "brew upgrade" is about to touch. Any --greedy* flag is
+# passed on so the snapshot matches what brew will upgrade.
+collect_outdated_cask_tokens() {
+    local -a outdated_args=(--cask --quiet)
+    local arg
+
+    for arg in "$@"; do
+        case "$arg" in
+            --greedy*)
+                outdated_args+=("$arg")
+                ;;
+        esac
+    done
+
+    command brew outdated "${outdated_args[@]}" 2>/dev/null || true
+}
+
+# The installed app bundles of one package, as paths under /Applications or
+# ~/Applications. brew list prints the Caskroom copy of each artifact, and the
+# app bundle itself lives in one of the two app directories.
 collect_app_paths_for_package() {
     local token="$1"
     local package_path
-    local app_bundle_path
     local app_name
     local app_path
 
     while IFS= read -r package_path; do
-        [[ -n "$package_path" ]] || continue
+        [[ "$package_path" == *.app ]] || continue
 
-        if [[ "$package_path" == *.app ]]; then
-            app_bundle_path="$package_path"
-        elif [[ "$package_path" == *.app/* ]]; then
-            app_bundle_path="${package_path%%.app/*}.app"
-        else
-            continue
-        fi
-
-        printf '%s\n' "$app_bundle_path"
-
-        app_name=${app_bundle_path##*/}
+        app_name=${package_path##*/}
         for app_path in "/Applications/$app_name" "$HOME/Applications/$app_name"; do
-            if [[ -e "$app_path" ]]; then
+            if [[ -d "$app_path" ]]; then
                 printf '%s\n' "$app_path"
             fi
         done
     done < <(
         {
-            brew list --cask "$token" 2>/dev/null || true
-            brew list --formula "$token" 2>/dev/null || true
+            command brew list --cask "$token" 2>/dev/null || true
+            command brew list --formula "$token" 2>/dev/null || true
         } | awk '!seen[$0]++'
     )
 }
 
-refresh_app_bundle() {
+# Returns 0 when nothing inside the bundle carries the quarantine attribute.
+# /usr/bin/find is spelled out because GNU find from coreutils lacks -xattrname.
+bundle_is_quarantine_free() {
+    local app_path="$1"
+    local remaining
+
+    remaining=$(/usr/bin/find "$app_path" -xattrname "$QUARANTINE_ATTRIBUTE" -print -quit 2>/dev/null)
+    [[ -z "$remaining" ]]
+}
+
+# Removes com.apple.quarantine from the whole bundle and verifies the result.
+# Returns 1 when files keep the attribute, for example on a root-owned bundle.
+strip_quarantine() {
     local app_path="$1"
 
-    [[ -e "$app_path" ]] || return 0
+    if bundle_is_quarantine_free "$app_path"; then
+        return 0
+    fi
+
+    # -s strips the attribute from symlinks inside the bundle as well, instead
+    # of following them and reporting "No such xattr" on their targets.
+    xattr -d -r -s "$QUARANTINE_ATTRIBUTE" "$app_path" 2>/dev/null || true
+
+    if bundle_is_quarantine_free "$app_path"; then
+        return 0
+    fi
+
+    return 1
+}
+
+# Nudges the metadata Alfred reads: the folder watch (touch), the LaunchServices
+# database (lsregister) and the Spotlight index (mdimport).
+refresh_app_bundle() {
+    local app_path="$1"
 
     touch -c "$app_path" >/dev/null 2>&1 || true
     touch -c "$(dirname "$app_path")" >/dev/null 2>&1 || true
@@ -71,37 +127,48 @@ refresh_app_bundle() {
 }
 
 trigger_alfred_app_cache_reload() {
-    open 'alfred://runtrigger/de.chris-grieser.homebrew/reload-app-cache/' >/dev/null 2>&1 || true
+    open "$ALFRED_RELOAD_URL" >/dev/null 2>&1 || true
 }
 
-refresh_alfred_metadata() {
+# Post-install pass over every app bundle of the given packages. Returns 1 when
+# any bundle still carries the quarantine attribute afterwards.
+postinstall_packages() {
     local -a package_tokens=("$@")
-    local refreshed_any=0
+    local -a app_paths=()
     local app_path
     local token
+    local failures=0
 
     if [[ ${#package_tokens[@]} -eq 0 ]]; then
         return 0
     fi
 
-    echo
-    echo "Refreshing Spotlight and LaunchServices metadata for Alfred..."
-
     while IFS= read -r app_path; do
         [[ -n "$app_path" ]] || continue
-        refresh_app_bundle "$app_path"
-        refreshed_any=1
-        echo "  - $app_path"
+        app_paths+=("$app_path")
     done < <(
         for token in "${package_tokens[@]}"; do
             collect_app_paths_for_package "$token"
         done | awk '!seen[$0]++'
     )
 
-    if [[ $refreshed_any -eq 1 ]]; then
-        trigger_alfred_app_cache_reload
-        echo "Metadata refresh complete."
+    if [[ ${#app_paths[@]} -eq 0 ]]; then
+        return 0
     fi
+
+    echo "==> Post-install: removing quarantine and refreshing metadata for Alfred"
+    for app_path in "${app_paths[@]}"; do
+        if strip_quarantine "$app_path"; then
+            echo "  ok    $app_path"
+        else
+            echo "  FAIL  $app_path still has $QUARANTINE_ATTRIBUTE (permissions?)" >&2
+            failures=$((failures + 1))
+        fi
+        refresh_app_bundle "$app_path"
+    done
+    trigger_alfred_app_cache_reload
+
+    [[ $failures -eq 0 ]]
 }
 
 main() {
@@ -111,12 +178,7 @@ main() {
     local token
     local status
 
-    if [[ ${#brew_args[@]} -eq 0 ]]; then
-        usage
-        exit 1
-    fi
-
-    if [[ "${brew_args[0]}" == "brew" ]]; then
+    if [[ ${#brew_args[@]} -gt 0 && "${brew_args[0]}" == "brew" ]]; then
         brew_args=("${brew_args[@]:1}")
     fi
 
@@ -127,10 +189,23 @@ main() {
 
     subcommand="${brew_args[0]}"
 
-    while IFS= read -r token; do
-        [[ -n "$token" ]] || continue
-        package_tokens+=("$token")
-    done < <(collect_requested_package_tokens "${brew_args[@]}")
+    case "$subcommand" in
+        install|reinstall|upgrade)
+            while IFS= read -r token; do
+                [[ -n "$token" ]] || continue
+                package_tokens+=("$token")
+            done < <(collect_requested_package_tokens "${brew_args[@]}")
+
+            # A bare "brew upgrade" names nothing, so snapshot the outdated
+            # casks now: after the upgrade they are no longer outdated.
+            if [[ "$subcommand" == "upgrade" && ${#package_tokens[@]} -eq 0 ]]; then
+                while IFS= read -r token; do
+                    [[ -n "$token" ]] || continue
+                    package_tokens+=("$token")
+                done < <(collect_outdated_cask_tokens "${brew_args[@]}")
+            fi
+            ;;
+    esac
 
     command brew "${brew_args[@]}"
     status=$?
@@ -138,13 +213,11 @@ main() {
         exit "$status"
     fi
 
-    if [[ "$subcommand" != "install" && "$subcommand" != "reinstall" ]]; then
+    if [[ "$(uname -s)" != "Darwin" ]]; then
         exit 0
     fi
 
-    if [[ ${#package_tokens[@]} -gt 0 ]]; then
-        refresh_alfred_metadata "${package_tokens[@]}"
-    fi
+    postinstall_packages "${package_tokens[@]}"
 }
 
 main "$@"
