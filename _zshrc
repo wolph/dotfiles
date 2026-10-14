@@ -930,6 +930,13 @@ if [ -f "$HOME/.zshrc.local" ] && [ "$HOME/.zshrc.local" != "${ROOT_DIR}.zshrc.l
     source "$HOME/.zshrc.local"
 fi
 
+# tmx puts TMX_PROJECT_RC=<project>/.zshrc in the environment of a project
+# session, so per-project aliases, exports and functions reach every shell in
+# that session. A project without the file is simply skipped.
+if [[ -n "$TMX_PROJECT_RC" && -r "$TMX_PROJECT_RC" && ! "$TMX_PROJECT_RC" -ef "${ZDOTDIR:-$HOME}/.zshrc" ]]; then
+    source "$TMX_PROJECT_RC"
+fi
+
 export CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY=1
 
 

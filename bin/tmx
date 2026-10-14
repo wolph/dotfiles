@@ -256,8 +256,11 @@ fi
 title "$base_session"
 
 # Start project sessions in ~/workspace/<session> when that directory exists.
+# TMX_PROJECT_RC goes into the session environment, so every shell opened in
+# the session sources <project>/.zshrc after the global one (see ~/.zshrc).
 project_path="${TMX_WORKSPACE_DIR%/}/$base_session"
 tmux_cwd="$PWD"
+typeset -a project_env=()
 
 if [ -d "$project_path" ]; then
     tmux_cwd="$project_path"
@@ -265,7 +268,17 @@ if [ -d "$project_path" ]; then
     if [ ! -f "$HISTFILE" ]; then
         cp ~/.zshhistory "$HISTFILE"
     fi
+    export TMX_PROJECT_RC="$project_path/.zshrc"
+    project_env=(-e "TMX_PROJECT_RC=$TMX_PROJECT_RC")
 fi
+
+# Sessions created by a .tmuxrc or by an older tmx lack the variable: set it on
+# the base session so windows opened from now on pick it up.
+function set_project_env(){
+    if [ -n "$TMX_PROJECT_RC" ]; then
+        tmux_command set-environment -t "$base_session" TMX_PROJECT_RC "$TMX_PROJECT_RC" 2>/dev/null
+    fi
+}
 
 # This actually works without the trim() on all systems except OSX
 tmux_nb=$(trim `echo "$sessions" | grep "^$base_session:" | wc -l`)
@@ -274,12 +287,13 @@ if [[ "$tmux_nb" == "0" ]]; then
     rc="$tmux_cwd/.tmuxrc"
     if [ -f $rc ]; then
         (cd "$tmux_cwd" && . $rc)
+        set_project_env
     else
         echo creating
 
         # Always create detached first
         # Pass TMX_DISABLE_ITERM=1 explicitly to ensure it propagates to the session
-    tmux_command -2 new-session -d -s "$base_session" -e "TMX_DISABLE_ITERM=1" -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY" -c "$tmux_cwd"
+    tmux_command -2 new-session -d -s "$base_session" -e "TMX_DISABLE_ITERM=1" -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY" "${project_env[@]}" -c "$tmux_cwd"
 
         if [ -t 0 ]; then
     tmux_command -2 attach-session -t $base_session
@@ -306,7 +320,8 @@ else
 
         # Create a new session (without attaching it) and link to base session
         # to share windows
-        tmux_command new-session -d -t $base_session -s $session_id -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY"
+        tmux_command new-session -d -t $base_session -s $session_id -e "DISPLAY=$DISPLAY" -e "XAUTHORITY=$XAUTHORITY" "${project_env[@]}"
+        set_project_env
 
         # Attach to the new session
         echo "Attaching tmux -2 attach-session -t $session_id"
