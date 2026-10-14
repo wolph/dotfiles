@@ -251,8 +251,9 @@ if test -n "$ITERM_PROFILE"; then
         tab_color_from_string "$base_session"
     fi
 fi
+
 # Set terminal name
-title "$1"
+title "$base_session"
 
 # Start project sessions in ~/workspace/<session> when that directory exists.
 project_path="${TMX_WORKSPACE_DIR%/}/$base_session"
