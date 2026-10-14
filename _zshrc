@@ -3,6 +3,13 @@
 # Raise open file limit from macOS default of 256
 ulimit -n 65536 2>/dev/null || ulimit -n 10240 2>/dev/null
 
+# A terminal launched from an agent shell inherits that shell's env
+# (NO_COLOR=1, TERM=dumb, CODEX_*). Scrub it for real tty sessions.
+if [[ -o interactive && -t 1 && $TERM != dumb && $TERM != unknown ]]; then
+    unset NO_COLOR CODEX_CI CODEX_SHELL CODEX_SESSION_ID \
+          CODEX_THREAD_ID CODEX_APP_TOOLS_PIPE_PATH TMX_AUTO_ATTACH
+fi
+
 # On OS X we have GNU Date as gdate, on normal operating systems it's just date
 if ! type gdate > /dev/null; then
     alias gdate=date
@@ -67,7 +74,7 @@ if [[ -o interactive ]] && [[ "$OSTYPE" == darwin* ]] && [[ -z "$TMUX" ]] &&
         [[ "$TERM_PROGRAM" == iTerm.app ]] && command_exists tmux &&
         ! tmux -L "$TMX_SOCKET_NAME" list-sessions >/dev/null 2>&1; then
     if ! tmux -L "$TMX_SOCKET_NAME" new-session -d -s __tmux_keeper -c "$HOME" >/dev/null 2>&1 &&
-            ! tmux -L "$TMX_SOCKET_NAME" has-session -t =__tmux_keeper >/dev/null 2>&1; then
+            ! tmux -L "$TMX_SOCKET_NAME" has-session -t "=__tmux_keeper" >/dev/null 2>&1; then
         print -u2 'Failed to start the iTerm-owned tmux keeper session'
     fi
 fi
@@ -122,10 +129,35 @@ fi
 export TZ=Europe/Amsterdam
 
 # Adding my own completion functions (before compinit so a clean rebuild of
-# the completion dump still registers everything, ~/.zfunc included)
+# the completion dump still registers everything, ~/.zfunc included).
+# brew shellenv exports FPATH, so nested shells arrive with these dirs already
+# present: keep the array unique instead of prepending them a second time.
+typeset -U fpath
 fpath=(${ROOT_DIR}.zsh/zsh-completions/src $fpath)
 fpath=(${ROOT_DIR}.zsh/site-functions $fpath)
 fpath+=~/.zfunc
+
+# uv ships its zsh completions with the Homebrew formula. Where uv came from
+# the standalone installer nothing puts _uv on fpath, so generate both files
+# once per uv binary into a cache dir (redone when the binary is newer).
+_uv_completion_cache() {
+    local cache=~/.zsh/cache/completions
+    local uv=${commands[uv]}
+    [[ -n $uv ]] || return 0
+    local d
+    for d in $fpath; do
+        [[ $d != $cache && -e $d/_uv ]] && return 0
+    done
+    if [[ ! -e $cache/_uv || $uv -nt $cache/_uv ]]; then
+        mkdir -p $cache
+        uv generate-shell-completion zsh > $cache/_uv
+        if (( $+commands[uvx] )); then
+            uvx --generate-shell-completion zsh > $cache/_uvx
+        fi
+    fi
+    fpath=($cache $fpath)
+}
+_uv_completion_cache
 
 # $PATH changes are done in .zprofile; guard against the duplicate entry on
 # login shells where .zprofile already added this.
@@ -208,7 +240,13 @@ if command_exists git; then
     alias push='git pull; git push'
 fi
 export GIT_MERGE_AUTOEDIT=no
-export HOMEBREW_CASK_OPTS=--no-quarantine
+# Homebrew dropped --no-quarantine in July 2026, so HOMEBREW_CASK_OPTS can no
+# longer keep Gatekeeper quiet. brew-cask-postinstall strips the quarantine
+# attribute after install/reinstall/upgrade and refreshes Spotlight and
+# LaunchServices so Alfred lists the app right away.
+if [[ "$OSTYPE" == darwin* ]] && command_exists brew-cask-postinstall; then
+    brew() { brew-cask-postinstall "$@"; }
+fi
 
 command grep --color=auto --directories=skip -q '' /dev/null >/dev/null 2>&1
 _grep_status=$?
