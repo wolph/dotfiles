@@ -283,6 +283,18 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
   Why: the progressbar2 stacklevel agent wrote its test file and stalled for five hours on 2026-09-08 while the fix took twenty minutes by hand.
   Why: the notification never arrives for an agent that died at spawn.
 
+## Codex
+
+- Run Codex through the companion script directly from Bash, never through the `codex:codex-rescue` subagent: `node ~/.claude/plugins/cache/openai-codex/codex/<version>/scripts/codex-companion.mjs task --background --write --fresh "<prompt>"`, started from the directory the work lives in.
+  Why: the subagent showed as "running" on the roster for eleven minutes with no Codex job registered and no output (2026-10-19). The direct call registers a job id within seconds.
+- Write the brief to a file first (the task, the files to read, the hard constraints, the exact output path and format) and make the prompt point at it. Pass `--write` whenever Codex has to create its output file, even outside the repository, and say in the brief which files it may not edit.
+  Why: a prompt of one line forgets constraints, and without `--write` Codex is read-only and can only answer in chat.
+- `status <id>` and `result <id>` only see a job from the directory it was launched in: jobs are registered per working directory. Watch the job with a Monitor on the output file plus `status <id>` until the phase reads done or failed, and flag ten minutes of silence like any other agent.
+  Why: a job launched in a worktree is invisible from the main checkout, which reads as "no jobs recorded".
+- `node codex-companion.mjs help` prints the usage. Never pass `--help` to a subcommand, that starts a real review. `adversarial-review --background` streams progress instead of returning a job id, so wait for the id in `status --all`.
+- Codex output is a draft by a second writer: scan it for first-person sentences and forbidden punctuation, check every factual claim against the code on the page, and put prose in front of the author as labelled options next to the current text. Never apply it directly.
+  Why: on 2026-10-19 all three Codex versions of a passage promised an "attempt number" that the example after it never adds.
+
 ## Error Handling
 
 - Read the error. Understand root cause. Fix the actual problem.
