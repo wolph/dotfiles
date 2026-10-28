@@ -74,13 +74,51 @@ rm -f "$HOME/.config/nvim/init.lua"
 ln -sfn "$PWD/vim.lua" "$HOME/.vim/vim.lua"
 
 # AI agent config: track only individual portable files; ~/.claude, ~/.codex and
-# ~/.gemini hold runtime state (sessions, plugins, settings/config with secrets)
-# and must not be linked wholesale.
-mkdir -p "$HOME/.claude" "$HOME/.codex" "$HOME/.gemini"
+# ~/.gemini hold runtime state (sessions, plugins, credentials) and must not be
+# linked wholesale.
+#
+# Claude Code: ~/.claude/settings.json is the shared file from this repo
+# (symlinked; Claude writes plugin toggles and the like through the link, so
+# git status shows them). Machine-specific hooks, MCP servers, extra plugins
+# and every secret belong in ~/.claude/settings.local.json, which Claude
+# layers on top and this repo ignores. A pre-existing regular settings.json is
+# kept as a timestamped backup to move those keys from.
+mkdir -p "$HOME/.claude/hooks" "$HOME/.codex" "$HOME/.gemini"
+settings="$HOME/.claude/settings.json"
+if [ -e "$settings" ] && [ ! -h "$settings" ]; then
+    backup="$settings.pre-dotfiles-$(date +%Y%m%dT%H%M%S)"
+    mv -v "$settings" "$backup"
+    echo "NOTE: $backup holds the previous settings; move machine-specific"
+    echo "      keys and secrets into $HOME/.claude/settings.local.json"
+fi
+ln -sfn "$PWD/claude/settings.json" "$settings"
 ln -sf "$PWD/claude/statusline.js" "$HOME/.claude/statusline.js"
 ln -sf "$PWD/claude/statusline.sh" "$HOME/.claude/statusline.sh"
+ln -sf "$PWD/claude/hooks/block-secrets.sh" "$HOME/.claude/hooks/block-secrets.sh"
 # Generate CLAUDE.md / AGENTS.md / GEMINI.md from the shared base + per-tool overrides.
 "$PWD/bin/sync-agent-config"
+# Codex rewrites its config.toml itself, so the shared keys are merged in
+# instead of linked. See codex/config.shared.toml.
+"$PWD/bin/sync-codex-config"
+# herdr reads a plain TOML file and leaves comments alone, so it is linked.
+mkdir -p "$HOME/.config/herdr"
+ln -sfn "$PWD/herdr/config.toml" "$HOME/.config/herdr/config.toml"
+# Claude Code skills, commands and hooks that the shared settings.json points
+# at live in the (private) ai repo next to this one.
+if [ ! -d "$HOME/workspace/ai" ]; then
+    mkdir -p "$HOME/workspace"
+    if command -v gh > /dev/null 2>&1; then
+        gh repo clone wolph/ai "$HOME/workspace/ai" || true
+    else
+        git clone git@github.com:wolph/ai.git "$HOME/workspace/ai" || true
+    fi
+fi
+if [ -x "$HOME/workspace/ai/install.sh" ]; then
+    "$HOME/workspace/ai/install.sh"
+else
+    echo "WARNING: $HOME/workspace/ai is missing; the agent-roster and task-gate"
+    echo "         hooks in ~/.claude/settings.json will fail until it is cloned."
+fi
 
 # Tool installs below never assume sudo, brew, or writable system dirs:
 # everything can land user-local in ~/.local/bin. Put it on PATH now so

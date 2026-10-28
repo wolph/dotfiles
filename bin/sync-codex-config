@@ -1,0 +1,146 @@
+#!/usr/bin/env python3
+"""Upsert the shared Codex keys from codex/config.shared.toml into a config.toml.
+
+Codex rewrites ~/.codex/config.toml itself (hook trust hashes, project trust,
+marketplaces), so the file cannot be a symlink into the repo. This script
+writes only the keys the shared file names: top-level scalars and the keys of
+the tables it declares ([tui], [features]). Comments and every other key are
+left in place. A backup is written next to the target before any change.
+
+Usage: sync-codex-config [TARGET]   (default: $CODEX_HOME/config.toml or ~/.codex/config.toml)
+"""
+
+from __future__ import annotations
+
+import os
+import re
+import shutil
+import sys
+import time
+import tomllib
+from pathlib import Path
+from typing import Any
+
+HEADER_PATTERN: re.Pattern[str] = re.compile(r"^\s*\[\[?\s*([^\]]+?)\s*\]\]?\s*(#.*)?$")
+KEY_PATTERN: re.Pattern[str] = re.compile(r"^\s*([A-Za-z0-9_\-]+|\"[^\"]+\")\s*=")
+
+
+def format_value(value: Any) -> str:
+    if isinstance(value, bool):
+        return "true" if value else "false"
+    if isinstance(value, (int, float)):
+        return str(value)
+    if isinstance(value, str):
+        escaped: str = value.replace("\\", "\\\\").replace('"', '\\"')
+        return f'"{escaped}"'
+    if isinstance(value, list):
+        return "[" + ", ".join(format_value(item) for item in value) + "]"
+    raise TypeError(f"unsupported value type for shared config: {type(value).__name__}")
+
+
+def section_bounds(lines: list[str], name: str | None) -> tuple[int, int] | None:
+    """Return [start, end) line indexes of a section body. None means top level."""
+    start: int | None = 0 if name is None else None
+    for index, line in enumerate(lines):
+        match = HEADER_PATTERN.match(line)
+        if match is None:
+            continue
+        if start is not None and start <= index and (name is None or index > start):
+            return start, index
+        if name is not None and match.group(1) == name and not line.lstrip().startswith("[["):
+            start = index + 1
+    if start is None:
+        return None
+    return start, len(lines)
+
+
+def value_extent(lines: list[str], index: int, end: int) -> int:
+    """Return the index one past the last line of the value starting at index.
+
+    A multi-line array runs until its brackets balance (comments ignored).
+    """
+    depth: int = 0
+    for cursor in range(index, end):
+        code: str = lines[cursor].split("#", 1)[0]
+        depth += code.count("[") - code.count("]")
+        if depth <= 0:
+            return cursor + 1
+    return end
+
+
+def upsert_key(lines: list[str], bounds: tuple[int, int], key: str, value: Any) -> tuple[list[str], bool]:
+    start, end = bounds
+    rendered: str = f"{key} = {format_value(value)}"
+    for index in range(start, end):
+        match = KEY_PATTERN.match(lines[index])
+        if match is not None and match.group(1).strip('"') == key:
+            stop: int = value_extent(lines, index, end)
+            if stop == index + 1 and lines[index].rstrip("\n") == rendered:
+                return lines, False
+            lines[index:stop] = [rendered + "\n"]
+            return lines, True
+    insert_at: int = end
+    while insert_at > start and lines[insert_at - 1].strip() == "":
+        insert_at -= 1
+    lines.insert(insert_at, rendered + "\n")
+    return lines, True
+
+
+def apply_shared(text: str, shared: dict[str, Any]) -> tuple[str, int]:
+    lines: list[str] = text.splitlines(keepends=True)
+    if lines and not lines[-1].endswith("\n"):
+        lines[-1] += "\n"
+    changes: int = 0
+    top_bounds = section_bounds(lines, None)
+    assert top_bounds is not None
+    for key, value in shared.items():
+        if isinstance(value, dict):
+            continue
+        lines, changed = upsert_key(lines, section_bounds(lines, None) or top_bounds, key, value)
+        changes += changed
+    for table, values in shared.items():
+        if not isinstance(values, dict):
+            continue
+        bounds = section_bounds(lines, table)
+        if bounds is None:
+            if lines and lines[-1].strip() != "":
+                lines.append("\n")
+            lines.append(f"[{table}]\n")
+            bounds = (len(lines), len(lines))
+            changes += 1
+        for key, value in values.items():
+            lines, changed = upsert_key(lines, section_bounds(lines, table) or bounds, key, value)
+            changes += changed
+    return "".join(lines), changes
+
+
+def main(argv: list[str]) -> int:
+    repo_dir: Path = Path(__file__).resolve().parent.parent
+    shared_path: Path = repo_dir / "codex" / "config.shared.toml"
+    codex_home: Path = Path(os.environ.get("CODEX_HOME", Path.home() / ".codex"))
+    target: Path = Path(argv[1]) if len(argv) > 1 else codex_home / "config.toml"
+    shared: dict[str, Any] = tomllib.loads(shared_path.read_text())
+    original: str = target.read_text() if target.exists() else ""
+    updated, changes = apply_shared(original, shared)
+    if changes == 0:
+        print(f"{target}: already in sync")
+        return 0
+    parsed: dict[str, Any] = tomllib.loads(updated)
+    for key, value in shared.items():
+        if isinstance(value, dict):
+            for sub_key, sub_value in value.items():
+                if parsed[key][sub_key] != sub_value:
+                    raise SystemExit(f"{target}: {key}.{sub_key} did not take")
+        elif parsed[key] != value:
+            raise SystemExit(f"{target}: {key} did not take")
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        backup: Path = target.with_name(f"{target.name}.bak-{time.strftime('%Y%m%dT%H%M%S')}")
+        shutil.copy2(target, backup)
+    target.write_text(updated)
+    print(f"{target}: {changes} key(s) updated")
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main(sys.argv))

@@ -1,0 +1,248 @@
+{
+  "env": {
+    "CLAUDE_CODE_DISABLE_AUTO_MEMORY": "1",
+    "CLAUDE_CODE_DISABLE_FEEDBACK_SURVEY": "1",
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1",
+    "ENABLE_TOOL_SEARCH": "true",
+    "CLAUDE_CODE_ENABLE_TODO_TOOLS": "1"
+  },
+  "includeCoAuthoredBy": false,
+  "permissions": {
+    "allow": [
+      "Bash(grep:*)",
+      "Bash(find:*)",
+      "Bash(ls:*)",
+      "Bash(echo:*)",
+      "Bash(tar:*)",
+      "Bash(curl:*)",
+      "Bash(source:*)",
+      "Bash(pkill:*)",
+      "Bash(python3:*)",
+      "Bash(python:*)",
+      "Bash(pip show:*)",
+      "Bash(pip install:*)",
+      "Bash(uv run python:*)",
+      "Bash(uv run pytest:*)",
+      "Bash(docker ps:*)",
+      "Bash(docker logs:*)",
+      "Bash(docker exec:*)",
+      "Bash(docker inspect:*)",
+      "Bash(docker-compose up:*)",
+      "Bash(docker-compose ps:*)",
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -50 {}')",
+      "Bash(xargs -I {} sh -c 'echo \"=== {} ===\" && head -80 {}')",
+      "Bash(dev-browser:*)"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "fable",
+  "skillOverrides": {
+    "find-skills": "off",
+    "python-type-hints": "off"
+  },
+  "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "printf \"\\x1b]9;Claude: $MESSAGE\\x07\""
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/.claude/hooks/block-secrets.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "rtk hook claude"
+          }
+        ]
+      }
+    ],
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write|MultiEdit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/bin/ruff-post-edit",
+            "timeout": 120
+          }
+        ]
+      }
+    ],
+    "PostToolUseFailure": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/workspace/ai/hooks/agent-roster.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "startup|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/workspace/ai/hooks/agent-roster.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/workspace/ai/hooks/agent-roster.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "SubagentStop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/workspace/ai/hooks/agent-roster.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/workspace/ai/hooks/agent-roster.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ],
+    "TaskCompleted": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "$HOME/workspace/ai/hooks/task-completed-gate.sh",
+            "timeout": 10
+          }
+        ]
+      }
+    ]
+  },
+  "worktree": {
+    "baseRef": "fresh"
+  },
+  "statusLine": {
+    "type": "command",
+    "command": "$HOME/.claude/statusline.sh",
+    "refreshInterval": 60
+  },
+  "enabledPlugins": {
+    "clangd-lsp@claude-plugins-official": false,
+    "claude-code-setup@claude-plugins-official": true,
+    "claude-md-management@claude-plugins-official": false,
+    "cli-tools@netresearch-claude-code-marketplace": true,
+    "code-simplifier@claude-plugins-official": false,
+    "codex@openai-codex": true,
+    "commit-commands@claude-plugins-official": false,
+    "feature-dev@claude-plugins-official": true,
+    "frontend-design@claude-plugins-official": false,
+    "i-have-adhd@i-have-adhd": true,
+    "playground@claude-plugins-official": true,
+    "playwright@claude-plugins-official": true,
+    "pyright-lsp@claude-plugins-official": true,
+    "ralph-loop@claude-plugins-official": true,
+    "remember@claude-plugins-official": true,
+    "security-guidance@claude-plugins-official": true,
+    "superpowers@claude-plugins-official": true,
+    "typescript-lsp@claude-plugins-official": false,
+    "ui-ux-pro-max@ui-ux-pro-max-skill": false
+  },
+  "extraKnownMarketplaces": {
+    "claude-plugins-official": {
+      "source": {
+        "source": "github",
+        "repo": "anthropics/claude-plugins-official"
+      }
+    },
+    "i-have-adhd": {
+      "source": {
+        "source": "github",
+        "repo": "ayghri/i-have-adhd"
+      }
+    },
+    "netresearch-claude-code-marketplace": {
+      "source": {
+        "source": "github",
+        "repo": "netresearch/claude-code-marketplace"
+      }
+    },
+    "openai-codex": {
+      "source": {
+        "source": "github",
+        "repo": "openai/codex-plugin-cc"
+      }
+    },
+    "ui-ux-pro-max-skill": {
+      "source": {
+        "source": "github",
+        "repo": "nextlevelbuilder/ui-ux-pro-max-skill"
+      }
+    },
+    "brag": {
+      "source": {
+        "source": "github",
+        "repo": "latent-spaces/brag"
+      }
+    }
+  },
+  "effortLevel": "xhigh",
+  "modelSettings": {
+    "claude-fable-5-1": {
+      "effortLevel": "high",
+      "autoCompactWindow": 500000
+    },
+    "claude-opus-5-5": {
+      "effortLevel": "high"
+    }
+  },
+  "askUserQuestionTimeout": "never",
+  "dialogExpiry": "never",
+  "autoUpdatesChannel": "latest",
+  "tui": "fullscreen",
+  "skipDangerousModePermissionPrompt": true,
+  "skipWorkflowUsageWarning": true,
+  "theme": "dark",
+  "autoCompactEnabled": false,
+  "idleCompaction": false,
+  "switchModelsOnFlag": false,
+  "showTurnDuration": true,
+  "teammateMode": "tmux",
+  "remoteControlAtStartup": false,
+  "crossSessionInbound": "accept",
+  "inputNeededNotifEnabled": true,
+  "agentPushNotifEnabled": true,
+  "skipAutoPermissionPrompt": true
+}

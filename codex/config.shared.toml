@@ -1,0 +1,29 @@
+# Shared Codex CLI settings, applied to ~/.codex/config.toml on every machine by
+# bin/sync-codex-config (run from install.sh). Only the keys listed here are
+# written; everything else in config.toml (MCP servers, hooks, project trust,
+# marketplaces, credentials) stays machine-local. Edit this file and re-run
+# the script, never the generated keys in ~/.codex/config.toml.
+approval_policy = "on-request"
+approvals_reviewer = "guardian_subagent"
+model = "gpt-6.1-sol"
+model_reasoning_effort = "high"
+plan_mode_reasoning_effort = "high"
+personality = "pragmatic"
+sandbox_mode = "danger-full-access"
+service_tier = "default"
+suppress_unstable_features_warning = true
+
+[tui]
+whimsy = false
+status_line = ["model-with-reasoning", "current-dir", "project-name", "git-branch", "pull-request-number", "branch-changes", "run-state", "permissions", "approval-mode", "context-used", "five-hour-limit", "weekly-limit", "used-tokens", "total-input-tokens", "total-output-tokens", "task-progress"]
+status_line_use_colors = true
+session_picker_view = "dense"
+
+[features]
+hooks = true
+guardian_approval = true
+memories = true
+external_migration = true
+default_mode_request_user_input = true
+analytics_plan_history = true
+terminal_resize_reflow = true

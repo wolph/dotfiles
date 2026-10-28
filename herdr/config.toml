@@ -1,0 +1,98 @@
+onboarding = false
+
+[ui.toast]
+delivery = "system"
+
+[ui.sidebar]
+
+[ui.sidebar.agents]
+row_gap = 0 # herdr-agent-quota
+rows = [["state_icon", { token = "tab", fg = "#eceef2", bold = true, dim = false }, { token = "$quota_provider_model", bold = true, dim = false }], [{ token = "$quota_topic", fg = "#c8cdd6", bold = false, dim = false }], [{ token = "$quota_cache", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_ttl", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_state", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_error", fg = "#e4b957", bold = false, dim = false }], [{ token = "$quota_context", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_inline_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_inline_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_inline_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_inline_unknown", fg = "#969eae", bold = false, dim = false }], [{ token = "$quota_5h_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_5h_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_5h_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_5h_unknown", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_unknown", fg = "#969eae", bold = false, dim = false }]]
+
+[ui.sidebar.agents.rows_by_agent]
+claude = [["state_icon", { token = "tab", fg = "#eceef2", bold = true, dim = false }, { token = "$quota_provider_model", fg = "#e88461", bold = true, dim = false }], [{ token = "$quota_topic", fg = "#c8cdd6", bold = false, dim = false }], [{ token = "$quota_cache", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_ttl", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_state", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_error", fg = "#e4b957", bold = false, dim = false }], [{ token = "$quota_context", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_inline_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_inline_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_inline_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_inline_unknown", fg = "#969eae", bold = false, dim = false }], [{ token = "$quota_5h_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_5h_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_5h_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_5h_unknown", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_unknown", fg = "#969eae", bold = false, dim = false }]] # herdr-agent-quota-provider
+codex = [["state_icon", { token = "tab", fg = "#eceef2", bold = true, dim = false }, { token = "$quota_provider_model", fg = "#c4d7f5", bold = true, dim = false }], [{ token = "$quota_topic", fg = "#c8cdd6", bold = false, dim = false }], [{ token = "$quota_cache", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_ttl", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_state", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_error", fg = "#e4b957", bold = false, dim = false }], [{ token = "$quota_context", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_inline_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_inline_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_inline_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_inline_unknown", fg = "#969eae", bold = false, dim = false }], [{ token = "$quota_5h_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_5h_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_5h_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_5h_unknown", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_unknown", fg = "#969eae", bold = false, dim = false }]] # herdr-agent-quota-provider
+agy = [["state_icon", { token = "tab", fg = "#eceef2", bold = true, dim = false }, { token = "$quota_provider_model", fg = "#8ab4f8", bold = true, dim = false }], [{ token = "$quota_topic", fg = "#c8cdd6", bold = false, dim = false }], [{ token = "$quota_cache", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_ttl", fg = "#969eae", bold = false, dim = false }, { token = "$quota_cache_state", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_error", fg = "#e4b957", bold = false, dim = false }], [{ token = "$quota_context", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_inline_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_inline_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_inline_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_inline_unknown", fg = "#969eae", bold = false, dim = false }], [{ token = "$quota_5h_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_5h_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_5h_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_5h_unknown", fg = "#969eae", bold = false, dim = false }, { token = "$quota_week_normal", fg = "#82d978", bold = false, dim = false }, { token = "$quota_week_warning", fg = "#e4b957", bold = false, dim = false }, { token = "$quota_week_danger", fg = "#f16f7e", bold = false, dim = false }, { token = "$quota_week_unknown", fg = "#969eae", bold = false, dim = false }]] # herdr-agent-quota-provider
+
+[theme]
+name = "gruvbox"
+auto_switch = false
+
+[ui]
+status_indicators = "symbols"
+show_agent_labels_on_pane_borders = true
+
+agent_panel_sort = "spaces"
+prompt_new_tab_name = false
+
+[keys]
+prefix = "ctrl+a"
+
+# tmux-style bindings (mirrors ~/.tmux.conf, screen-style ctrl+a prefix)
+detach = "prefix+d"                  # tmux: prefix d
+last_pane = "prefix+semicolon"       # tmux: prefix ; (last-pane)
+rename_tab = "prefix+shift+a"        # tmux: prefix A (rename-window)
+# Built-in new tab and splits follow terminal.new_cwd (~/workspace). The
+# [[keys.command]] entries below take prefix+c/v/s and keep the pane's cwd.
+new_tab = "prefix+c"
+split_vertical = "prefix+v"
+split_horizontal = "prefix+s"
+settings = "prefix+shift+s"          # moved off prefix+s to make room for split
+previous_tab = "prefix+p"
+next_tab = "prefix+n"
+previous_workspace = "prefix+up"
+next_workspace = "prefix+down"
+reload_config = "prefix+shift+r"
+
+# tmux-pain-control style resize (prefix H/J/K/L)
+resize_pane_left = "prefix+shift+h"
+resize_pane_down = "prefix+shift+j"
+resize_pane_up = "prefix+shift+k"
+resize_pane_right = "prefix+shift+l"
+
+[[keys.command]]
+key = "prefix+q"
+type = "plugin_action"
+command = "herdr-agent-quota.open-settings"
+description = "open agent quota settings"
+
+[[keys.command]]
+key = "prefix+shift+q"
+type = "plugin_action"
+command = "herdr-agent-quota.refresh"
+description = "refresh all agent quotas"
+
+# prefix+0 jumps to the first tab (screen/tmux base-index 0 habit). herdr only
+# accepts 1..9 for switch_tab, so this goes through the socket API instead.
+[[keys.command]]
+key = "prefix+0"
+type = "shell"
+command = "h=\"${HERDR_BIN_PATH:-herdr}\"; t=$(\"$h\" tab list --workspace \"$HERDR_ACTIVE_WORKSPACE_ID\" | jq -r '.result.tabs[0].tab_id // empty') && [ -n \"$t\" ] && \"$h\" tab focus \"$t\""
+description = "switch to tab 1 (prefix+0)"
+
+# herdr has a single new_cwd policy for workspaces, tabs and panes. New
+# workspaces should start in ~/workspace, while new tabs and splits stay in
+# the focused pane's directory, so those go through the socket API with --cwd.
+[[keys.command]]
+key = "prefix+c"
+type = "shell"
+command = "\"${HERDR_BIN_PATH:-herdr}\" tab create --workspace \"$HERDR_ACTIVE_WORKSPACE_ID\" --cwd \"${HERDR_ACTIVE_PANE_CWD:-$PWD}\" --focus"
+description = "new tab in current directory"
+
+[[keys.command]]
+key = "prefix+v"
+type = "shell"
+command = "\"${HERDR_BIN_PATH:-herdr}\" pane split \"$HERDR_ACTIVE_PANE_ID\" --direction right --cwd \"${HERDR_ACTIVE_PANE_CWD:-$PWD}\" --focus"
+description = "split right in current directory"
+
+[[keys.command]]
+key = "prefix+s"
+type = "shell"
+command = "\"${HERDR_BIN_PATH:-herdr}\" pane split \"$HERDR_ACTIVE_PANE_ID\" --direction down --cwd \"${HERDR_ACTIVE_PANE_CWD:-$PWD}\" --focus"
+description = "split down in current directory"
+
+[terminal]
+new_cwd = "~/workspace"
+
+[experimental]
+pane_history = true
