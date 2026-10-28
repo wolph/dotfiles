@@ -338,7 +338,9 @@ fi
 # sentinel: it is dropped so Claude Code uses its per-session list. Outside
 # a git work tree nothing is set. Launchers that bypass this shell function
 # (herdr, ccmux, an IDE) get a per-session list unless they export the
-# variable themselves.
+# variable themselves. An agent team ignores the variable: on 2026-10-28 two
+# tmux teammates wrote their tasks to the team's own session-<id> list, not
+# to the repo list, so team work is not visible in /open or the status line.
 claude() {
     if [[ "${CLAUDE_CODE_TASK_LIST_ID-}" == session ]]; then
         command env -u CLAUDE_CODE_TASK_LIST_ID claude --allow-dangerously-skip-permissions "$@"
