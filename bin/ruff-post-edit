@@ -1,0 +1,237 @@
+#!/usr/bin/env python3
+"""Format Python files changed by Codex or Claude edit tools."""
+
+from __future__ import annotations
+
+import json
+import os
+import re
+import shutil
+import subprocess
+import sys
+import time
+from pathlib import Path
+from typing import Any
+
+EDIT_TOOL_NAMES: frozenset[str] = frozenset(
+    {"apply_patch", "Edit", "Write", "MultiEdit"}
+)
+PATCH_PATH_PATTERN: re.Pattern[str] = re.compile(
+    r"^\*\*\* (?:Add File|Update File|Move to): (.+)$", re.MULTILINE
+)
+PROJECT_MARKERS: tuple[str, ...] = ("pyproject.toml", "ruff.toml", ".ruff.toml")
+MAX_EDITED_FILES: int = 50
+DEFAULT_COMMAND_TIMEOUT_SECONDS: float = 15.0
+TOTAL_TIMEOUT_SECONDS: float = 90.0
+MAX_FEEDBACK_CHARACTERS: int = 2_000
+
+
+def _read_payload() -> dict[str, Any]:
+    try:
+        payload: Any = json.load(sys.stdin)
+    except (json.JSONDecodeError, UnicodeDecodeError) as error:
+        raise ValueError(f"invalid hook JSON: {error.msg}") from error
+    if not isinstance(payload, dict):
+        raise ValueError("invalid hook JSON: top-level value must be an object")
+    return payload
+
+
+def _edit_succeeded(payload: dict[str, Any]) -> bool:
+    response: Any = payload.get("tool_response")
+    if not isinstance(response, dict):
+        return True
+    if response.get("isError") is True or response.get("is_error") is True:
+        return False
+    status: Any = response.get("status")
+    return not (
+        isinstance(status, str)
+        and status.lower() in {"cancelled", "error", "failed", "failure"}
+    )
+
+
+def _raw_paths(payload: dict[str, Any]) -> list[str]:
+    tool_name: Any = payload.get("tool_name")
+    if tool_name not in EDIT_TOOL_NAMES or not _edit_succeeded(payload):
+        return []
+    tool_input: Any = payload.get("tool_input")
+    if not isinstance(tool_input, dict):
+        return []
+    if tool_name == "apply_patch":
+        command: Any = tool_input.get("command")
+        if not isinstance(command, str):
+            return []
+        return PATCH_PATH_PATTERN.findall(command)
+    file_path: Any = tool_input.get("file_path")
+    return [file_path] if isinstance(file_path, str) else []
+
+
+def _python_paths(payload: dict[str, Any]) -> list[Path]:
+    cwd_value: Any = payload.get("cwd")
+    cwd: Path = Path(cwd_value) if isinstance(cwd_value, str) else Path.cwd()
+    resolved_paths: list[Path] = []
+    seen: set[Path] = set()
+    raw_paths: list[str] = _raw_paths(payload)
+    if len(raw_paths) > MAX_EDITED_FILES:
+        raise ValueError(
+            f"edit names {len(raw_paths)} files; maximum is {MAX_EDITED_FILES}"
+        )
+    for raw_path in raw_paths:
+        candidate: Path = Path(raw_path)
+        if candidate.suffix.lower() != ".py":
+            continue
+        if not candidate.is_absolute():
+            candidate = cwd / candidate
+        try:
+            resolved: Path = candidate.resolve(strict=True)
+        except (OSError, RuntimeError, ValueError):
+            continue
+        if not resolved.is_file() or resolved in seen:
+            continue
+        seen.add(resolved)
+        resolved_paths.append(resolved)
+    return resolved_paths
+
+
+def _ancestors(path: Path) -> tuple[Path, ...]:
+    return (path.parent, *path.parent.parents)
+
+
+def _project_root(path: Path) -> Path:
+    for directory in _ancestors(path):
+        if any((directory / marker).is_file() for marker in PROJECT_MARKERS):
+            return directory
+    return path.parent
+
+
+def _ruff_executable(path: Path) -> Path | None:
+    for directory in _ancestors(path):
+        local_ruff: Path = directory / ".venv" / "bin" / "ruff"
+        if local_ruff.is_file() and os.access(local_ruff, os.X_OK):
+            return local_ruff
+    global_ruff: str | None = shutil.which("ruff")
+    return Path(global_ruff) if global_ruff is not None else None
+
+
+def _command_timeout_seconds() -> float:
+    raw_value: str | None = os.environ.get("RUFF_POST_EDIT_TIMEOUT_SECONDS")
+    if raw_value is None:
+        return DEFAULT_COMMAND_TIMEOUT_SECONDS
+    try:
+        timeout_seconds: float = float(raw_value)
+    except ValueError:
+        return DEFAULT_COMMAND_TIMEOUT_SECONDS
+    return max(0.01, min(timeout_seconds, DEFAULT_COMMAND_TIMEOUT_SECONDS))
+
+
+def _run_ruff(
+    executable: Path,
+    arguments: list[str],
+    *,
+    cwd: Path,
+    deadline: float,
+) -> tuple[subprocess.CompletedProcess[str] | None, str | None]:
+    remaining_seconds: float = deadline - time.monotonic()
+    if remaining_seconds <= 0:
+        return None, "total hook deadline exceeded"
+    timeout_seconds: float = min(_command_timeout_seconds(), remaining_seconds)
+    try:
+        result: subprocess.CompletedProcess[str] = subprocess.run(
+            [str(executable), *arguments],
+            cwd=cwd,
+            text=True,
+            capture_output=True,
+            check=False,
+            timeout=timeout_seconds,
+        )
+    except subprocess.TimeoutExpired:
+        return (
+            None,
+            f"Ruff {' '.join(arguments[:1])} timed out after {timeout_seconds:g}s",
+        )
+    except OSError as error:
+        return None, f"could not run Ruff: {error}"
+    return result, None
+
+
+def _result_feedback(result: subprocess.CompletedProcess[str]) -> str:
+    output: str = "\n".join(
+        part.strip() for part in (result.stdout, result.stderr) if part.strip()
+    )
+    if len(output) > MAX_FEEDBACK_CHARACTERS:
+        return output[-MAX_FEEDBACK_CHARACTERS:]
+    return output
+
+
+def _format_path(path: Path, *, deadline: float) -> list[str]:
+    executable: Path | None = _ruff_executable(path)
+    if executable is None:
+        return [
+            f"{path}: Ruff executable not found; install Ruff in the project's "
+            ".venv (prefer `uv add --dev ruff`)"
+        ]
+    project_root: Path = _project_root(path)
+    errors: list[str] = []
+    check_arguments: list[str] = [
+        "check",
+        "--fix",
+        "--no-unsafe-fixes",
+        "--extend-select",
+        "I",
+        str(path),
+    ]
+    _, check_error = _run_ruff(
+        executable, check_arguments, cwd=project_root, deadline=deadline
+    )
+    if check_error is not None:
+        errors.append(f"{path}: {check_error}")
+
+    format_result, format_error = _run_ruff(
+        executable, ["format", str(path)], cwd=project_root, deadline=deadline
+    )
+    if format_error is not None:
+        errors.append(f"{path}: {format_error}")
+    elif format_result is not None and format_result.returncode != 0:
+        feedback: str = _result_feedback(format_result)
+        errors.append(f"{path}: Ruff format failed\n{feedback}")
+
+    recheck_result, recheck_error = _run_ruff(
+        executable,
+        [
+            "check",
+            "--no-fix",
+            "--no-fix-only",
+            "--no-unsafe-fixes",
+            "--extend-select",
+            "I",
+            str(path),
+        ],
+        cwd=project_root,
+        deadline=deadline,
+    )
+    if recheck_error is not None:
+        errors.append(f"{path}: {recheck_error}")
+    elif recheck_result is not None and recheck_result.returncode != 0:
+        feedback = _result_feedback(recheck_result)
+        errors.append(f"{path}: Ruff check found unresolved issues\n{feedback}")
+    return errors
+
+
+def main() -> int:
+    try:
+        payload: dict[str, Any] = _read_payload()
+        paths: list[Path] = _python_paths(payload)
+    except ValueError as error:
+        print(f"ruff-post-edit: {error}", file=sys.stderr)
+        return 2
+    deadline: float = time.monotonic() + TOTAL_TIMEOUT_SECONDS
+    errors: list[str] = []
+    for path in paths:
+        errors.extend(_format_path(path, deadline=deadline))
+    if errors:
+        print("ruff-post-edit: " + "\n".join(errors), file=sys.stderr)
+        return 2
+    return 0
+
+
+if __name__ == "__main__":
+    raise SystemExit(main())
