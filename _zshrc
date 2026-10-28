@@ -332,8 +332,9 @@ fi
 # claude: auto mode default (settings); bypass available to engage in-session.
 # A function rather than an alias because it also names the task list, so
 # every session started in the same repository shares one list:
-# CLAUDE_CODE_TASK_LIST_ID=repo-<basename of the main checkout>, resolved
-# through the common git dir so a linked worktree lands in the same list.
+# CLAUDE_CODE_TASK_LIST_ID=repo-<basename of the main checkout>, taken from
+# the first line of `git worktree list` so a linked worktree lands in the
+# same list and a submodule is named after itself, not its parent directory.
 # A value already in the environment wins. The value "session" is a
 # sentinel: it is dropped so Claude Code uses its per-session list. Outside
 # a git work tree nothing is set. Launchers that bypass this shell function
@@ -348,10 +349,10 @@ claude() {
     fi
     if [[ -z "${CLAUDE_CODE_TASK_LIST_ID-}" ]] \
         && [[ "$(command git rev-parse --is-inside-work-tree 2>/dev/null)" == true ]]; then
-        local common
-        common=$(command git rev-parse --path-format=absolute --git-common-dir 2>/dev/null)
-        if [[ -n "$common" ]]; then
-            CLAUDE_CODE_TASK_LIST_ID="repo-${common:h:t}" command claude --allow-dangerously-skip-permissions "$@"
+        local main
+        main=$(command git worktree list --porcelain 2>/dev/null | sed -n '1s/^worktree //p')
+        if [[ -n "$main" ]]; then
+            CLAUDE_CODE_TASK_LIST_ID="repo-${main:t}" command claude --allow-dangerously-skip-permissions "$@"
             return
         fi
     fi

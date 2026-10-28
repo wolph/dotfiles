@@ -35,6 +35,8 @@ make_repo "$TMPDIR/alpha"
 mkdir -p "$TMPDIR/alpha/src"
 git_quiet -C "$TMPDIR/alpha" worktree add -q "$TMPDIR/alpha-wt" -b wt
 make_repo "$TMPDIR/my project"
+make_repo "$TMPDIR/sub"
+git_quiet -C "$TMPDIR/alpha" -c protocol.file.allow=always submodule add -q "$TMPDIR/sub" libs/sub 2>/dev/null
 mkdir -p "$TMPDIR/plain"
 
 failures=0
@@ -59,6 +61,7 @@ run_case "flag is kept and args pass through" "$TMPDIR/alpha"   "ARGS=--allow-da
 run_case "subdirectory resolves to the root" "$TMPDIR/alpha/src" "TASK_LIST_ID=repo-alpha"
 run_case "linked worktree shares the list"  "$TMPDIR/alpha-wt"   "TASK_LIST_ID=repo-alpha"
 run_case "space in the repo name"           "$TMPDIR/my project" "TASK_LIST_ID=repo-my project"
+run_case "submodule names itself, not libs" "$TMPDIR/alpha/libs/sub" "TASK_LIST_ID=repo-sub"
 run_case "outside git stays unset"          "$TMPDIR/plain"      "TASK_LIST_ID=<unset>"
 run_case "exported value wins"              "$TMPDIR/alpha"      "TASK_LIST_ID=custom"  CLAUDE_CODE_TASK_LIST_ID=custom
 run_case "session sentinel unsets"          "$TMPDIR/alpha"      "TASK_LIST_ID=<unset>" CLAUDE_CODE_TASK_LIST_ID=session
