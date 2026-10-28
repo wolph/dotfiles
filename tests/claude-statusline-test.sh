@@ -29,6 +29,9 @@ long_subject="$(printf 'line one\nline two \033[31mred\033[0m %s' "$(printf 'x%.
 task "$T/repo-long" 1 in_progress "$long_subject"
 task "$T/session-abcdef12" 1 in_progress "Session scoped work"
 mkdir -p "$T/repo-empty"
+task "$T/repo-unblocked" 1 completed   "Done blocker"
+task "$T/repo-unblocked" 2 pending     "Freed task"               '["1"]'
+task "$T/repo-unblocked" 3 pending     "Still blocked"            '["2"]'
 
 INPUT='{"session_id":"abcdef12-0000-0000-0000-000000000000","workspace":{"current_dir":"/nowhere"}}'
 export CLAUDE_STATUSLINE_UPSTREAM='cat >/dev/null; echo UPSTREAM-LINE'
@@ -72,6 +75,10 @@ run "" 80
 
 run repo-empty 80
 [ "$lines" = 1 ] && [ "$out" = "UPSTREAM-LINE" ] && echo "ok empty directory prints upstream only" || fail "empty directory: $out"
+
+run repo-unblocked 80
+line2="$(sed -n 2p <<< "$out" | strip_ansi)"
+[[ "$line2" == "tasks 0 active ▸ 1 ready ▸ 1 blocked ▸ 1 done"* ]] && echo "ok a completed blocker no longer blocks" || fail "completed blocker: '$line2'"
 
 CLAUDE_STATUSLINE_UPSTREAM='cat >/dev/null; printf UPSTREAM-LINE' run repo-alpha 80
 line1="$(sed -n 1p <<< "$out")"

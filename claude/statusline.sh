@@ -46,8 +46,9 @@ files=("$dir"/*.json)
 summary="$(jq -rs '
     [ .[] | select(type == "object") ] | sort_by(.id | tonumber? // 0) as $t
     | ([$t[] | select(.status == "in_progress")] | length) as $active
-    | ([$t[] | select(.status == "pending" and ((.blockedBy // []) | length) == 0)] | length) as $ready
-    | ([$t[] | select(.status == "pending" and ((.blockedBy // []) | length) > 0)] | length) as $blocked
+    | ([$t[] | select(.status == "completed") | .id]) as $done
+    | ([$t[] | select(.status == "pending" and ([(.blockedBy // [])[] | select(. as $b | ($done | index($b)) == null)] | length) == 0)] | length) as $ready
+    | ([$t[] | select(.status == "pending" and ([(.blockedBy // [])[] | select(. as $b | ($done | index($b)) == null)] | length) > 0)] | length) as $blocked
     | ([$t[] | select(.status == "completed")] | length) as $done
     | (first($t[] | select(.status == "in_progress") | .subject // "") // "") as $subject
     | [$active, $ready, $blocked, $done, ($subject | gsub("[[:cntrl:]]"; ""))]
