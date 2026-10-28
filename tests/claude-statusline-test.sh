@@ -73,6 +73,10 @@ run "" 80
 run repo-empty 80
 [ "$lines" = 1 ] && [ "$out" = "UPSTREAM-LINE" ] && echo "ok empty directory prints upstream only" || fail "empty directory: $out"
 
+CLAUDE_STATUSLINE_UPSTREAM='cat >/dev/null; printf UPSTREAM-LINE' run repo-alpha 80
+line1="$(sed -n 1p <<< "$out")"
+[ "$lines" = 2 ] && [ "$line1" = "UPSTREAM-LINE" ] && echo "ok upstream without trailing newline still gets its own row" || fail "upstream without newline: $out"
+
 if [ "$failures" -ne 0 ]; then
     echo "$failures check(s) failed"
     exit 1

@@ -26,7 +26,10 @@ RESET=$'\033[0m'
 
 input="$(cat)"
 
-printf '%s' "$input" | bash -c "$UPSTREAM" 2>/dev/null || true
+# Capture rather than stream: herdr prints its line without a trailing
+# newline, and the task line below must land on its own row.
+upstream_out="$(printf '%s' "$input" | bash -c "$UPSTREAM" 2>/dev/null || true)"
+[ -n "$upstream_out" ] && printf '%s\n' "$upstream_out"
 
 list_id="${CLAUDE_CODE_TASK_LIST_ID:-}"
 if [ -z "$list_id" ]; then
