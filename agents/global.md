@@ -20,6 +20,8 @@ Never claim work is complete without running it first.
 - CLI/scripts: run the command, check output and exit code.
 - Libraries: run test suite or write a smoke test.
 - Web pages: thorough multi-pass visual verification (see below).
+- A PR is never handed over, and a PR description never written, for a change whose tests did not run locally and pass. "Not run locally", "CI runs them" or "the target was run alone" is never acceptable text in a PR description: it describes a PR that does not exist yet. When the toolchain cannot run the tests, the work stops there and the first thing to report is what is needed to run them (an Xcode or OS version, a device), not a PR.
+  Why: home-assistant/iOS, 2026-10-20: two PR descriptions carried "Not run locally" because the App test host would not start under the installed Xcode. The user's rule: a PR nobody could test is not a PR.
 
 - A gate chain never pipes pytest through tail or head: the pipe returns the last command's status and a red test ships with the commit. Run pytest to a log and exit on its own status.
   Why: chapter 11 shipped one commit red on 2026-09-09 exactly this way.
@@ -87,9 +89,14 @@ Why: prevents wasted work on wrong assumptions. But excessive confirmation on tr
 
 Condensed from the Mastering Python LLM style guide. The full version lives at
 ~/workspace/mastering-python-3/docs/editorial/2026-07-25-llm-style-guide-rick-van-hattem-mastering-python.md
-and wins whenever that repo is the working context. Apply this style to all
-authored prose: documentation, READMEs, docstrings, code comments, changelogs,
-commit messages, release notes, and editorial text.
+and wins whenever that repo is the working context.
+
+This is the author's own voice, so it applies to every piece of prose written
+on their behalf, in every tool: emails and chat messages drafted for them, pull
+request titles and descriptions, issue and review comments, commit messages,
+changelogs, release notes, documentation, READMEs, docstrings, code comments,
+and editorial text. Replies in the terminal keep the Tone rules above and the
+punctuation and spelling rules below.
 
 ### Punctuation (hard rules)
 

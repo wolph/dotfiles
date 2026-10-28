@@ -55,10 +55,12 @@ if [ -n "$SSH_AUTH_SOCK" ] && [ "$SSH_AUTH_SOCK" != "$HOME/.ssh/auth_sock" ] && 
 fi
 
 # Also defined in .zprofile on purpose: each file must work standalone
-# (non-login shells never read .zprofile). Matches functions/aliases too,
-# unlike whence -p / $+commands — do not "simplify".
+# (non-login shells never read .zprofile). Must keep matching functions
+# and aliases too, so not whence -p or $+commands.
 function command_exists(){
-    type $1 2>/dev/null | grep -vq ' not found'
+    # whence -w sees aliases, functions, builtins and
+    # commands, like type does, without forking grep.
+    whence -w -- "$1" >/dev/null 2>&1
 }
 
 if [[ "${HOST%%.*}" == lappie ]]; then

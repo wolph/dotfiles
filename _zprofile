@@ -99,7 +99,9 @@ export PATH
 # export ANDROID_NDK=/usr/local/Cellar/android-ndk/r9d
 
 function command_exists(){
-    type $1 2>/dev/null | grep -vq ' not found'
+    # whence -w sees aliases, functions, builtins and
+    # commands, like type does, without forking grep.
+    whence -w -- "$1" >/dev/null 2>&1
 }
 
 test -f "$HOME/.zprofile.local" && source "$HOME/.zprofile.local"
