@@ -16,8 +16,8 @@
 
 ## Background Agents (Claude Code)
 
-- A hook injects `Running agents: ...` on every user turn and at every turn
-  end while Agent-tool subagents run. An agent absent from that line has
+- A hook injects `Running agents: ...` on every user turn while Agent-tool
+  subagents run. An agent absent from that line has
   not started. One marked `over 10 min` is stopped and its work taken over,
   as the global rule says. Teammates in tmux panes are not on the line.
 
