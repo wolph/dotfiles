@@ -221,8 +221,7 @@
   "effortLevel": "xhigh",
   "modelSettings": {
     "claude-fable-5-1": {
-      "effortLevel": "high",
-      "autoCompactWindow": 750000
+      "effortLevel": "high"
     },
     "claude-opus-5-5": {
       "effortLevel": "high"
@@ -236,6 +235,7 @@
   "skipWorkflowUsageWarning": true,
   "theme": "dark",
   "autoCompactEnabled": true,
+  "autoCompactWindow": 750000,
   "precomputeCompactionEnabled": true,
   "idleCompaction": false,
   "switchModelsOnFlag": false,
