@@ -56,6 +56,12 @@ Use AskUserQuestion before completing work when:
 
 Do not ask for confirmation on routine, reversible, low-stakes actions.
 
+Every question to the user goes through the question dialog (AskUserQuestion in
+Claude Code, request_user_input in Codex), never as plain text in a reply. Put
+the options in the dialog, with the recommended one first.
+Why: a question in prose is missed; the dialog blocks until it is answered and
+the answer lands in the conversation.
+
 Why: prevents wasted work on wrong assumptions. But excessive confirmation on trivial matters wastes the user's time — use judgment.
 
 ## Code Quality
