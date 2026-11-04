@@ -457,6 +457,26 @@ function autossh(){
     exec autossh -o ControlMaster=no -M $monitor_port $*
 }
 
+# herdr --remote defaults to --remote-keybindings local: the client loads the
+# local config but drops every [[keys.command]] entry, so the cwd-keeping
+# prefix+c/v/s commands do nothing in a remote session. With server
+# keybindings the remote herdr runs its own commands against its own socket.
+# Pass --remote-keybindings yourself to override.
+function herdr(){
+    local arg has_remote=0 has_keybindings=0
+    for arg in "$@"; do
+        case "$arg" in
+            --remote|--remote=*)                         has_remote=1;;
+            --remote-keybindings|--remote-keybindings=*) has_keybindings=1;;
+        esac
+    done
+    if (( has_remote && ! has_keybindings )); then
+        command herdr "$@" --remote-keybindings server
+    else
+        command herdr "$@"
+    fi
+}
+
 # Little function to go to a random directory, handy if you have a lot of
 # stuff to sort out and don't know where to start ;)
 torandomdir(){
