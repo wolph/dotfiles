@@ -34,9 +34,9 @@ last_pane = "prefix+semicolon"       # tmux: prefix ; (last-pane)
 rename_tab = "prefix+shift+a"        # tmux: prefix A (rename-window)
 # Built-in new tab and splits follow terminal.new_cwd (~/workspace). The
 # [[keys.command]] entries below take prefix+c/v/s and keep the pane's cwd.
-new_tab = "prefix+c"
-split_vertical = "prefix+v"
-split_horizontal = "prefix+s"
+new_tab = "prefix+alt+c"
+split_vertical = "prefix+alt+v"
+split_horizontal = "prefix+alt+s"
 settings = "prefix+shift+s"          # moved off prefix+s to make room for split
 previous_tab = "prefix+p"
 next_tab = "prefix+n"
