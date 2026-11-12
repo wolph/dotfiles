@@ -234,6 +234,18 @@ The five-part release checklist and its verification commands live in
 ~/workspace/dotfiles/agents/on-demand.md. Read it before cutting or verifying
 a release. For Claude the release-python-package skill covers the same steps.
 
+## Parallel Work
+
+- Work that splits into two or more parts without shared state runs in parallel by a team of agents, not one part after the other. Typical splits: searching several modules or repositories, a review per dimension (correctness, security, tests), competing hypotheses for a bug, implementation and its tests and docs, the same change on several hosts.
+  Why: the user wants results faster and accepts the extra tokens for it (2026-11-12).
+- Plan the split before the first spawn: one deliverable per agent, a distinct set of files per agent, and the dependencies between parts. Parts that depend on each other run in order, the independent ones next to each other.
+- Two agents never edit the same file. When parts must touch the same file, one agent owns it and the others send their changes to that owner, or each works in its own worktree.
+- Brief every agent like a peer: the goal, the files to read, what is already ruled out, the hard constraints, and the exact output path and format. An agent has none of the lead's conversation.
+- Start with three to five agents. More only when the work has that many independent parts.
+- The lead coordinates, waits for the team, checks each result against the code, and synthesises. The lead does not redo work it delegated.
+- Stay inline for a handful of tool calls, a lookup whose target is known, or a single edit: briefing an agent costs more than doing it.
+- When a tool has no agents, it still runs independent tool calls in parallel in one step.
+
 ## Background Agents
 
 - A spawned agent is not running until its output proves it. Require a progress file as its first action, verify the file exists within a minute, and start a Monitor on it that reports each step and flags ten minutes of silence.

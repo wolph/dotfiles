@@ -21,6 +21,28 @@
   not started. One marked `over 10 min` is stopped and its work taken over,
   as the global rule says. Teammates in tmux panes are not on the line.
 
+## Agent teams (Claude Code)
+
+- The Parallel Work rule above is carried out with an agent team. Spawn every
+  teammate in one message, each an Agent call with a `name` (a named Agent
+  call launches as a teammate while teams are enabled), and put the shared
+  work on the task list with TaskCreate so teammates can claim it.
+- Pick a fitting subagent type per teammate (Explore for read-only sweeps,
+  security-reviewer, general-purpose for edits) and name the model in the
+  spawn prompt when a cheaper one does the job.
+- Parallel edits in one repository: each teammate owns its own files. When
+  ownership cannot be split, use an unnamed Agent call with
+  `isolation: "worktree"` instead, which runs as a subagent in its own
+  worktree.
+- An unnamed Agent call or a fork stays an ordinary subagent. Use that for a
+  single focused lookup whose result is all that matters.
+- Teammates cannot spawn teammates and their own subagents run in the
+  foreground. `/resume` does not bring in-process teammates back: after a
+  resume, spawn a new team.
+- The lead waits for the idle notifications instead of implementing the
+  delegated parts itself, and asks each teammate to shut down once its work
+  is verified.
+
 ## Long-running and recurring work
 
 - Monitor watches a process or file and reports each line. Use it for test
@@ -37,9 +59,9 @@
 
 ## Resource lifetime
 
-- Use ordinary subagents for delegated tasks. Persistent agent teams require
-  an explicit need for continued inter-agent coordination. Defaults disable
-  experimental teams and use in-process teammates when a team is enabled.
+- Agent teams are enabled (CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS=1) with
+  in-process teammates (teammateMode in-process), so teammates live inside
+  the lead's process and stay under the resource guard.
 - Release a teammate when its assigned work is complete. The TeammateIdle hook
   requests termination. Verify completion and process exit before treating
   that as successful cleanup. Spawn a fresh worker for later independent work.
