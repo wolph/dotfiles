@@ -34,3 +34,31 @@
   the remote default branch.
   Why: these tools exist in Claude Code 2.1.312 and were unused because
   nothing named them.
+
+## Resource lifetime
+
+- Use ordinary subagents for delegated tasks. Persistent agent teams require
+  an explicit need for continued inter-agent coordination. Defaults disable
+  experimental teams and use in-process teammates when a team is enabled.
+- Release a teammate when its assigned work is complete. The TeammateIdle hook
+  requests termination. Verify completion and process exit before treating
+  that as successful cleanup. Spawn a fresh worker for later independent work.
+- The independent Claude guard supervises each session including its helpers
+  at 8 GiB, after two consecutive healthy over-limit samples. Only the user's
+  explicit permission allows a session override in
+  ~/.config/agent-resource-guard/config.json. This is sampled supervision,
+  not a kernel allocation limit. Do not raise a limit to keep your work running.
+- Audit RAM disks belong to the whole run, not an individual sandbox command.
+  Register the real long-lived coordinator PID at run creation using
+  python3 ~/workspace/ai/scripts/resource_guard/audit_guard.py --register-run
+  <run-directory> --owner-pid <coordinator-pid>. Verify registration succeeds.
+  A one-shot tool shell's PID is not the coordinator PID.
+- Stop owned workers and preserve their evidence before finalising an audit.
+  Run python3 ~/workspace/ai/scripts/resource_guard/finalize_audit.py --run
+  <run-directory> --apply under a 110-second outer timeout. The finaliser
+  verifies archiving and resource retirement before setting run_status complete.
+  Missing result.json is not grounds for leaving a cancelled agent's RAM disk
+  indefinitely. Preserve data and report a blocked cleanup for a busy resource.
+- Keep the independent launchd Claude and audit guards enabled. They recover
+  missed lifecycle hooks and interrupted finalisation. Do not delete team
+  configuration or send broad process-name kills to simulate cleanup.

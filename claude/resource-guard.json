@@ -1,0 +1,8 @@
+{
+  "idle_grace_seconds": 900,
+  "memory_limit_gib": 8,
+  "memory_samples": 2,
+  "term_grace_seconds": 5,
+  "stop_idle_teammates": true,
+  "session_overrides": {}
+}

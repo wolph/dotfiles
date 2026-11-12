@@ -97,6 +97,13 @@ Condensed from the Mastering Python LLM style guide. The full version lives at
 ~/workspace/mastering-python-3/docs/editorial/2026-07-25-llm-style-guide-rick-van-hattem-mastering-python.md
 and wins whenever that repo is the working context.
 
+The author's own paragraphs teach the voice better than any rule here. When
+samples of their writing are at hand (for the book, the twenty paragraphs at
+the top of the full guide), write so that the text could sit among them
+unnoticed, taking their manner and never their sentences. The rules below are
+for what the samples cannot show. Never aim for a sentence length, a rate, or
+a quota of anything.
+
 This is the author's own voice, so it applies to every piece of prose written
 on their behalf, in every tool: emails and chat messages drafted for them, pull
 request titles and descriptions, issue and review comments, commit messages,
@@ -135,7 +142,7 @@ punctuation and spelling rules below.
 - Give the problem before the solution. Name the operational situation that demands the feature.
 - Run the example loop: one setup sentence ending in a colon, the code, then a read-back that translates each visible detail of the output into its cause and consequence. Code that is not read back is decoration.
 - For contested style, run the comparison loop: show the clumsy version first, improve it in graded rungs, grade every rung out loud, and let the final form feel earned.
-- Close a section with a first-person verdict and the reason welded on. Close a document with one takeaway and a handoff that sells the next topic in reader-benefit terms.
+- Close a section on its last fact and its reason, or on the author's own verdict where they have written one. Where a verdict or a habit is wanted and they have not written it, write the facts in a neutral sentence and report the open slot. Close a document with one takeaway and a handoff that sells the next topic in reader-benefit terms.
 - A section ends on its last fact or its verdict, never on a sentence announcing the next section. Only the document opening bridges. A forward pointer inside a document goes in a box.
 - When revising, delete solved problems whole instead of trimming them, and own a reversed verdict in one sentence.
 
@@ -144,16 +151,18 @@ punctuation and spelling rules below.
 - Plan NOTE and TIP boxes with the outline, next to the code they protect. They are load-bearing, not decoration.
 - The body carries the argument. A box carries what is true but off the spine: platform caveats, version boundaries with a fallback for the older side, steps outside the page, definitions at first use, cross-references, dated ecosystem facts, honest disclosure of trimmed or staged output, and skip permissions.
 - Notes explain and warn (something to know). Tips hand over a shortcut or safer default (something to run).
-- A box is one to four sentences, flat register, placed directly against the code it protects. Neither body nor box may refer to the other.
+- A box is usually one to four sentences, flat register, placed directly against the code it protects, and two boxes never touch. A box may run longer when it carries one complete setup task. Neither body nor box may refer to the other.
+- A difference between two versions that the reader can run into is a box with the fallback for the older side. A feature that was merely introduced in some release flows into the body sentence.
 - If the caution is the lesson of the section, it gets a heading and body prose, not a box.
 - Author boxes as GitHub alerts: a blockquote opening with [!NOTE] or [!TIP]. No other flavors, no nesting.
 
-### Humor
+### Humour
 
-- Dry, embedded in the explanation, aimed at tools, ecosystems, or yourself. Never at the reader.
-- The recipes: understatement one size smaller than the event, spam-and-eggs prop data never announced, one violent verb for a mundane failure inside a calm sentence, deflating grand jargon by reading the name literally, naming the party responsible for an ecosystem hurt, ranking your own demo honestly the moment it ends, one short burst of delight converted into the lesson, and confessing the trap has bitten you right before teaching the fix.
+- The humour is the author's. Add no joke, flourish, or figure of speech to prose written on their behalf, and keep every one they wrote. A candidate goes to the author in its paragraph, beside the plain version, and the plain version goes into the draft.
+- Their lines are dry, embedded in the explanation, aimed at tools, ecosystems, or themselves. Never at the reader.
+- The forms to recognise and preserve: understatement one size smaller than the event, spam-and-eggs prop data never announced, one violent verb for a mundane failure inside a calm sentence, deflating grand jargon by reading the name literally, naming the party responsible for an ecosystem hurt, ranking your own demo honestly the moment it ends, one short burst of delight converted into the lesson, and confessing the trap has bitten you right before teaching the fix.
 - Placement: the verdict sentence after output, trailing clauses, code comments and example data, and the summary. Openers stay straight. Boxes stay straight.
-- Keep a line only if it makes the consequence memorable, relieves genuine density, exposes a relevant ecosystem absurdity, owns the example's limits, or shows measured delight. Otherwise delete it.
+- A candidate is worth offering only if it makes the consequence memorable, relieves genuine density, exposes a relevant ecosystem absurdity, owns the example's limits, or shows measured delight.
 - Never joke inside a safety instruction. At most one polished line per subsection. Many pages carry no joke, and that absence is faithful.
 
 ### Vocabulary and recommendations
@@ -161,11 +170,13 @@ punctuation and spelling rules below.
 - Working adjectives: useful, convenient, simple, easy, nice, ugly, clunky. Softeners: a tad, a bit, slightly. Make the generic word specific nearby: faster, safer, easier to debug, less error-prone, more readable.
 - Recommendations are habit reports, not feature matrices: what you use, in which situation, and what you switched from. When two tools split the territory, fork by use case, one sentence per branch, and end with a permission slip when both are fine.
 - Hedges have jobs: "at the time of writing" plus a date for advice that will rot, "in my experience" for testimony, a parenthetical "(in my opinion, at least)" to quarantine taste, "if at all possible" for strong defaults. One hedge per claim.
+- The author's conversational hedges stay as written: "oftentimes", "naturally", "of course", "just in case". Never dry them into "often" or "useful", and never hand them out from a list. A consequence that depends on circumstances takes "could", "may", or "can", and what always happens stays in the indicative.
+- The plain verb for a mechanism (cause, raise, return, close, stop, keep), and the thing named: the value, the identifier, the full name of the tool.
 - Reserve loaded words for the worst offender in a topic, once, aimed at a named party. Reserve absolute prohibitions for interpreter-crashing danger.
 
 ### Honesty
 
-- Own imperfect demos. Disclose trimming, staging, cherry-picking, and luck in first person at the moment they would mislead.
+- Own imperfect demos. Disclose trimming, staging, cherry-picking, and luck at the moment they would mislead. A first-person disclosure is the author's to write.
 - When the page cannot show a feature, say so and send the reader to their own machine. Never fake a demonstration.
 - Shrink benchmark verdicts to the version and test that produced them. A fast wrong answer is worthless, and say so.
 - Transcripts are recordings. When a version, marker, or timing goes stale, re-run the whole series on current releases and paste the new output. Never patch a number by hand. Disclose a cold cache or an outlier in one clause.
@@ -173,88 +184,31 @@ punctuation and spelling rules below.
 
 ### Rhythm
 
-- One sentence, one job. Split mechanism, caveat, and consequence into separate sentences.
-- Follow a dense causal sentence with a short clarification or a verdict, which may be a fragment.
+- One explanation, one sentence. A reason and its consequence share a sentence, joined by "because", "so", "which", or "instead of". Split a sentence that teaches two things, never to reach a length, and never drop a caveat in either shape.
+- Connect the sentences of a paragraph into one explanation. A list of separate true sentences reads as a second writer.
+- A short ruling follows a dense sentence only when there is a ruling to give. A polished fragment after the point is made is a tell.
 - Keep the trailing "however" for earned shrugs and let sentence structure carry the other contrasts.
 - Move cross-references to paragraph endings. Parentheses hold compact asides and quarantined hedges only, and stay out of the strongest clause.
 - A sentence containing a "however", a parenthesis, a cross-reference, and a consequence clause is too heavy. Cut it in two.
 
 ### Tells of a second writer
 
-Drafted prose drifts from an author in patterns, not sentences. Count each pattern with grep in the draft and in the author's own text before rewriting. A device the reference never uses is yours to remove. A device the reference uses at all is the author's and stays until they answer.
-
-- Reveal hinge: a fact withheld and released after ", yet".
-- Closing aphorism: a polished fragment ending a section after the point is made, or a full sentence that restates the sentence before it in a figure ("That is not composition doing you a favour."). A fragment stays only when it carries the mechanism. Read each closer against the sentence before it, and count figurative nouns in closers.
-- Thesis callback: "from the start of this chapter", "at module scale". A callback to a concrete earlier example stays. A callback to the theme goes.
-- Narrator bookkeeping: "I still owe you", "as promised", "that I have kept quiet about".
-- Section bridge: a section that ends by announcing the next one.
-- Guide vocabulary on the page: habit report, verdict, earns its keep, read back, load-bearing, spine. These words are for the editor, never for the reader.
-- Coined metaphor system: label, rung, ladder where the author says "points to". The author's plain phrase wins.
-- Reference-manual register: attribute inventories that no transcript on the page shows. Cut to a one-sentence pointer only when the reference never showed it either. When the reference has the transcript, restore the demonstration in the chapter's own example.
-- Thesis-first opener: a section that opens on the theme instead of the reader's situation.
-- Trailer copy: "the stakes go up", "watch X", "while you watch", "see who wins".
-- Self-interview and question lists: a question answered in a fragment, or an opener listing the questions the section will answer. Voicing the reader's question and answering it in full sentences is the author's move and stays. Count question marks in both texts: a draft with none against a reference with several has lost the move, and the reference's question on the same topic comes back.
-- Frame phrases and unbounded superlatives: "the honest way to think about", "let me be precise", "three weeks from now", "better than anything else in the language".
-- Contraction drought: the reference contracts and the draft does not. Count both. The settled rule: contract the negatives (don't, doesn't, can't), leave "it is", "that is", and "you are" as the reference leaves them. A non-negative contraction approved before this rule reverts on the next pass.
-- Commentary about the page itself, including its own test suite, and bug tracker numbers in prose.
-- Policy register: consumers, installers, resolvers, operators as subjects, "must" and "should" as verbs, almost no "you". Count agentless nouns, "must", and "you" per hundred lines in both texts. When "you" is under a fifth of the reference, the register is the finding and every paragraph is rewritten from the reader's side with the same facts.
-- Antithesis pair: "X rather than Y", "X, not Y". Each becomes one plain statement.
-- Coined abstraction family: boundary, claim, evidence, prove, promise standing where the plain noun would. Once one member appears, count the family, headings included, and keep a word only where it names a real thing.
-- Transcripts that are not what the tool prints (a bare list where the tool prints a table, a hand-sorted listing, an elided version, a percentage rounded by hand, a transcript inherited from the previous edition that the current code cannot produce) and pins one release series behind the current one. Rebuild the example from the page's own code blocks, diff every transcript with the inherited ones first, re-pin before recording, record at the book's width with COLUMNS=66 instead of narrowing by hand, and change the command rather than the output when the real output does not fit the page.
-- A tool used before the section that introduces what it runs under (Hypothesis under pytest before pytest). Move the section.
-- Example drift: the same function defined differently across a chapter's blocks where the difference is not the lesson. Diff the bodies.
-- A rewritten confession: an "I" sentence with an ancestor in the reference whose reasons were replaced. Put both on the page and let the author choose.
-- Topics covered twice, and paragraphs another chapter already carries. One home per topic, and a one-sentence pointer at the chapter that owns the paragraph.
-- Definition-first opener: a section whose first sentence defines the heading's term ("A composition root is the one place that..."), the vocabulary-chapter form of the thesis-first opener. The reader's situation goes first and the definition second. Count openers that start with the heading's noun against the number of sections.
-- Described output with no transcript: prose that says what a command prints, raises, or returns while no fenced block on the page shows it. Rebuild from the page's own code blocks, record it, and read it back. Count "prints", "raises", "returns", and "fails" in prose against the fenced blocks.
-- Cross-references: the full chapter title in italics on the first mention (Chapter 9, *Testing for Confidence*), the bare number afterwards, and at most one pointer per target chapter per section. Check titles against the project's titles table, and grep the target branch for the word it uses for the concept before pointing at it.
-- Adverbs the reference never uses: genuinely, quietly, deliberately. Count each in both texts. One inside an "I" sentence is the author's.
-- A demonstrative in the first sentence after a box ("is that documented surface"), and a term used before its definition.
-- Internet catchphrases that read as plain English: "with extra steps", "a scavenger hunt".
-- Time-cost motif: "hours", "3 a.m.", "several hours later" as the price of every mistake. Count in both texts, keep the one the reference has.
-- A sentence between a setup colon and its code, usually a version note. It is a box, a deletion, or the setup sentence itself, never a third thing.
-- Two rules for one concept in one chapter's code, such as a registry that accepts "upper-case" and a metaclass that demands an identifier. Grep the blocks for the same policy before reading the prose.
-- A rewritten read-back is a claim to run. Improving the voice of a wrong sentence keeps it wrong.
-- A mechanism retired for a decade is deleted whole, not owned as a reversal. Own a reversal only while the old way is in living memory.
-- Output fences in a form the harness does not lex verify nothing. Count fences by form, and give a noexec block a text fence with a sentence saying where the run came from.
-- Test-pinned prose: read the chapter's test file before a pass, keep pinned sentences verbatim inside any rewrite, and change a pinned heading with its test in one commit.
-- Summary habit fork: quote the body's "I" sentences verbatim. Never paraphrase one into the summary. Joining two of the author's own clauses, even from different sections, is allowed when the page names both source lines and the author approves the join.
-- Thesis word: a plain adjective worn into a system by repetition (a section title, the opening, five verdicts, the summary). Count any adjective in a heading that recurs in more than three verdicts, in both texts. Show the author every place with what each option produces. They decide which places keep it.
-- Undefined acronym at first use where the reference defined it with a link (LBYL, EAFP). Restore the reference definition instead of writing a box.
-- Edition commentary: "the earlier edition", "the original lesson", a box naming editions. A read-back that refers to a lesson the page never sets up is a missing restoration, not a deletion.
-- A technical adjective in two senses inside one section ("undecorated" for the decorated fallback and for the handler that register() returns). Check that each repeated technical word means the same thing both times.
-- A deprecated construct inside the supported range (typing.TypeAlias in a block that runs green on 3.10 through 3.15). A green test does not catch a deprecation, so check every typing import and standard-library name against the docs' deprecation notes and the owning chapter's advice.
-- A preservation ledger line is a claim about the text ("The readability verdict remains under ## Summary"). Verify every [adapted] and [retained] line the way a cross-reference is verified.
-- Verification can end in a box: run an undemonstrated claim, and the obvious misuse of the object it describes, on every supported version. A behaviour that changed at a version boundary is a version box, not a cut.
-- A section that only defines a term and has no fenced block is a definition box at first use, not a section.
-- Back-pointer: two chapters each saying the other owns a topic, so nobody covers it. Grep the target branch for this chapter's number and the previous chapter for promises made to this one before trusting or dropping a pointer.
-- Verification that ends in a box: an undemonstrated version claim that, once run on every supported version, differs across them becomes a version caveat with a fallback, not a cut.
-- Figures as transcripts: a figure inherited from the previous edition beside retyped code, and a read-back that quotes identifiers the figure no longer shows. Read the identifiers in each image against the block above it and the prose around it, rebuild the page from the chapter's own blocks on the pinned tool, and re-key the pixel manifest.
-- Options counted by the prose: "three more options" above a block that adds four. Count the options in the block and in the sentence, and read back the one the sentence skipped.
-- Luck in a read-back: "in this run", "this time", "happened to" over deterministic behaviour. Check the behaviour before keeping the hedge.
-- The fork stated twice: an imperative use-case fork repeated where the reference had one first-person verdict. Restore the verdict. When a later sentence undercuts the verdict's reason clause, the verdict becomes a use-case fork in the author's voice from the author's own answer, with the mix-and-match case, and a tool named in it is built against the chapter's own package first and dated when its last release is old.
-- Reader routing in the body: "skip this ..." outside a box, and a demonstrative with no referent ("this gallery"). Permission to skip is a box placed before the section it skips, naming that section.
-- Appendix commentary: "portable", "centre of gravity", "next to this chapter" in a companion file's first sentences or in the pointers at it. A companion file is a named appendix in print that opens on what it is.
-- Figure gaps and one-line sections: figure numbers run without gaps within a chapter, appendix included, with files renamed and the manifest re-keyed in one commit, and a section of one sentence and a figure folds into the one before it, with ledger anchors re-pointed and the contract digest recomputed by the test's own algorithm.
-- A humour line the author asks for: ground every candidate in the changelog or source of the author's own packages, show them beside the section, and place only what the author picks, verbatim. A candidate that names a bug still live in the author's package gets the bug fixed on a pushed branch in the same session, with a test that pins the observable the sentence claims.
-- A flourish approved from a label is not approved: six deadpan lines kept when offered as labels in a question all went plain once the author read one in its paragraph. Show a flourish on the page in its paragraph with the plain version beside it, never as a label in a question.
-- An imperative pair that is a recommendation ("Use X for... Use Y once..."): offer the reader's situation and a first-person habit report built from the draft's own facts, and let the author pick. The agent never writes the "I" sentence on its own, but it may offer one.
-- Dry-run every numbered page through the chapter's test file before publishing it. Gate self-tests mutate pinned sentences with replace_once, so a rewritten pin fails before the page goes out, and the pin moves with its prose in the same commit.
-- A fact the agent adds to carry a sentence ("what asyncio was originally built on") is named as an addition in the item's reason and asked about, never slipped in with the rewrite.
-- Shared-build voice: count "we" per thousand prose words separately from "you". The form that is not new content is the setup sentence before a block we define together, in "let's" and "we will". A read-back that narrates the build is new content and the author's call.
+The catalogue of patterns that mark drafted prose as a second writer lives in
+~/workspace/dotfiles/agents/on-demand.md. Read it before any prose pass over a
+draft. For Claude the restoring-author-voice skill carries the same list.
 
 ### Avoid in prose
 
 - Marketing language: seamless, powerful, game-changing, effortless. Benefits without failure modes.
 - Universal claims without a named boundary, unexplained imperatives, fake neutrality.
-- Formula signposting: "in this section", "as you can see", "it should be noted". Trust the heading and start with the problem.
+- Formula signposting on repeat: "in this section", "it should be noted". Trust the heading and start with the problem. "As you can see" and "Note that" are the author's own forms: keep the ones they wrote, and judge a new one by whether it points at a specific result.
 - Stacked concession markers, previews and recaps, sentences that teach two mechanisms.
 - Jokes in consecutive paragraphs, memes, internet slang, explained punchlines.
 
 ### Before finishing prose
 
-- Verify the chain: problem, mechanism, example, read-back, caveat in place, owned recommendation, handoff.
-- Verify the boxes: planned, typed by the note-versus-tip rule, one breath long, placed against their code.
+- Verify the chain: problem, mechanism, example, read-back, every caveat in place, the reason for each recommendation, the open slots for the author's own sentences reported, handoff.
+- Verify the boxes: planned, typed by the note-versus-tip rule, one breath long, placed against their code, no two touching.
 - Replace vague "this" and generic praise with the actual object and the specific benefit.
 - Sweep for the tells of a second writer, count contractions against the reference, and read the first and last sentence of every section.
 - Check that every "I" sentence is the author's, every path is on the fictional machine, and every cross-reference uses the current title.
@@ -276,16 +230,9 @@ Drafted prose drifts from an author in patterns, not sentences. Count each patte
 
 ## Releases
 
-- A release has five parts: version bump + changelog entry, pushed git tag, package registry publish (PyPI etc.), a GitHub release, and the stable branch (master) fast-forwarded to the tag. Verify all five — compare `git tag --sort=-creatordate` against `gh release list`, and check `git rev-list --count origin/master..vX.Y.Z` prints 0.
-  Why: CI publish workflows typically cover only the registry (e.g. Trusted Publishing to PyPI); the GitHub release and the master sync are manual unless explicitly automated, and manual steps get silently skipped (portalocker: 4.1.0 shipped without a GitHub release, 4.2.0 without the master fast-forward).
-- Create missing GitHub releases from the already-pushed tag: extract that version's changelog section to a file, then `gh release create vX.Y.Z --title vX.Y.Z --notes-file <file> --verify-tag`. Match the body format of the repo's previous releases.
-  Why: `--verify-tag` fails instead of minting a new tag from the wrong ref; sourcing the body from the changelog keeps release notes single-sourced and consistent.
-- Sync a stale master with `git push origin vX.Y.Z^{commit}:master`.
-  Why: a plain push refuses non-fast-forward updates, so a diverged master fails loudly instead of being overwritten.
-- Automating the master sync in CI requires a fine-grained PAT (Contents + Workflows write) or a write deploy key, passed to actions/checkout as `token:`/`ssh-key:`.
-  Why: GITHUB_TOKEN is forbidden from pushing commits that touch .github/workflows/, and release diffs regularly include workflow changes.
-- Afterwards confirm with `gh release list` that the release exists and is marked Latest.
-  Why: verification rule — no completion claims without checked output.
+The five-part release checklist and its verification commands live in
+~/workspace/dotfiles/agents/on-demand.md. Read it before cutting or verifying
+a release. For Claude the release-python-package skill covers the same steps.
 
 ## Background Agents
 
