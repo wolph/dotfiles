@@ -3,16 +3,22 @@
 - Multi-step work gets a task per step with TaskCreate before the first edit.
   Dependencies go in with addBlockedBy. Status moves to in_progress before a
   step starts and to completed only after verification.
-  Why: the list is shared per repository (CLAUDE_CODE_TASK_LIST_ID is set by
-  the claude shell function, launches from herdr, ccmux or an IDE get a
-  per-session list), so the next session in this repo starts from it, and
-  Ctrl+T shows it to the user while work runs.
+  Why: Ctrl+T shows the list to the user while work runs.
+- Each session has its own task list (session-<first 8 of the session id>),
+  which /resume keeps and an agent team shares with its lead. The claude
+  shell function drops CLAUDE_CODE_TASK_LIST_ID. Never set it to share a
+  list between sessions.
+  Why: a list shared per repository was used by every concurrent session in
+  that repository and kept old sessions' tasks, so new sessions started on
+  unrelated work (removed 2026-11-13).
 - A task is completed only when its description carries a line
   `Verified: <check> -> <result>` or `Unverified: <reason>`. A TaskCompleted
   hook rejects anything else. Write the line with TaskUpdate first.
   Why: the verification rule above was prose. The hook makes it a gate.
-- At session start in a repo with open tasks, run /open before anything else
-  and continue from the in_progress task unless the user says otherwise.
+- Work left unfinished at the end of a session goes into the remember notes,
+  not into a task list for a later session. A new session starts from the
+  user's request. /open reports git, GitHub and the remember notes when the
+  user asks where they were.
 
 ## Background Agents (Claude Code)
 

@@ -3,8 +3,8 @@
 # of task counts for this session's task list when that list holds tasks.
 #
 # Input: Claude Code's status line JSON on stdin. The task list directory is
-# ~/.claude/tasks/$CLAUDE_CODE_TASK_LIST_ID (set by the claude() function in
-# _zshrc) or ~/.claude/tasks/session-<first 8 of session_id> without it.
+# ~/.claude/tasks/session-<first 8 of session_id>, or
+# ~/.claude/tasks/$CLAUDE_CODE_TASK_LIST_ID when something exported it.
 #
 # Overrides, for tests: CLAUDE_STATUSLINE_UPSTREAM (the upstream command,
 # run with bash -c and the JSON on its stdin) and CLAUDE_TASKS_DIR.
