@@ -103,6 +103,8 @@ ln -sf "$PWD/claude/hooks/block-secrets.sh" "$HOME/.claude/hooks/block-secrets.s
 # herdr reads a plain TOML file and leaves comments alone, so it is linked.
 mkdir -p "$HOME/.config/herdr"
 ln -sfn "$PWD/herdr/config.toml" "$HOME/.config/herdr/config.toml"
+mkdir -p "$HOME/.config/herdr-automatic-rename"
+link "$PWD/herdr/automatic-rename-config.sh" "$HOME/.config/herdr-automatic-rename/config.sh"
 # Claude Code skills, commands and hooks that the shared settings.json points
 # at live in the (private) ai repo next to this one.
 if [ ! -d "$HOME/workspace/ai" ]; then
